@@ -364,6 +364,8 @@ void define_ruby_class()
   rb_define_method(rb_klass, "pyr_mean_shift_filtering", RUBY_METHOD_FUNC(rb_pyr_mean_shift_filtering), -1);
   rb_define_method(rb_klass, "watershed", RUBY_METHOD_FUNC(rb_watershed), 1);
 
+  rb_define_method(rb_klass, "grab_cut", RUBY_METHOD_FUNC(rb_grab_cut), 7);
+
   rb_define_method(rb_klass, "moments", RUBY_METHOD_FUNC(rb_moments), -1);
 
   rb_define_method(rb_klass, "hough_lines", RUBY_METHOD_FUNC(rb_hough_lines), -1);
@@ -4409,6 +4411,25 @@ rb_watershed(VALUE self, VALUE markers)
 {
   cvWatershed(CVARR(self), CVARR(markers));
   return markers;
+}
+
+/*
+ * call-seq:
+ *   grabcut -> cvmat(mask:cv32s)
+ *
+ * Does grab cut segmentation.
+ */
+VALUE
+rb_grab_cut(VALUE self, VALUE mask, VALUE rect, VALUE bgdModel, VALUE fgdModel, VALUE iterCount, VALUE mode)
+{
+  if (!(rb_obj_is_kind_of(mask, cCvMat::rb_class())) || cvGetElemType(CVARR(mask)) != CV_8UC1)
+    rb_raise(rb_eTypeError, "argument 1 (mask) should be mask image.");
+
+  const int INVALID_TYPE = -1;
+  int mode = CVMETHOD("GRAB_CUT_MODE", inpaint_method, INVALID_TYPE);
+
+  grabCut(CVARR(self), CVARR(mask), VALUE_TO_CVRECT(rect), CVARR(bgdModel), CVARR(fgdModel), NUM2INT(iterCount), mode);
+  return mask;
 }
 
 /*

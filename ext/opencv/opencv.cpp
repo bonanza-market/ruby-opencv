@@ -387,6 +387,11 @@ define_ruby_module()
   rb_define_const(rb_module, "CV_HOUGH_MULTI_SCALE", INT2FIX(CV_HOUGH_MULTI_SCALE));
   rb_define_const(rb_module, "CV_HOUGH_GRADIENT", INT2FIX(CV_HOUGH_GRADIENT));
 
+  /* Grab cut mode */
+  rb_define_const(rb_module, "GC_INIT_WITH_RECT", INT2FIX(GC_INIT_WITH_RECT));
+  rb_define_const(rb_module, "GC_INIT_WITH_MASK", INT2FIX(GC_INIT_WITH_MASK));
+  rb_define_const(rb_module, "GC_EVAL", INT2FIX(GC_EVAL));
+
   /* Inpaint method */
   rb_define_const(rb_module, "CV_INPAINT_NS", INT2FIX(CV_INPAINT_NS));
   rb_define_const(rb_module, "CV_INPAINT_TELEA", INT2FIX(CV_INPAINT_TELEA));
@@ -546,8 +551,15 @@ define_ruby_module()
   RESIST_CVMETHOD(hough_transform_method, "multi_scale", CV_HOUGH_MULTI_SCALE);
   RESIST_CVMETHOD(hough_transform_method, "gradient", CV_HOUGH_GRADIENT);
 
+  VALUE grab_cut_mode = rb_hash_new();
+  /* {:init_with_rect, :init_with_mask, :eval} : Grab Cut mode */
+  rb_define_const(rb_module, "GRAB_CUT_MODE", grab_cut_mode);
+  RESIST_CVMETHOD(grab_cut_mode, "init_with_rect", GC_INIT_WITH_RECT);
+  RESIST_CVMETHOD(grab_cut_mode, "init_with_mask", GC_INIT_WITH_MASK);
+  RESIST_CVMETHOD(grab_cut_mode, "eval", GC_EVAL);
+
   VALUE inpaint_method = rb_hash_new();
-  /* {:ns, :telea} : Inpaint method */
+  /* {:ns, :telea_mask} : Inpaint method */
   rb_define_const(rb_module, "INPAINT_METHOD", inpaint_method);
   RESIST_CVMETHOD(inpaint_method, "ns", CV_INPAINT_NS);
   RESIST_CVMETHOD(inpaint_method, "telea", CV_INPAINT_TELEA);
