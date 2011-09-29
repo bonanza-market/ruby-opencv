@@ -146,7 +146,7 @@ rb_detect_objects(int argc, VALUE *argv, VALUE self)
   }
 
   CvSeq *seq = cvHaarDetectObjects(CVMAT(image), CVHAARCLASSIFIERCASCADE(self), CVMEMSTORAGE(storage_val),
-                                   scale_factor, min_neighbors, flags, min_size, max_size);
+                                   scale_factor, min_neighbors, flags, min_size);
   VALUE result = cCvSeq::new_sequence(cCvSeq::rb_class(), seq, cCvAvgComp::rb_class(), storage_val);
   if (rb_block_given_p()) {
     for(int i = 0; i < seq->total; ++i)
