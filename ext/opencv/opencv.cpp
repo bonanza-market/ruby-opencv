@@ -239,6 +239,11 @@ define_ruby_module()
   rb_define_const(rb_module, "CV_HOUGH_MULTI_SCALE", INT2FIX(CV_HOUGH_MULTI_SCALE));
   rb_define_const(rb_module, "CV_HOUGH_GRADIENT", INT2FIX(CV_HOUGH_GRADIENT));
 
+  /* Grab cut mode */
+  rb_define_const(rb_module, "GC_INIT_WITH_RECT", INT2FIX(cv::GC_INIT_WITH_RECT));
+  rb_define_const(rb_module, "GC_INIT_WITH_MASK", INT2FIX(cv::GC_INIT_WITH_MASK));
+  rb_define_const(rb_module, "GC_EVAL", INT2FIX(cv::GC_EVAL));
+
   /* Inpaint method */
   rb_define_const(rb_module, "CV_INPAINT_NS", INT2FIX(CV_INPAINT_NS));
   rb_define_const(rb_module, "CV_INPAINT_TELEA", INT2FIX(CV_INPAINT_TELEA));
@@ -414,7 +419,7 @@ define_ruby_module()
   REGISTER_CVMETHOD(hough_transform_method, "gradient", CV_HOUGH_GRADIENT);
 
   VALUE inpaint_method = rb_hash_new();
-  /* {:ns, :telea} : Inpaint method */
+  /* {:ns, :telea_mask} : Inpaint method */
   rb_define_const(rb_module, "INPAINT_METHOD", inpaint_method);
   REGISTER_CVMETHOD(inpaint_method, "ns", CV_INPAINT_NS);
   REGISTER_CVMETHOD(inpaint_method, "telea", CV_INPAINT_TELEA);
