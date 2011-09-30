@@ -4740,13 +4740,16 @@ rb_watershed(VALUE self, VALUE markers)
 
 /*
  * call-seq:
- *   grabcut -> cvmat(mask:cv32s)
+ *   grab_cut -> cvmat(mask:cv8uc1)
  *
  * Does grab cut segmentation.
  */
 VALUE
 rb_grab_cut(VALUE self, VALUE mask, VALUE rect, VALUE bgdModel, VALUE fgdModel, VALUE iterCount, VALUE mode)
 {
+  if (!(rb_obj_is_kind_of(self, cCvMat::rb_class())) || cvGetElemType(CVARR(self)) != CV_8UC3)
+    rb_raise(rb_eTypeError, "image (self) should be 8-bit 3-channel image.");
+
   if (!(rb_obj_is_kind_of(mask, cCvMat::rb_class())) || cvGetElemType(CVARR(mask)) != CV_8UC1)
     rb_raise(rb_eTypeError, "argument 1 (mask) should be mask image.");
 
