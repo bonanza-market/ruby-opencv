@@ -4902,6 +4902,37 @@ rb_watershed(VALUE self, VALUE markers)
 
 /*
  * call-seq:
+ *   grab_cut -> cvmat(mask:cv8uc1)
+ *
+ * Does grab cut segmentation.
+ */
+VALUE
+rb_grab_cut(VALUE self, VALUE mask, VALUE rect, VALUE bgdModel, VALUE fgdModel, VALUE iterCount, VALUE mode)
+{
+  if (!(rb_obj_is_kind_of(self, cCvMat::rb_class())) || cvGetElemType(CVARR(self)) != CV_8UC3)
+    rb_raise(rb_eTypeError, "image (self) should be 8-bit 3-channel image.");
+
+  if (!(rb_obj_is_kind_of(mask, cCvMat::rb_class())) || cvGetElemType(CVARR(mask)) != CV_8UC1)
+    rb_raise(rb_eTypeError, "argument 1 (mask) should be mask image.");
+
+  const int INVALID_TYPE = -1;
+  int valid_mode = CVMETHOD("GRAB_CUT_MODE", mode, INVALID_TYPE);
+
+  try {
+    const cv::Mat selfMat(CVMAT(self));
+    cv::Mat maskMat(CVMAT(mask));
+    cv::Mat bgMat(CVMAT(fgdModel));
+    cv::Mat fgMat(CVMAT(fgdModel));
+
+    cv::grabCut(selfMat, maskMat, VALUE_TO_CVRECT(rect), bgMat, fgMat, NUM2INT(iterCount), valid_mode);
+  } catch (cv::Exception& e) {
+    raise_cverror(e);
+  }
+  return mask;
+}
+
+/*
+ * call-seq:
  *   moments -> array(include CvMoments)
  *
  * Calculates moments.

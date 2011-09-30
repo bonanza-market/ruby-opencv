@@ -300,6 +300,12 @@ init_ruby_module()
   rb_define_const(rb_module, "GC_INIT_WITH_MASK", INT2FIX(cv::GC_INIT_WITH_MASK));
   rb_define_const(rb_module, "GC_EVAL", INT2FIX(cv::GC_EVAL));
 
+  /* Grab cut marker */
+  rb_define_const(rb_module, "GC_BGD", INT2FIX(cv::GC_BGD));
+  rb_define_const(rb_module, "GC_FGD", INT2FIX(cv::GC_FGD));
+  rb_define_const(rb_module, "GC_PR_BGD", INT2FIX(cv::GC_PR_BGD));
+  rb_define_const(rb_module, "GC_PR_FGD", INT2FIX(cv::GC_PR_FGD));
+
   /* Inpaint method */
   rb_define_const(rb_module, "CV_INPAINT_NS", INT2FIX(CV_INPAINT_NS));
   rb_define_const(rb_module, "CV_INPAINT_TELEA", INT2FIX(CV_INPAINT_TELEA));
