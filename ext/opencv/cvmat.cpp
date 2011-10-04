@@ -4149,19 +4149,19 @@ rb_smooth_median(int argc, VALUE *argv, VALUE self)
 
 /*
  * call-seq:
- *   smooth_bilateral(<i>[p1 = 3][p2 = 3]</i>) -> cvmat
+ *   smooth_bilateral(<i>[p1 = 0][p3 = 3][p4 = 3]</i>) -> cvmat
  *
  * Smooths the image by bilateral filter.
- * Applying bilateral 3x3 filtering with color sigma=<i>p1</i> and space sigma=<i>p2</i>.
+ * Applying bilateral 3x3 filtering with color sigma=<i>p3</i> and space sigma=<i>p4</i>.
  */
 VALUE
 rb_smooth_bilateral(int argc, VALUE *argv, VALUE self)
 {
-  VALUE p1, p2, dest;
-  rb_scan_args(argc, argv, "02", &p1, &p2);
+  VALUE p1, p3, p4, dest;
+  rb_scan_args(argc, argv, "03", &p1, &p3, &p4);
   CvArr* self_ptr = CVARR(self);
   dest = new_mat_kind_object(cvGetSize(self_ptr), self);
-  cvSmooth(self_ptr, CVARR(dest), CV_BILATERAL, IF_INT(p1, 3), IF_INT(p2, 3));
+  cvSmooth(self_ptr, CVARR(dest), CV_BILATERAL, IF_INT(p1, 0), 0, IF_INT(p3, 3), IF_INT(p4, 3));
   return dest;
 }
 
@@ -4192,7 +4192,7 @@ rb_smooth(int argc, VALUE *argv, VALUE self)
     break;
   case CV_BILATERAL:
     smooth_func = rb_smooth_bilateral;
-    argc = (argc > 2) ? 2 : argc;
+    argc = (argc > 3) ? 3 : argc;
     break;
   default:
     smooth_func = rb_smooth_gaussian;
