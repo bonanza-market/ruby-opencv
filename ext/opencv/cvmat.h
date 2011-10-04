@@ -203,6 +203,8 @@ VALUE rb_pyr_segmentation(VALUE self, VALUE level, VALUE threshold1, VALUE thres
 VALUE rb_pyr_mean_shift_filtering(int argc, VALUE *argv, VALUE self);
 VALUE rb_watershed(VALUE self, VALUE markers);
 
+VALUE rb_grab_cut(VALUE self, VALUE mask, VALUE rect, VALUE bgdModel, VALUE fgdModel, VALUE iterCount, VALUE mode);
+
 VALUE rb_moments(int argc, VALUE *argv, VALUE self);
 
 VALUE rb_hough_lines(int argc, VALUE *argv, VALUE self);
