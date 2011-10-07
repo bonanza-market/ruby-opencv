@@ -4157,7 +4157,7 @@ VALUE
 rb_smooth_bilateral(int argc, VALUE *argv, VALUE self)
 {
   VALUE p1, p2, p3, p4, dest;
-  rb_scan_args(argc, argv, "02", &p1, &p2);
+  rb_scan_args(argc, argv, "04", &p1, &p2, &p3, &p4);
   CvArr* self_ptr = CVARR(self);
   dest = new_mat_kind_object(cvGetSize(self_ptr), self);
   cvSmooth(self_ptr, CVARR(dest), CV_BILATERAL, IF_INT(p1, 3), IF_INT(p2, 3), IF_INT(p3, 0), IF_INT(p4, 0));
