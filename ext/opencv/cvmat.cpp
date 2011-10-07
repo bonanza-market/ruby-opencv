@@ -4156,11 +4156,11 @@ rb_smooth_median(int argc, VALUE *argv, VALUE self)
 VALUE
 rb_smooth_bilateral(int argc, VALUE *argv, VALUE self)
 {
-  VALUE p1, p2, dest;
+  VALUE p1, p2, p3, p4, dest;
   rb_scan_args(argc, argv, "02", &p1, &p2);
   CvArr* self_ptr = CVARR(self);
   dest = new_mat_kind_object(cvGetSize(self_ptr), self);
-  cvSmooth(self_ptr, CVARR(dest), CV_BILATERAL, IF_INT(p1, 3), IF_INT(p2, 3));
+  cvSmooth(self_ptr, CVARR(dest), CV_BILATERAL, IF_INT(p1, 3), IF_INT(p2, 3), IF_INT(p3, 0), IF_INT(p4, 0));
   return dest;
 }
 
@@ -4191,7 +4191,7 @@ rb_smooth(int argc, VALUE *argv, VALUE self)
     break;
   case CV_BILATERAL:
     smooth_func = rb_smooth_bilateral;
-    argc = (argc > 2) ? 2 : argc;
+    argc = (argc > 4) ? 4 : argc;
     break;
   default:
     smooth_func = rb_smooth_gaussian;
