@@ -4921,7 +4921,7 @@ rb_grab_cut(VALUE self, VALUE mask, VALUE rect, VALUE bgdModel, VALUE fgdModel, 
   try {
     const cv::Mat selfMat(CVMAT(self));
     cv::Mat maskMat(CVMAT(mask));
-    cv::Mat bgMat(CVMAT(fgdModel));
+    cv::Mat bgMat(CVMAT(bgdModel));
     cv::Mat fgMat(CVMAT(fgdModel));
 
     cv::grabCut(selfMat, maskMat, VALUE_TO_CVRECT(rect), bgMat, fgMat, NUM2INT(iterCount), valid_mode);
