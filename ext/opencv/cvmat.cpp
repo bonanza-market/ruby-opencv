@@ -3424,7 +3424,9 @@ rb_sobel(int argc, VALUE *argv, VALUE self)
   }
 
   try {
-    cv::Sobel(self_ptr, CVARR(dest), CV_MAT_DEPTH(self_ptr->type), NUM2INT(xorder), NUM2INT(yorder), NUM2INT(ksize));
+    const cv::Mat selfMat(CVMAT(self)); // WBH convert openCv1-style cvMat to openCv2-style cv::Mat
+    cv::Mat destMat(CVMAT(dest));
+    cv::Sobel(selfMat, destMat, CV_MAT_DEPTH(self_ptr->type), NUM2INT(xorder), NUM2INT(yorder), NUM2INT(ksize));
   }
   catch (cv::Exception& e) {
     raise_cverror(e);
@@ -3461,7 +3463,9 @@ rb_scharr(int argc, VALUE *argv, VALUE self)
   }
 
   try {
-    cv::Scharr(self_ptr, CVARR(dest), CV_MAT_DEPTH(self_ptr->type), NUM2INT(xorder), NUM2INT(yorder), scale);
+    const cv::Mat selfMat(CVMAT(self)); // WBH convert openCv1-style cvMat to openCv2-style cv::Mat
+    cv::Mat destMat(CVMAT(dest));
+    cv::Scharr(selfMat, destMat, CV_MAT_DEPTH(self_ptr->type), NUM2INT(xorder), NUM2INT(yorder), scale);
   }
   catch (cv::Exception& e) {
     raise_cverror(e);
