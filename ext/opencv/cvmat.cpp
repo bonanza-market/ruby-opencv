@@ -3407,9 +3407,8 @@ rb_put_text_bang(int argc, VALUE* argv, VALUE self)
 VALUE
 rb_sobel(int argc, VALUE *argv, VALUE self)
 {
-  rb_raise(rb_eArgError, "source depth should be CV_8U or CV_32F.");
-  VALUE xorder, yorder, dest, ksize;
-  rb_scan_args(argc, argv, "3", &xorder, &yorder, &ksize);
+  VALUE xorder, yorder, dest, ksize, ddepth;
+  rb_scan_args(argc, argv, "4", &xorder, &yorder, &ksize, &ddepth);
   //  aperture_size = INT2FIX(3);
   CvMat* self_ptr = CVMAT(self);
   switch(CV_MAT_DEPTH(self_ptr->type)) {
@@ -3427,7 +3426,7 @@ rb_sobel(int argc, VALUE *argv, VALUE self)
   try {
     const cv::Mat selfMat(CVMAT(self)); // WBH convert openCv1-style cvMat to openCv2-style cv::Mat
     cv::Mat destMat(CVMAT(dest));
-    cv::Sobel(selfMat, destMat, CV_MAT_DEPTH(self_ptr->type), NUM2INT(xorder), NUM2INT(yorder), NUM2INT(ksize));
+    cv::Sobel(selfMat, destMat, ddepth, NUM2INT(xorder), NUM2INT(yorder), NUM2INT(ksize));
   }
   catch (cv::Exception& e) {
     raise_cverror(e);
