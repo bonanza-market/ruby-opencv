@@ -13,7 +13,7 @@ GRTAGS
 GSYMS
 GTAGS
 OpenCV-*
-ruby-*.*.*
+ruby-*
 ext/opencv/test.txt
 pkg/
 doc/
@@ -25,4 +25,4 @@ Gemfile.lock
 .RUBYLIBDIR.*
 .RUBYARCHDIR.*
 .bundle
-
+.idea
