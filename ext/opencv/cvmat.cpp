@@ -3407,6 +3407,7 @@ rb_put_text_bang(int argc, VALUE* argv, VALUE self)
 VALUE
 rb_sobel(int argc, VALUE *argv, VALUE self)
 {
+  rb_raise(rb_eArgError, "source depth should be CV_8U or CV_32F.");
   VALUE xorder, yorder, dest, ksize;
   rb_scan_args(argc, argv, "3", &xorder, &yorder, &ksize);
   //  aperture_size = INT2FIX(3);
