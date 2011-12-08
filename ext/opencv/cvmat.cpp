@@ -3413,7 +3413,7 @@ rb_sobel(int argc, VALUE *argv, VALUE self)
   CvMat* self_ptr = CVMAT(self);
   switch(CV_MAT_DEPTH(self_ptr->type)) {
   case CV_8U:
-    dest = new_mat_kind_object(cvGetSize(self_ptr), self, CV_16S, 1);
+    dest = new_mat_kind_object(cvGetSize(self_ptr), self, CV_8U, 1);
     break;
   case CV_32F:
     dest = new_mat_kind_object(cvGetSize(self_ptr), self, CV_32F, 1);
