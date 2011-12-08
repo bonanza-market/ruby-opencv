@@ -3407,8 +3407,8 @@ rb_put_text_bang(int argc, VALUE* argv, VALUE self)
 VALUE
 rb_sobel(int argc, VALUE *argv, VALUE self)
 {
-  VALUE xorder, yorder, dest, ksize, ddepth;
-  rb_scan_args(argc, argv, "4", &xorder, &yorder, &ksize, &ddepth);
+  VALUE xorder, yorder, dest, ksize;
+  rb_scan_args(argc, argv, "3", &xorder, &yorder, &ksize);
   //  aperture_size = INT2FIX(3);
   CvMat* self_ptr = CVMAT(self);
   switch(CV_MAT_DEPTH(self_ptr->type)) {
@@ -3426,7 +3426,7 @@ rb_sobel(int argc, VALUE *argv, VALUE self)
   try {
     const cv::Mat selfMat(CVMAT(self)); // WBH convert openCv1-style cvMat to openCv2-style cv::Mat
     cv::Mat destMat(CVMAT(dest));
-    cv::Sobel(selfMat, destMat, ddepth, NUM2INT(xorder), NUM2INT(yorder), NUM2INT(ksize));
+    cv::Sobel(selfMat, destMat, CV_MAT_DEPTH(self_ptr->type), NUM2INT(xorder), NUM2INT(yorder), NUM2INT(ksize));
   }
   catch (cv::Exception& e) {
     raise_cverror(e);
@@ -3452,7 +3452,7 @@ rb_scharr(int argc, VALUE *argv, VALUE self)
   CvMat* self_ptr = CVMAT(self);
   switch(CV_MAT_DEPTH(self_ptr->type)) {
   case CV_8U:
-    dest = new_mat_kind_object(cvGetSize(self_ptr), self, CV_16S, 1);
+    dest = new_mat_kind_object(cvGetSize(self_ptr), self, CV_8U, 1);
     break;
   case CV_32F:
     dest = new_mat_kind_object(cvGetSize(self_ptr), self, CV_32F, 1);
