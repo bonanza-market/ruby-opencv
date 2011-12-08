@@ -161,6 +161,7 @@ VALUE rb_put_text_bang(int argc, VALUE *argv, VALUE self);
 
 /* cv function */
 VALUE rb_sobel(int argc, VALUE *argv, VALUE self);
+VALUE rb_scharr(int argc, VALUE *argv, VALUE self);
 VALUE rb_laplace(int argc, VALUE *argv, VALUE self);
 VALUE rb_canny(int argc, VALUE *argv, VALUE self);
 VALUE rb_pre_corner_detect(int argc, VALUE *argv, VALUE self);

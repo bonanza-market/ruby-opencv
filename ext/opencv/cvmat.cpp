@@ -293,6 +293,7 @@ void define_ruby_class()
   rb_define_method(rb_klass, "dct", RUBY_METHOD_FUNC(rb_dct), -1);
 
   rb_define_method(rb_klass, "sobel", RUBY_METHOD_FUNC(rb_sobel), -1);
+  rb_define_method(rb_klass, "scharr", RUBY_METHOD_FUNC(rb_scharr), -1);
   rb_define_method(rb_klass, "laplace", RUBY_METHOD_FUNC(rb_laplace), -1);
   rb_define_method(rb_klass, "canny", RUBY_METHOD_FUNC(rb_canny), -1);
   rb_define_method(rb_klass, "pre_corner_detect", RUBY_METHOD_FUNC(rb_pre_corner_detect), -1);
@@ -3406,9 +3407,9 @@ rb_put_text_bang(int argc, VALUE* argv, VALUE self)
 VALUE
 rb_sobel(int argc, VALUE *argv, VALUE self)
 {
-  VALUE xorder, yorder, aperture_size, dest;
-  if (rb_scan_args(argc, argv, "21", &xorder, &yorder, &aperture_size) < 3)
-    aperture_size = INT2FIX(3);
+  VALUE xorder, yorder, dest, ksize;
+  rb_scan_args(argc, argv, "3", &xorder, &yorder, &ksize);
+  //  aperture_size = INT2FIX(3);
   CvMat* self_ptr = CVMAT(self);
   switch(CV_MAT_DEPTH(self_ptr->type)) {
   case CV_8U:
@@ -3423,7 +3424,44 @@ rb_sobel(int argc, VALUE *argv, VALUE self)
   }
 
   try {
-    cvSobel(self_ptr, CVARR(dest), NUM2INT(xorder), NUM2INT(yorder), NUM2INT(aperture_size));
+    cv::Sobel(self_ptr, CVARR(dest), CV_MAT_DEPTH(self_ptr->type), NUM2INT(xorder), NUM2INT(yorder), NUM2INT(ksize));
+  }
+  catch (cv::Exception& e) {
+    raise_cverror(e);
+  }
+  return dest;
+}
+
+/*
+ * call-seq:
+ *   sobel(<i>xorder,yorder[,aperture_size=3]</i>) -> cvmat
+ *
+ * Calculates first, second, third or mixed image derivatives using extended Sobel operator.
+ * <i>self</i> should be single-channel 8bit unsigned or 32bit floating-point.
+ *
+ * link:../images/CvMat_sobel.png
+ */
+VALUE
+rb_scharr(int argc, VALUE *argv, VALUE self)
+{
+  VALUE xorder, yorder, aperture_size, dest, scale;
+  rb_scan_args(argc, argv, "3", &xorder, &yorder, &scale);
+  //  aperture_size = INT2FIX(3);
+  CvMat* self_ptr = CVMAT(self);
+  switch(CV_MAT_DEPTH(self_ptr->type)) {
+  case CV_8U:
+    dest = new_mat_kind_object(cvGetSize(self_ptr), self, CV_16S, 1);
+    break;
+  case CV_32F:
+    dest = new_mat_kind_object(cvGetSize(self_ptr), self, CV_32F, 1);
+    break;
+  default:
+    rb_raise(rb_eArgError, "source depth should be CV_8U or CV_32F.");
+    break;
+  }
+
+  try {
+    cv::Scharr(self_ptr, CVARR(dest), CV_MAT_DEPTH(self_ptr->type), NUM2INT(xorder), NUM2INT(yorder), scale);
   }
   catch (cv::Exception& e) {
     raise_cverror(e);
