@@ -326,6 +326,7 @@ void define_ruby_class()
   rb_define_method(rb_klass, "filter2d", RUBY_METHOD_FUNC(rb_filter2d), -1);
   rb_define_method(rb_klass, "integral", RUBY_METHOD_FUNC(rb_integral), -1);
   rb_define_method(rb_klass, "threshold", RUBY_METHOD_FUNC(rb_threshold), -1);
+  rb_define_method(rb_klass, "adaptive_threshold", RUBY_METHOD_FUNC(rb_adaptive_threshold), -1);
 
   rb_define_method(rb_klass, "pyr_down", RUBY_METHOD_FUNC(rb_pyr_down), -1);
   rb_define_method(rb_klass, "pyr_up", RUBY_METHOD_FUNC(rb_pyr_up), -1);
@@ -4476,6 +4477,7 @@ rb_threshold_internal(int threshold_type, VALUE threshold, VALUE max_value, VALU
     return dest;
 }
 
+
 /*
  * call-seq:
  *   threshold(<i>threshold, max_value, threshold_type[,use_otsu = false]</i>)
@@ -4561,6 +4563,36 @@ rb_adaptive_threshold(int argc, VALUE *argv, VALUE self)
   }
   
   return dst;
+}
+
+/*
+ * call-seq:
+ *   threshold(<i>threshold, max_value, threshold_type[,use_otsu = false]</i>)
+ *
+ * Applies fixed-level threshold to array elements.
+ *
+ */
+VALUE
+rb_adaptive_threshold(int argc, VALUE *argv, VALUE self)
+{
+  VALUE dest, max_value, adaptive_method, threshold_type, block_size, constant;
+  rb_scan_args(argc, argv, "5", &max_value, &adaptive_method, &threshold_type, &block_size, &constant);
+
+  CvMat* self_ptr = CVMAT(self);
+  // Create our destination pixels
+  dest = new_mat_kind_object(cvGetSize(self_ptr), self, CV_MAT_DEPTH(self_ptr->type), 1);
+
+  try {
+    const cv::Mat selfMat(CVMAT(self)); // WBH convert openCv1-style cvMat to openCv2-style cv::Mat
+    cv::Mat destMat(CVMAT(dest));
+
+		cv::adaptiveThreshold(selfMat, destMat, max_value, adaptive_method, threshold_type, block_size, constant);
+  }
+  catch (cv::Exception& e) {
+    raise_cverror(e);
+  }
+
+  return dest;
 }
 
 /*
