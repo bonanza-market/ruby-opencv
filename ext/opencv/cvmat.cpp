@@ -4621,9 +4621,9 @@ rb_distance_transform(VALUE self, VALUE labels, VALUE distance_type, VALUE mask_
 
     if (labels != Qnil) {
       cv::Mat labelsMat(CVMAT(labels));
-      cv::distanceTransform(selfMat, destMat, labelsMat, CV_DIST_L2, CV_DIST_MASK_5);
+      cv::distanceTransform(selfMat, destMat, labelsMat, NUM2INT(distance_type), NUM2INT(mask_size));
     } else {
-      cv::distanceTransform(selfMat, destMat, CV_DIST_L2, CV_DIST_MASK_5);
+      cv::distanceTransform(selfMat, destMat, NUM2INT(distance_type), NUM2INT(mask_size);
     }
   }
   catch (cv::Exception& e) {
