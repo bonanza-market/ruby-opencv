@@ -3520,8 +3520,8 @@ rb_laplace(int argc, VALUE *argv, VALUE self)
 VALUE
 rb_laplace2(int argc, VALUE *argv, VALUE self)
 {
-  VALUE dest, delta, ksize, scale, xorder, yorder;
-  rb_scan_args(argc, argv, "23", &xorder, &yorder, &ksize, &scale, &delta);
+  VALUE dest, delta, ksize, scale;
+  rb_scan_args(argc, argv, "03", &ksize, &scale, &delta);
 
   CvMat* self_ptr = CVMAT(self);
   dest = new_mat_kind_object(cvGetSize(self_ptr), self, CV_MAT_DEPTH(self_ptr->type), 1);
