@@ -3466,7 +3466,7 @@ rb_scharr(int argc, VALUE *argv, VALUE self)
   try {
     const cv::Mat selfMat(CVMAT(self)); // WBH convert openCv1-style cvMat to openCv2-style cv::Mat
     cv::Mat destMat(CVMAT(dest));
-    cv::Scharr(selfMat, destMat, CV_MAT_DEPTH(self_ptr->type), NUM2INT(xorder), NUM2INT(yorder), scale);
+    cv::Laplacian(selfMat, destMat, CV_MAT_DEPTH(self_ptr->type), ksize, scale, delta);
   }
   catch (cv::Exception& e) {
     raise_cverror(e);
