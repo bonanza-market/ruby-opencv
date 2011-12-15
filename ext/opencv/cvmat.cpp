@@ -295,6 +295,7 @@ void define_ruby_class()
   rb_define_method(rb_klass, "sobel", RUBY_METHOD_FUNC(rb_sobel), -1);
   rb_define_method(rb_klass, "scharr", RUBY_METHOD_FUNC(rb_scharr), -1);
   rb_define_method(rb_klass, "laplace", RUBY_METHOD_FUNC(rb_laplace), -1);
+  rb_define_method(rb_klass, "rb_laplace2", RUBY_METHOD_FUNC(rb_laplace2), -1);
   rb_define_method(rb_klass, "canny", RUBY_METHOD_FUNC(rb_canny), -1);
   rb_define_method(rb_klass, "pre_corner_detect", RUBY_METHOD_FUNC(rb_pre_corner_detect), -1);
   rb_define_method(rb_klass, "corner_eigenvv", RUBY_METHOD_FUNC(rb_corner_eigenvv), -1);
@@ -3489,7 +3490,7 @@ rb_laplace(int argc, VALUE *argv, VALUE self)
   CvMat* self_ptr = CVMAT(self);
   switch(CV_MAT_DEPTH(self_ptr->type)) {
   case CV_8U:
-    dest = new_mat_kind_object(cvGetSize(self_ptr), self, CV_16S, 1);
+    dest = new_mat_kind_object(cvGetSize(self_ptr), self, CV_8U, 1);
     break;
   case CV_32F:
     dest = new_mat_kind_object(cvGetSize(self_ptr), self, CV_32F, 1);
@@ -3500,6 +3501,38 @@ rb_laplace(int argc, VALUE *argv, VALUE self)
 
   try {
     cvLaplace(self_ptr, CVARR(dest), NUM2INT(aperture_size));
+  }
+  catch (cv::Exception& e) {
+    raise_cverror(e);
+  }
+  return dest;
+}
+
+/*
+ * call-seq:
+ *   laplace2(<i>xorder,yorder,ksize=1,scale=1,delta=0</i>) -> cvmat
+ *
+ * Calculates first, second, third or mixed image derivatives using extended Sobel operator.
+ * <i>self</i> should be single-channel 8bit unsigned or 32bit floating-point.
+ *
+ * link:../images/CvMat_sobel.png
+ */
+VALUE
+rb_laplace2(int argc, VALUE *argv, VALUE self)
+{
+  VALUE dest, delta, ksize, scale, xorder, yorder;
+  rb_scan_args(argc, argv, "23", &xorder, &yorder, &ksize, &scale, &delta);
+
+  CvMat* self_ptr = CVMAT(self);
+  dest = new_mat_kind_object(cvGetSize(self_ptr), self, CV_MAT_DEPTH(self_ptr->type), 1);
+	if(NIL_P(ksize)) ksize = INT2FIX(1);
+	if(NIL_P(scale)) scale = 1.0;
+	if(NIL_P(delta)) delta = 0.0;
+
+  try {
+    const cv::Mat selfMat(CVMAT(self)); // WBH convert openCv1-style cvMat to openCv2-style cv::Mat
+    cv::Mat destMat(CVMAT(dest));
+    cv::Laplacian(selfMat, destMat, CV_MAT_DEPTH(self_ptr->type), ksize, scale, delta);
   }
   catch (cv::Exception& e) {
     raise_cverror(e);

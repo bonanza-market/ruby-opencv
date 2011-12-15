@@ -163,6 +163,7 @@ VALUE rb_put_text_bang(int argc, VALUE *argv, VALUE self);
 VALUE rb_sobel(int argc, VALUE *argv, VALUE self);
 VALUE rb_scharr(int argc, VALUE *argv, VALUE self);
 VALUE rb_laplace(int argc, VALUE *argv, VALUE self);
+VALUE rb_laplace2(int argc, VALUE *argv, VALUE self);
 VALUE rb_canny(int argc, VALUE *argv, VALUE self);
 VALUE rb_pre_corner_detect(int argc, VALUE *argv, VALUE self);
 VALUE rb_corner_eigenvv(int argc, VALUE *argv, VALUE self);
