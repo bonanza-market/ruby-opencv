@@ -4623,7 +4623,7 @@ rb_distance_transform(VALUE self, VALUE labels, VALUE distance_type, VALUE mask_
       cv::Mat labelsMat(CVMAT(labels));
       cv::distanceTransform(selfMat, destMat, labelsMat, NUM2INT(distance_type), NUM2INT(mask_size));
     } else {
-      cv::distanceTransform(selfMat, destMat, NUM2INT(distance_type), NUM2INT(mask_size);
+      cv::distanceTransform(selfMat, destMat, NUM2INT(distance_type), NUM2INT(mask_size));
     }
   }
   catch (cv::Exception& e) {
