@@ -3453,7 +3453,7 @@ rb_scharr(int argc, VALUE *argv, VALUE self)
   CvMat* self_ptr = CVMAT(self);
   switch(CV_MAT_DEPTH(self_ptr->type)) {
   case CV_8U:
-    dest = new_mat_kind_object(cvGetSize(self_ptr), self, CV_8U, 1);
+    dest = new_mat_kind_object(cvGetSize(self_ptr), self, CV_16S, 1);
     break;
   case CV_32F:
     dest = new_mat_kind_object(cvGetSize(self_ptr), self, CV_32F, 1);
@@ -3532,7 +3532,7 @@ rb_laplace2(int argc, VALUE *argv, VALUE self)
   try {
     const cv::Mat selfMat(CVMAT(self)); // WBH convert openCv1-style cvMat to openCv2-style cv::Mat
     cv::Mat destMat(CVMAT(dest));
-    cv::Laplacian(selfMat, destMat, CV_MAT_DEPTH(self_ptr->type), ksize, scale, delta);
+    cv::Scharr(selfMat, destMat, CV_MAT_DEPTH(self_ptr->type), NUM2INT(xorder), NUM2INT(yorder), scale);
   }
   catch (cv::Exception& e) {
     raise_cverror(e);
