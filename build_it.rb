@@ -20,7 +20,7 @@ mf = mf.gsub(/^RUBYLIBDIR\s*=\s*\$[^$]*/, "RUBYLIBDIR = #{dest_path}")
 
 File.open('Makefile', 'wb') {|f| f.print mf}
 ['', ' install'].each do |target|
-  cmd = "ruby extconf.rb && make #{target}"
+  cmd = "make #{target}"
 	puts "Running #{cmd}..."
   `#{cmd} 2>&1`
 end
