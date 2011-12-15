@@ -263,6 +263,15 @@ init_ruby_module()
   rb_define_const(rb_module, "CV_THRESH_OTSU", INT2FIX(CV_THRESH_OTSU));
   rb_define_const(rb_module, "CV_ADAPTIVE_THRESH_GAUSSIAN_C", INT2FIX(CV_ADAPTIVE_THRESH_GAUSSIAN_C));
   rb_define_const(rb_module, "CV_ADAPTIVE_THRESH_MEAN_C", INT2FIX(CV_ADAPTIVE_THRESH_MEAN_C));
+  
+  /* Distance transform distance types */
+  rb_define_const(rb_module, "CV_DIST_L1", INT2FIX(CV_DIST_L1));
+  rb_define_const(rb_module, "CV_DIST_L2", INT2FIX(CV_DIST_L2));
+  rb_define_const(rb_module, "CV_DIST_C", INT2FIX(CV_DIST_C));
+  
+  rb_define_const(rb_module, "CV_DIST_MASK_3", INT2FIX(CV_DIST_MASK_3));
+  rb_define_const(rb_module, "CV_DIST_MASK_5", INT2FIX(CV_DIST_MASK_5));
+  rb_define_const(rb_module, "CV_DIST_MASK_PRECISE", INT2FIX(CV_DIST_MASK_PRECISE));
 
   /* Adaptive methods */
   rb_define_const(rb_module, "CV_ADAPTIVE_THRESH_MEAN_C", INT2FIX(CV_ADAPTIVE_THRESH_MEAN_C));

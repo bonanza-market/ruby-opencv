@@ -327,6 +327,7 @@ void define_ruby_class()
   rb_define_method(rb_klass, "integral", RUBY_METHOD_FUNC(rb_integral), -1);
   rb_define_method(rb_klass, "threshold", RUBY_METHOD_FUNC(rb_threshold), -1);
   rb_define_method(rb_klass, "adaptive_threshold", RUBY_METHOD_FUNC(rb_adaptive_threshold), -1);
+  rb_define_method(rb_klass, "distance_transform", RUBY_METHOD_FUNC(rb_distance_transform), 3);
 
   rb_define_method(rb_klass, "pyr_down", RUBY_METHOD_FUNC(rb_pyr_down), -1);
   rb_define_method(rb_klass, "pyr_up", RUBY_METHOD_FUNC(rb_pyr_up), -1);
@@ -4587,6 +4588,48 @@ rb_adaptive_threshold(int argc, VALUE *argv, VALUE self)
     cv::Mat destMat(CVMAT(dest));
 
 		cv::adaptiveThreshold(selfMat, destMat, max_value, adaptive_method, threshold_type, block_size, constant);
+  }
+  catch (cv::Exception& e) {
+    raise_cverror(e);
+  }
+
+  return dest;
+}
+
+/*
+ * call-seq:
+ *   distance_transform(<i>threshold, max_value, threshold_type[,use_otsu = false]</i>)
+ *
+ * Applies fixed-level threshold to array elements.
+ *
+ */
+VALUE
+rb_distance_transform(VALUE self, VALUE labels, VALUE distance_type, VALUE mask_size)
+{
+  VALUE labels, distance_type, mask_size;
+  rb_scan_args(argc, argv, "3", &labels, &distance_type, &mask_size);
+
+  if (!(rb_obj_is_kind_of(self, cCvMat::rb_class())) || cvGetElemType(CVARR(self)) != CV_8UC1)
+    rb_raise(rb_eTypeError, "self should be 8-bit single-channel CvMat.");
+    
+  if (labels != Qnil) {
+    if (!(rb_obj_is_kind_of(labels, cCvMat::rb_class())) || cvGetElemType(CVARR(labels)) != CV_32S)
+      rb_raise(rb_eTypeError, "labels should be 32-bit signed single-channel CvMat.");
+  }
+  
+  CvMat* self_ptr = CVMAT(self);
+  VALUE dest = new_mat_kind_object(cvGetSize(self_ptr), self, CV_32F, 1);
+
+  try {
+    const cv::Mat selfMat(CVMAT(self));
+    cv::Mat destMat(CVMAT(dest));
+
+    if (labels != Qnil) {
+      cv::Mat labelsMat(CVMAT(labels));
+      cv::distanceTransform(selfMat, destMat, labelsMat, distance_type, mask_size);
+    } else {
+      cv::distanceTransform(selfMat, destMat, distance_type, mask_size);
+    }
   }
   catch (cv::Exception& e) {
     raise_cverror(e);

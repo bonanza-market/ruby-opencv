@@ -195,6 +195,7 @@ VALUE rb_filter2d(int argc, VALUE *argv, VALUE self);
 VALUE rb_integral(int argc, VALUE *argv, VALUE self);
 VALUE rb_threshold(int argc, VALUE *argv, VALUE self);
 VALUE rb_adaptive_threshold(int argc, VALUE *argv, VALUE self);
+VALUE rb_distance_transform(VALUE self, VALUE labels, VALUE distance_type, VALUE mask_size);
 
 VALUE rb_pyr_down(int argc, VALUE *argv, VALUE self);
 VALUE rb_pyr_up(int argc, VALUE *argv, VALUE self);
