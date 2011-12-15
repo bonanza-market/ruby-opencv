@@ -4598,17 +4598,12 @@ rb_adaptive_threshold(int argc, VALUE *argv, VALUE self)
 
 /*
  * call-seq:
- *   distance_transform(<i>threshold, max_value, threshold_type[,use_otsu = false]</i>)
- *
- * Applies fixed-level threshold to array elements.
+ *   distance_transform(<i>labels, distance_type, mask_size</i>)
  *
  */
 VALUE
 rb_distance_transform(VALUE self, VALUE labels, VALUE distance_type, VALUE mask_size)
 {
-  VALUE labels, distance_type, mask_size;
-  rb_scan_args(argc, argv, "3", &labels, &distance_type, &mask_size);
-
   if (!(rb_obj_is_kind_of(self, cCvMat::rb_class())) || cvGetElemType(CVARR(self)) != CV_8UC1)
     rb_raise(rb_eTypeError, "self should be 8-bit single-channel CvMat.");
     
