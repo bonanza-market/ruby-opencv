@@ -295,7 +295,7 @@ void define_ruby_class()
   rb_define_method(rb_klass, "sobel", RUBY_METHOD_FUNC(rb_sobel), -1);
   rb_define_method(rb_klass, "scharr", RUBY_METHOD_FUNC(rb_scharr), -1);
   rb_define_method(rb_klass, "laplace", RUBY_METHOD_FUNC(rb_laplace), -1);
-  rb_define_method(rb_klass, "rb_laplace2", RUBY_METHOD_FUNC(rb_laplace2), -1);
+  rb_define_method(rb_klass, "laplace2", RUBY_METHOD_FUNC(rb_laplace2), -1);
   rb_define_method(rb_klass, "canny", RUBY_METHOD_FUNC(rb_canny), -1);
   rb_define_method(rb_klass, "pre_corner_detect", RUBY_METHOD_FUNC(rb_pre_corner_detect), -1);
   rb_define_method(rb_klass, "corner_eigenvv", RUBY_METHOD_FUNC(rb_corner_eigenvv), -1);
