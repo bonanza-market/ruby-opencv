@@ -4784,7 +4784,7 @@ rb_flood_fill_bang(int argc, VALUE *argv, VALUE self)
   try {
     CvSize size = cvGetSize(self_ptr);
     // TODO: Change argument format to set mask
-    mask = new_object(size.width + 2, size.height + 2, CV_MAKETYPE(CV_8U, 1));
+    mask = new_object(cvSize(size.width + 2, size.height + 2), CV_MAKETYPE(CV_8U, 1));
     CvMat* mask_ptr = CVMAT(mask);
     cvSetZero(mask_ptr);
     cvFloodFill(self_ptr,
