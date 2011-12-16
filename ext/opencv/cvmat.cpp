@@ -4787,14 +4787,20 @@ rb_flood_fill_bang(int argc, VALUE *argv, VALUE self)
     mask = new_object(cvSize(size.width + 2, size.height + 2), CV_MAKETYPE(CV_8U, 1));
     CvMat* mask_ptr = CVMAT(mask);
     cvSetZero(mask_ptr);
-    cvFloodFill(self_ptr,
-		VALUE_TO_CVPOINT(seed_point),
-		VALUE_TO_CVSCALAR(new_val),
-		NIL_P(lo_diff) ? cvScalar(0) : VALUE_TO_CVSCALAR(lo_diff),
-		NIL_P(up_diff) ? cvScalar(0) : VALUE_TO_CVSCALAR(up_diff),
-		CVCONNECTEDCOMP(comp),
-		flags,
-		mask_ptr);
+    
+    cv::Mat selfMat(CVMAT(self));
+    cv::Mat maskMat(CVMAT(mask));
+    ///cv::grabCut(selfMat, maskMat, VALUE_TO_CVRECT(rect), bgMat, fgMat, NUM2INT(iterCount), valid_mode);
+    cv::Rect rect;
+    
+    cv::floodFill(selfMat,
+      maskMat,
+      cv::Point(VALUE_TO_CVPOINT(seed_point)),
+      cv::Scalar(VALUE_TO_CVSCALAR(new_val)),
+      &rect,
+      cv::Scalar(NIL_P(lo_diff) ? cvScalar(0) : VALUE_TO_CVSCALAR(lo_diff)),
+      cv::Scalar(NIL_P(up_diff) ? cvScalar(0) : VALUE_TO_CVSCALAR(up_diff)),
+      flags);
   }
   catch (cv::Exception& e) {
     raise_cverror(e);
