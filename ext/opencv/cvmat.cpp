@@ -4715,7 +4715,7 @@ rb_pyr_up(int argc, VALUE *argv, VALUE self)
 
 /*
  * call-seq:
- *   flood_fill(<i>seed_point, new_val, lo_diff, up_diff[,flood_fill_option]</i>) -> [cvmat, cvconnectedcomp, iplimage(mask)]
+ *   flood_fill(<i>seed_point, new_val, lo_diff, up_diff[,flood_fill_option]</i>) -> [cvmat, rect, iplimage(mask)]
  *
  * Return image filled a connnected compoment with given color.
  * This operation fills a connected component starting from the seed point with the specified color.
@@ -4760,7 +4760,7 @@ rb_flood_fill(int argc, VALUE *argv, VALUE self)
 
 /*
  * call-seq:
- *   flood_fill!(<i>seed_point, new_val, lo_diff, up_diff[,flood_fill_option]</i>) -> [self, cvconnectedcomp, iplimage(mask)]
+ *   flood_fill!(<i>seed_point, new_val, lo_diff, up_diff[,flood_fill_option]</i>) -> [self, rect, iplimage(mask)]
  *
  * Fills a connected component with given color.
  * see CvMat#flood_fill
