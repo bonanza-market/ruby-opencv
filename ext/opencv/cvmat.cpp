@@ -4779,7 +4779,7 @@ rb_flood_fill_bang(int argc, VALUE *argv, VALUE self)
     flags |= CV_FLOODFILL_MASK_ONLY;
   }
   CvArr* self_ptr = CVARR(self);
-  VALUE comp = cCvConnectedComp::new_object();
+  VALUE rect = Qnil;
   VALUE mask = Qnil;
   try {
     CvSize size = cvGetSize(self_ptr);
@@ -4788,16 +4788,19 @@ rb_flood_fill_bang(int argc, VALUE *argv, VALUE self)
     CvMat* mask_ptr = CVMAT(mask);
     cvSetZero(mask_ptr);
     
+    rect = cCvRect::new_object(CvRect());
+    CvRect* rect_ptr = CVRECT(rect);
+    cv::Rect rect_wrapper = cv::Rect(*rect_ptr);
+    
     cv::Mat selfMat(CVMAT(self));
     cv::Mat maskMat(CVMAT(mask));
-    ///cv::grabCut(selfMat, maskMat, VALUE_TO_CVRECT(rect), bgMat, fgMat, NUM2INT(iterCount), valid_mode);
-    cv::Rect rect;
     
-    cv::floodFill(selfMat,
+    cv::floodFill(
+      selfMat,
       maskMat,
       cv::Point(VALUE_TO_CVPOINT(seed_point)),
       cv::Scalar(VALUE_TO_CVSCALAR(new_val)),
-      &rect,
+      &rect_wrapper,
       cv::Scalar(NIL_P(lo_diff) ? cvScalar(0) : VALUE_TO_CVSCALAR(lo_diff)),
       cv::Scalar(NIL_P(up_diff) ? cvScalar(0) : VALUE_TO_CVSCALAR(up_diff)),
       flags);
@@ -4805,7 +4808,7 @@ rb_flood_fill_bang(int argc, VALUE *argv, VALUE self)
   catch (cv::Exception& e) {
     raise_cverror(e);
   }
-  return rb_ary_new3(3, self, comp, mask);
+  return rb_ary_new3(3, self, rect, mask);
 }
 
 /*
