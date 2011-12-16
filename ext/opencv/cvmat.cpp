@@ -4790,7 +4790,7 @@ rb_flood_fill_bang(int argc, VALUE *argv, VALUE self)
     
     rect = cCvRect::new_object(CvRect());
     CvRect* rect_ptr = CVRECT(rect);
-    cv::Rect rect_wrapper = cv::Rect(*rect_ptr);
+    cv::Rect rect_wrapper(*rect_ptr);
     
     cv::Mat selfMat(CVMAT(self));
     cv::Mat maskMat(CVMAT(mask));
