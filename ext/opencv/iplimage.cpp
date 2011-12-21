@@ -265,7 +265,7 @@ rb_get_mat(VALUE self)
   catch (cv::Exception& e) {
     raise_cverror(e);
   }
-  return DEPEND_OBJECT(CvMat::rb_klass, dst_mat, self);
+  return DEPEND_OBJECT(cCvMat::rb_class(), dst_mat, self);
 }
 
 /*
