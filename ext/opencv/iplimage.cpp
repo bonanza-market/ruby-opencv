@@ -258,7 +258,7 @@ rb_reset_coi(VALUE self)
 VALUE
 rb_get_mat(VALUE self)
 {
-  const IplImage* self_ptr = IPLIMAGE(self);
+  const CvArr* self_ptr = CVARR(self);
 
   if (!CV_IS_IMAGE_HDR(self_ptr))
     raise_typeerror(self, cIplImage::rb_class());
