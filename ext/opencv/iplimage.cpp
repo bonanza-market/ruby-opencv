@@ -258,6 +258,9 @@ rb_reset_coi(VALUE self)
 VALUE
 rb_get_mat(VALUE self)
 {
+  if (!CV_IS_IMAGE_HDR(IPLIMAGE(self)))
+    raise_typeerror(self, cIplImage::rb_class());
+
   CvMat temp_buffer, *dst_mat;
   try {
     dst_mat = cvGetMat(IPLIMAGE_WITH_CHECK(self), &temp_buffer, 0, 0);
