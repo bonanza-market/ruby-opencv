@@ -258,19 +258,14 @@ rb_reset_coi(VALUE self)
 VALUE
 rb_get_mat(VALUE self)
 {
-  const CvArr* self_ptr = CVARR(self);
-
-  if (!CV_IS_IMAGE_HDR(self_ptr))
-    raise_typeerror(self, cIplImage::rb_class());
-
-  CvMat temp_buffer, *dst_mat;
+  const CVMAT* mat_ptr = NULL;
   try {
-    dst_mat = cvGetMat(self_ptr, &temp_buffer, 0, 0);
+    mat_ptr = CVMAT(self);
   }
   catch (cv::Exception& e) {
     raise_cverror(e);
   }
-  return DEPEND_OBJECT(cCvMat::rb_class(), dst_mat, self);
+  return DEPEND_OBJECT(cCvMat::rb_class(), mat_ptr, self);
 }
 
 /*
