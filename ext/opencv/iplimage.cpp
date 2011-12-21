@@ -258,15 +258,14 @@ rb_reset_coi(VALUE self)
 VALUE
 rb_get_mat(VALUE self)
 {
-  IplImage* self_ptr = IPLIMAGE(self);
   CvMat temp_buffer, *dst_mat;
   try {
-    dst_mat = cvGetMat(self_ptr, &temp_buffer, 0, 0);
+    dst_mat = cvGetMat(IPLIMAGE_WITH_CHECK(self), &temp_buffer, 0, 0);
   }
   catch (cv::Exception& e) {
     raise_cverror(e);
   }
-  return DEPEND_OBJECT(rb_klass, dst_mat, self);
+  return DEPEND_OBJECT(CvMat::rb_klass, dst_mat, self);
 }
 
 /*
