@@ -258,7 +258,7 @@ rb_reset_coi(VALUE self)
 VALUE
 rb_get_mat(VALUE self)
 {
-  const CvMat* mat_ptr = NULL;
+  CvMat* mat_ptr = NULL;
   try {
     mat_ptr = CVMAT(self);
   }
