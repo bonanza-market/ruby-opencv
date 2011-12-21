@@ -41,7 +41,7 @@ rb_allocate(VALUE klass)
 
 /*
  * call-seq:
- *   new(width, height[, depth = CV_8U][, channel = 3])
+ *   new(<i>width, height[, depth = CV_8U][, channel = 3]</i>)
  *
  * Create width * height image. Each element-value set 0.
  *
@@ -65,7 +65,7 @@ rb_initialize(int argc, VALUE *argv, VALUE self)
 
 /*
  * call-seq:
- *   IplImage::load(filename[,iscolor = CV_LOAD_IMAGE_COLOR])
+ *   IplImage::load(<i>filename[,iscolor = CV_LOAD_IMAGE_COLOR]</i>)
  *
  * Load an image from file.
  *  iscolor = CV_LOAD_IMAGE_COLOR, the loaded image is forced to be a 3-channel color image
@@ -149,8 +149,8 @@ rb_get_roi(VALUE self)
 
 /*
  * call-seq:
- *   set_roi(rect)
- *   set_roi(rect){|image| ...}
+ *   set_roi(<i>rect</i>)
+ *   set_roi(<i>rect</i>){|image| ...}
  *
  * Set ROI. <i>rect</i> should be CvRect or compatible object.
  * Return self.
@@ -210,8 +210,8 @@ rb_get_coi(VALUE self)
 
 /*
  * call-seq:
- *   set_coi(coi)
- *   set_coi(coi){|image| ...}
+ *   set_coi(<i>coi</i>)
+ *   set_coi(<i>coi</i>){|image| ...}
  *
  * Set COI. <i>coi</i> should be Fixnum.
  * Return self.
@@ -253,8 +253,25 @@ rb_reset_coi(VALUE self)
 }
 
 /*
+ * Return a CvMat pointing to the same data as this iplimage
+ */
+VALUE
+rb_get_mat(VALUE self)
+{
+  IplImage* self_ptr = IPLIMAGE(self);
+  CvMat temp_buffer, *dst_mat;
+  try {
+    dst_mat = cvGetMat(self_ptr, &temp_buffer, 0, 0);
+  }
+  catch (cv::Exception& e) {
+    raise_cverror(e);
+  }
+  return DEPEND_OBJECT(rb_klass, dst_mat, self);
+}
+
+/*
  * call-seq:
- *   IplImage.smoothness(lowFreqRatio, blankDensity, messyDensity, highFreqRatio) -> [ symbol, float, float ]
+ *   IplImage.smoothness(<i>lowFreqRatio, blankDensity, messyDensity, highFreqRatio</i>) -> [ symbol, float, float ]
  *
  * Determines if the image's smoothness is either, :smooth, :messy, or :blank.
  *
@@ -343,7 +360,7 @@ compute_smoothness(const IplImage *pFourierImage, const double lowFreqRatio, con
   int low, high;
   IplImage *filteredFourierImage;
   int totalIntensity;
-  double den, totalArea;
+  double sum, den, totalArea;
   CvScalar scalar;
 
   if (!(pFourierImage->nChannels == 1 && pFourierImage->depth == 64) ) {
@@ -356,7 +373,7 @@ compute_smoothness(const IplImage *pFourierImage, const double lowFreqRatio, con
 
   filteredFourierImage = create_frequency_filtered_image(pFourierImage, low, high);
   scalar = cvSum(filteredFourierImage);
-  totalIntensity = (int)scalar.val[0];
+  totalIntensity = scalar.val[0];
   cvReleaseImage(&filteredFourierImage);
   outLowDensity = den = totalIntensity / totalArea;
 
@@ -368,7 +385,7 @@ compute_smoothness(const IplImage *pFourierImage, const double lowFreqRatio, con
 
   filteredFourierImage = create_frequency_filtered_image(pFourierImage, low, high);
   scalar = cvSum(filteredFourierImage);
-  totalIntensity = (int)scalar.val[0];
+  totalIntensity = scalar.val[0];
   cvReleaseImage(&filteredFourierImage);
   outHighDensity = den = totalIntensity / totalArea;
 
@@ -514,13 +531,13 @@ create_frequency_filtered_image(const IplImage *pImage, int low, int high)
 {
 
   CvPoint2D32f  center;
-  center.x = (float)(pImage->width / 2);
-  center.y = (float)(pImage->height / 2);
+  center.x = pImage->width / 2;
+  center.y = pImage->height / 2;
   CvBox2D box;
   box.center = center;
 
-  box.size.width = (float)high;
-  box.size.height = (float)high;
+  box.size.width = high;
+  box.size.height = high;
 
   IplImage *pFilterMask = rb_cvCreateImage(cvGetSize(pImage), IPL_DEPTH_64F, 1);
   IplImage *pFiltered = rb_cvCreateImage(cvGetSize(pImage), IPL_DEPTH_64F, 1);
@@ -531,8 +548,8 @@ create_frequency_filtered_image(const IplImage *pImage, int low, int high)
   if (high > 0)
     cvEllipseBox(pFilterMask, box, cvScalar(255, 255, 255, 255), CV_FILLED, 8, 0);
 
-  box.size.width = (float)low;
-  box.size.height = (float)low;
+  box.size.width = low;
+  box.size.height = low;
   if (low > 0)
     cvEllipseBox(pFilterMask, box, cvScalar(0, 0, 0, 0), CV_FILLED, 8, 0);
 
@@ -648,4 +665,3 @@ init_ruby_class()
 
 __NAMESPACE_END_IPLIMAGE
 __NAMESPACE_END_OPENCV
-

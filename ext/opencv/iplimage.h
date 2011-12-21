@@ -20,7 +20,7 @@ __NAMESPACE_BEGIN_IPLIMAGE
 
 VALUE rb_class();
 
-void init_ruby_class();    
+void define_ruby_class();    
 
 VALUE rb_allocate(VALUE klass);
 VALUE rb_initialize(int argc, VALUE *argv, VALUE self);
@@ -39,6 +39,8 @@ VALUE rb_set_coi(VALUE self, VALUE coi);
 VALUE rb_reset_coi(VALUE self);
 
 VALUE rb_pyr_segmentation(VALUE self, VALUE level, VALUE threshold1, VALUE threshold2);
+
+VALUE rb_get_mat(VALUE self);
 
 VALUE rb_smoothness(int argc, VALUE *argv, VALUE self);
 typedef enum { SMOOTH = 1, BLANK = 2, MESSY = 3 } Smoothness;
