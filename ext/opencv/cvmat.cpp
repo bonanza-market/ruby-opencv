@@ -3601,7 +3601,7 @@ rb_canny(int argc, VALUE *argv, VALUE self)
     const cv::Mat selfMat(CVMAT(self)); // WBH convert openCv1-style cvMat to openCv2-style cv::Mat
     cv::Mat destMat(CVMAT(dest));
 
-		cv::Canny(selfMat, destMat, NUM2INT(thresh1), NUM2INT(thresh2), aperture_size, l2_gradient);
+		cv::Canny(selfMat, destMat, NUM2INT(thresh1), NUM2INT(thresh2), NUM2INT(aperture_size), l2_gradient);
   }
   catch (cv::Exception& e) {
     raise_cverror(e);
