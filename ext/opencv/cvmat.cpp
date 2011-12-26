@@ -251,6 +251,7 @@ void define_ruby_class()
   rb_define_method(rb_klass, "avg_sdv", RUBY_METHOD_FUNC(rb_avg_sdv), -1);
   rb_define_method(rb_klass, "sdv", RUBY_METHOD_FUNC(rb_sdv), -1);
   rb_define_method(rb_klass, "min_max_loc", RUBY_METHOD_FUNC(rb_min_max_loc), -1);
+  //rb_define_method(rb_klass, "set_roi", RUBY_METHOD_FUNC(rb_set_roi), -1);
   rb_define_method(rb_klass, "dot_product", RUBY_METHOD_FUNC(rb_dot_product), 1);
   rb_define_method(rb_klass, "cross_product", RUBY_METHOD_FUNC(rb_cross_product), 1);
   rb_define_method(rb_klass, "transform", RUBY_METHOD_FUNC(rb_transform), -1);
@@ -2385,6 +2386,40 @@ rb_min_max_loc(int argc, VALUE *argv, VALUE self)
 
 /*
  * call-seq:
+ *
+ * WBH started this but didn't end up needing it, so didn't complete debugging
+ * (used bounding_rect instead)
+ *
+VALUE
+rb_set_roi(int argc, VALUE *argv, VALUE self)
+{
+  VALUE dest, newMat, delta, ksize, rect, scale;
+  rb_scan_args(argc, argv, "1", &rect);
+
+  CvMat* self_ptr = CVMAT(self);
+  dest = new_mat_kind_object(cvGetSize(self_ptr), self, CV_MAT_DEPTH(self_ptr->type), 1);
+
+	cv::Rect cppCvRect;
+	cppCvRect.x =
+		CVRECT(rect)->x;
+	cppCvRect.y =
+		CVRECT(rect)->y;
+
+  try {
+    cv::Mat selfMat(CVMAT(self)); // WBH convert openCv1-style cvMat to openCv2-style cv::Mat
+    cv::Mat destMat(CVMAT(dest));
+    destMat(selfMat(cppCvRect));
+  }
+  catch (cv::Exception& e) {
+    raise_cverror(e);
+  }
+  return newMat;
+
+}
+ */
+
+/*
+ * call-seq:
  *   dot_product(<i>mat</i>) -> float
  *
  * Calculates dot product of two arrays in Euclidian metrics.
@@ -3551,18 +3586,27 @@ rb_laplace2(int argc, VALUE *argv, VALUE self)
 VALUE
 rb_canny(int argc, VALUE *argv, VALUE self)
 {
-  VALUE thresh1, thresh2, aperture_size;
-  if (rb_scan_args(argc, argv, "21", &thresh1, &thresh2, &aperture_size) < 3)
-    aperture_size = INT2FIX(3);
-  CvArr* self_ptr = CVARR(self);
-  VALUE dest = new_mat_kind_object(cvGetSize(self_ptr), self);
-  
+  VALUE dest, thresh1, thresh2, aperture_size, l2_gradient;
+  int args_given = rb_scan_args(argc, argv, "22", &thresh1, &thresh2, &aperture_size, &l2_gradient);
+  switch(args_given) {
+  	case 2: aperture_size = 3; // intentional fallthrough, params applied cumulatively
+  	case 1: l2_gradient = false;
+  }
+
+  CvMat* self_ptr = CVMAT(self);
+  // Create our destination pixels
+  dest = new_mat_kind_object(cvGetSize(self_ptr), self, CV_MAT_DEPTH(self_ptr->type), 1);
+
   try {
-    cvCanny(self_ptr, CVARR(dest), NUM2INT(thresh1), NUM2INT(thresh2), NUM2INT(aperture_size));
+    const cv::Mat selfMat(CVMAT(self)); // WBH convert openCv1-style cvMat to openCv2-style cv::Mat
+    cv::Mat destMat(CVMAT(dest));
+
+		cv::Canny(selfMat, destMat, NUM2INT(thresh1), NUM2INT(thresh2), aperture_size, l2_gradient);
   }
   catch (cv::Exception& e) {
     raise_cverror(e);
   }
+
   return dest;
 }
 
