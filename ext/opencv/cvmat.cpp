@@ -3503,7 +3503,7 @@ rb_scharr(int argc, VALUE *argv, VALUE self)
   try {
     const cv::Mat selfMat(CVMAT(self)); // WBH convert openCv1-style cvMat to openCv2-style cv::Mat
     cv::Mat destMat(CVMAT(dest));
-    cv::Laplacian(selfMat, destMat, CV_MAT_DEPTH(self_ptr->type), ksize, scale, delta);
+    cv::Laplacian(selfMat, destMat, ddepth, ksize, scale, delta);
   }
   catch (cv::Exception& e) {
     raise_cverror(e);
@@ -3558,10 +3558,18 @@ VALUE
 rb_laplace2(int argc, VALUE *argv, VALUE self)
 {
   VALUE dest, delta, ksize, scale;
+  int ddepth;
   rb_scan_args(argc, argv, "03", &ksize, &scale, &delta);
 
   CvMat* self_ptr = CVMAT(self);
-  dest = new_mat_kind_object(cvGetSize(self_ptr), self, CV_MAT_DEPTH(self_ptr->type), 1);
+  if(CV_MAT_DEPTH(self_ptr->type) == CV_8U) {
+  	ddepth = CV_16S; // An 8U datatype would overflow due to negative derivative values
+  } else {
+  	ddepth = CV_MAT_DEPTH(self_ptr->type);
+  }
+
+	dest = new_mat_kind_object(cvGetSize(self_ptr), self, ddepth, 1);
+
 	if(NIL_P(ksize)) ksize = INT2FIX(1);
 	if(NIL_P(scale)) scale = 1.0;
 	if(NIL_P(delta)) delta = 0.0;
