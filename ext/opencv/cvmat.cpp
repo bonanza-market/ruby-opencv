@@ -3547,7 +3547,7 @@ rb_laplace(int argc, VALUE *argv, VALUE self)
 
 /*
  * call-seq:
- *   laplace2(<i>xorder,yorder,ksize=1,scale=1,delta=0</i>) -> cvmat
+ *   laplace2(<i>ksize=1,scale=1,delta=0</i>) -> cvmat
  *
  * Calculates first, second, third or mixed image derivatives using extended Sobel operator.
  * <i>self</i> should be single-channel 8bit unsigned or 32bit floating-point.
