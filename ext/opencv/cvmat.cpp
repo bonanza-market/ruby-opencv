@@ -251,6 +251,8 @@ void define_ruby_class()
   rb_define_method(rb_klass, "avg_sdv", RUBY_METHOD_FUNC(rb_avg_sdv), -1);
   rb_define_method(rb_klass, "sdv", RUBY_METHOD_FUNC(rb_sdv), -1);
   rb_define_method(rb_klass, "min_max_loc", RUBY_METHOD_FUNC(rb_min_max_loc), -1);
+  rb_define_method(rb_klass, "min", RUBY_METHOD_FUNC(rb_min), -1);
+  rb_define_method(rb_klass, "max", RUBY_METHOD_FUNC(rb_max), -1);
   //rb_define_method(rb_klass, "set_roi", RUBY_METHOD_FUNC(rb_set_roi), -1);
   rb_define_method(rb_klass, "dot_product", RUBY_METHOD_FUNC(rb_dot_product), 1);
   rb_define_method(rb_klass, "cross_product", RUBY_METHOD_FUNC(rb_cross_product), 1);
@@ -2382,6 +2384,46 @@ rb_min_max_loc(int argc, VALUE *argv, VALUE self)
     raise_cverror(e);
   }
   return rb_ary_new3(4, rb_float_new(min_val), rb_float_new(max_val), min_loc, max_loc);
+}
+
+/*
+ * call-seq:
+ *   min(another mat)
+ *
+ */
+VALUE
+rb_min(int argc, VALUE *argv, VALUE self)
+{
+  VALUE second_mat, dest;
+  rb_scan_args(argc, argv, "1", &second_mat);
+  dest = copy(self);
+  try {
+    cvMin(CVARR(self), CVARR(second_mat), CVARR(dest));
+  }
+  catch (cv::Exception& e) {
+    raise_cverror(e);
+  }
+  return dest;
+}
+
+/*
+ * call-seq:
+ *   max(another mat)
+ *
+ */
+VALUE
+rb_max(int argc, VALUE *argv, VALUE self)
+{
+  VALUE second_mat, dest;
+  rb_scan_args(argc, argv, "1", &second_mat);
+  dest = copy(self);
+  try {
+    cvMax(CVARR(self), CVARR(second_mat), CVARR(dest));
+  }
+  catch (cv::Exception& e) {
+    raise_cverror(e);
+  }
+  return dest;
 }
 
 /*

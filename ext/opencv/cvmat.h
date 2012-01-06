@@ -116,6 +116,8 @@ VALUE rb_avg(int argc, VALUE *argv, VALUE self);
 VALUE rb_avg_sdv(int argc, VALUE *argv, VALUE self);
 VALUE rb_sdv(int argc, VALUE *argv, VALUE self);
 VALUE rb_min_max_loc(int argc, VALUE *argv, VALUE self);
+VALUE rb_min(int argc, VALUE *argv, VALUE self);
+VALUE rb_max(int argc, VALUE *argv, VALUE self);
 
 /* Hacked */
 //VALUE rb_set_roi(VALUE self, VALUE args);
