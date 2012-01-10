@@ -63,6 +63,7 @@ __NAMESPACE_BEGIN_CVMAT
 #define FF_CONNECTIVITY(op) NUM2INT(rb_hash_aref(op, ID2SYM(rb_intern("connectivity"))))
 #define FF_FIXED_RANGE(op) TRUE_OR_FALSE(rb_hash_aref(op, ID2SYM(rb_intern("fixed_range"))), 0)
 #define FF_MASK_ONLY(op) TRUE_OR_FALSE(rb_hash_aref(op, ID2SYM(rb_intern("mask_only"))), 0)
+#define FF_MASK(op) (rb_hash_aref(op, ID2SYM(rb_intern("mask"))))
 
 #define FIND_CONTOURS_OPTION(op) NIL_P(op) ? rb_const_get(rb_class(), rb_intern("FIND_CONTOURS_OPTION")) : rb_funcall(rb_const_get(rb_class(), rb_intern("FIND_CONTOURS_OPTION")), rb_intern("merge"), 1, op)
 #define FC_MODE(op) FIX2INT(rb_hash_aref(op, ID2SYM(rb_intern("mode"))))
@@ -125,6 +126,7 @@ void define_ruby_class()
   rb_hash_aset(flood_fill_option, ID2SYM(rb_intern("connectivity")), INT2FIX(4));
   rb_hash_aset(flood_fill_option, ID2SYM(rb_intern("fixed_range")), Qfalse);
   rb_hash_aset(flood_fill_option, ID2SYM(rb_intern("mask_only")), Qfalse);
+  rb_hash_aset(flood_fill_option, ID2SYM(rb_intern("mask")), Qnil);
 
   VALUE find_contours_option = rb_hash_new();
   rb_define_const(rb_klass, "FIND_CONTOURS_OPTION", find_contours_option);
@@ -4843,6 +4845,7 @@ rb_pyr_up(int argc, VALUE *argv, VALUE self)
  *     If set the difference between the current pixel and seed pixel is considered, otherwise difference between neighbor pixels is considered (the range is floating).
  *   :mask_only => true or false, false default
  *     If set, the function does not fill the image(new_val is ignored), but the fills mask.
+ *   :mask => cvmat with an extra pixel around the edges, or nil
  *
  * note: <i>flood_fill_option</i>'s default value is CvMat::FLOOD_FILL_OPTION.
  */
@@ -4872,15 +4875,14 @@ rb_flood_fill_bang(int argc, VALUE *argv, VALUE self)
   if (FF_MASK_ONLY(flood_fill_option)) {
     flags |= CV_FLOODFILL_MASK_ONLY;
   }
-  CvArr* self_ptr = CVARR(self);
   cv::Rect rect;
-  VALUE mask = Qnil;
+  VALUE mask = FF_MASK(flood_fill_option);
   try {
-    CvSize size = cvGetSize(self_ptr);
-    // TODO: Change argument format to set mask
-    mask = new_object(cvSize(size.width + 2, size.height + 2), CV_MAKETYPE(CV_8U, 1));
-    CvMat* mask_ptr = CVMAT(mask);
-    cvSetZero(mask_ptr);
+    if (mask == Qnil) {
+      CvSize size = cvGetSize(CVARR(self));
+      mask = new_object(cvSize(size.width + 2, size.height + 2), CV_MAKETYPE(CV_8U, 1));
+      cvSetZero(CVARR(mask));
+    }
     
     cv::Mat selfMat(CVMAT(self));
     cv::Mat maskMat(CVMAT(mask));
