@@ -31,6 +31,8 @@ VALUE rb_aref(VALUE self, VALUE index);
 VALUE rb_aset(VALUE self, VALUE index, VALUE value);
 VALUE rb_sub(int argc, VALUE *argv, VALUE self);
 
+VALUE rb_zero_q(VALUE self);
+
 VALUE rb_to_s(VALUE self);
 VALUE rb_to_ary(VALUE self);
 

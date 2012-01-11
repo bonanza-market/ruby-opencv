@@ -137,6 +137,17 @@ rb_sub(int argc, VALUE *argv, VALUE self)
 
 /*
  * call-seq:
+ *   zero? -> true (all elements equal zero) or false
+ */
+VALUE
+rb_zero_q(VALUE self)
+{
+  CvScalar* self_ptr = CVSCALAR(self);
+  return (self_ptr->val[0] == 0 && self_ptr->val[1] == 0 && self_ptr->val[2] == 0 && self_ptr->val[3] == 0) ? Qtrue : Qfalse;
+}
+
+/*
+ * call-seq:
  *   to_s -> "<OpeCV::CvScalar:#{self[0]},#{self[1]},#{self[2]},#{self[3]}>"
  *
  * Return values by String.
@@ -213,7 +224,9 @@ init_ruby_class()
   rb_define_method(rb_klass, "[]=", RUBY_METHOD_FUNC(rb_aset), 2);
   rb_define_method(rb_klass, "sub", RUBY_METHOD_FUNC(rb_sub), -1);
   rb_define_alias(rb_klass, "-", "sub");
-  
+
+  rb_define_method(rb_klass, "zero?", RUBY_METHOD_FUNC(rb_zero_q), 0);
+
   rb_define_method(rb_klass, "to_s", RUBY_METHOD_FUNC(rb_to_s), 0);
   rb_define_method(rb_klass, "to_ary", RUBY_METHOD_FUNC(rb_to_ary), 0);
   rb_define_alias(rb_klass, "to_a", "to_ary");
