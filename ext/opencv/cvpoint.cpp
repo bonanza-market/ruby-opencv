@@ -164,6 +164,14 @@ rb_check_equality(VALUE self, VALUE compare_to) {
   return (self_ptr->x == compare.x && self_ptr->y == compare.y) ? Qtrue : Qfalse;
 }
 
+VALUE
+rb_check_inequality(VALUE self, VALUE compare_to) {
+	CvPoint compare = VALUE_TO_CVPOINT(compare_to);
+  CvPoint* self_ptr = CVPOINT(self);
+
+  return (self_ptr->x != compare.x || self_ptr->y != compare.y) ? Qtrue : Qfalse;
+}
+
 /*
  * call-seq:
  *   to_s -> "<OpenCV::CvPoint:(self.x,self.y)>"
