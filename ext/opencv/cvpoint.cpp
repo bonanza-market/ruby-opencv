@@ -152,6 +152,20 @@ rb_set_y(VALUE self, VALUE y)
 
 /*
  * call-seq:
+ *   rb_check_equality(val[,mask])
+ *
+ * Return true CvScalar if has same values as we do
+ */
+VALUE
+rb_check_equality(VALUE self, VALUE compare_to) {
+	CvPoint compare = VALUE_TO_CVPOINT(compare_to);
+  CvPoint* self_ptr = CVPOINT(self);
+
+  return (self_ptr->x == compare.x && self_ptr->y == compare.x) ? Qtrue : Qfalse;
+}
+
+/*
+ * call-seq:
  *   to_s -> "<OpenCV::CvPoint:(self.x,self.y)>"
  *
  * Return x and y by String.
@@ -231,4 +245,3 @@ init_ruby_class()
 
 __NAMESPACE_END_CVPOINT
 __NAMESPACE_END_OPENCV
-

@@ -30,6 +30,7 @@ VALUE rb_x(VALUE self);
 VALUE rb_set_x(VALUE self, VALUE x);
 VALUE rb_y(VALUE self);
 VALUE rb_set_y(VALUE self, VALUE y);
+VALUE rb_check_equality(VALUE self, VALUE compare_to);
 
 VALUE rb_to_s(VALUE self);
 VALUE rb_to_ary(VALUE self);

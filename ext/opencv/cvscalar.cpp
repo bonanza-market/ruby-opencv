@@ -102,6 +102,20 @@ rb_aset(VALUE self, VALUE index, VALUE value)
 
 /*
  * call-seq:
+ *   rb_check_equality(val[,mask])
+ *
+ * Return true CvScalar if has same values as we do
+ */
+VALUE
+rb_check_equality(VALUE self, VALUE compare_to) {
+	CvScalar compare = VALUE_TO_CVSCALAR(compare_to);
+  CvScalar* self_ptr = CVSCALAR(self);
+
+  return (self_ptr->val[0] == compare.val[0] && self_ptr->val[1] == compare.val[1] && self_ptr->val[2] == compare.val[2] && self_ptr->val[3] == compare.val[3]) ? Qtrue : Qfalse;
+}
+
+/*
+ * call-seq:
  *   sub(val[,mask])
  *
  * Return new CvScalar if <i>val</i> is CvScalar or compatible object.
