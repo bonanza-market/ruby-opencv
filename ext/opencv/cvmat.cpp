@@ -227,6 +227,7 @@ void define_ruby_class()
   rb_define_method(rb_klass, "sub", RUBY_METHOD_FUNC(rb_sub), -1);
   rb_define_alias(rb_klass, "-", "sub");
   rb_define_method(rb_klass, "mul", RUBY_METHOD_FUNC(rb_mul), -1);
+  rb_define_method(rb_klass, "sqrt", RUBY_METHOD_FUNC(rb_sqrt), 0);
   rb_define_method(rb_klass, "mat_mul", RUBY_METHOD_FUNC(rb_mat_mul), -1);
   rb_define_alias(rb_klass, "*", "mat_mul");
   rb_define_method(rb_klass, "div", RUBY_METHOD_FUNC(rb_div), -1);
@@ -1859,6 +1860,29 @@ rb_mul(int argc, VALUE *argv, VALUE self)
   catch (cv::Exception& e) {
     raise_cverror(e);
   }
+  return dest;
+}
+/*
+ * call-seq:
+ *   sqrt() -> cvmat
+ *
+ * Calculates a square root of array elements.
+ */
+VALUE
+rb_sqrt(VALUE self)
+{
+  CvArr* self_ptr = CVARR(self);
+  VALUE dest = new_mat_kind_object(cvGetSize(self_ptr), self);
+  
+  try {
+    const cv::Mat srcMat(CVMAT(self));
+    cv::Mat dstMat(CVMAT(dest)); 
+    cv::sqrt(srcMat, dstMat);
+  }
+  catch (cv::Exception& e) {
+    raise_cverror(e);
+  }
+  
   return dest;
 }
 
