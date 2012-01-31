@@ -196,7 +196,9 @@ void define_ruby_class()
   rb_define_method(rb_klass, "dim_size", RUBY_METHOD_FUNC(rb_dim_size), 1);
   rb_define_method(rb_klass, "[]", RUBY_METHOD_FUNC(rb_aref), -2);
   rb_define_alias(rb_klass, "at", "[]");
-  rb_define_method(rb_klass, "[]=", RUBY_METHOD_FUNC(rb_aset), -2);
+    rb_define_method(rb_klass, "[]=", RUBY_METHOD_FUNC(rb_aset), -2);
+  rb_define_method(rb_klass, "pixel_value", RUBY_METHOD_FUNC(rb_pixel_value), 1);
+  rb_define_method(rb_klass, "vector_magnitude!", RUBY_METHOD_FUNC(rb_vector_magnitude), 0);
   rb_define_method(rb_klass, "set_data", RUBY_METHOD_FUNC(rb_set_data), 1);
   rb_define_method(rb_klass, "fill", RUBY_METHOD_FUNC(rb_fill), -1);
   rb_define_alias(rb_klass, "set", "fill");
@@ -1181,6 +1183,43 @@ rb_aref(VALUE self, VALUE args)
     raise_cverror(e);
   }
   return cCvScalar::new_object(scalar);
+}
+
+/*
+ * call-seq:
+ *
+ *
+ *
+ */
+VALUE
+rb_pixel_value(VALUE self, VALUE index)
+{
+  CvScalar scalar = cvGet1D(CVARR(self), NUM2INT(index));
+	return rb_float_new(scalar.val[0]);
+}
+
+/*
+ * call-seq:
+ *
+ *
+ */
+VALUE
+rb_vector_magnitude(VALUE self)
+{
+  CvMat* self_ptr = CVMAT(self);
+  int type = self_ptr->type, depth = CV_MAT_DEPTH(type), channel = CV_MAT_CN(type);
+
+  CvArr* mat_ptr = CVARR(self);
+	CvScalar this_scalar;
+	CvSize arrSize = cvGetSize(CVARR(self));
+	for(int i=0;i<(arrSize.height*arrSize.width)-1;i++) {
+		this_scalar = cvGet1D(mat_ptr, i);
+
+		int sum_of_squares = this_scalar.val[0]*this_scalar.val[0] + this_scalar.val[1]*this_scalar.val[1] + this_scalar.val[2]*this_scalar.val[2];
+		cvSet1D(CVARR(self), i, cvScalar(sqrt(sum_of_squares), 0, 0, 0));
+	}
+
+	return self;
 }
 
 /*

@@ -65,6 +65,8 @@ VALUE rb_size(VALUE self);
 VALUE rb_dims(VALUE self);
 VALUE rb_dim_size(VALUE self, VALUE index);
 VALUE rb_aref(VALUE self, VALUE args);
+VALUE rb_pixel_value(VALUE self, VALUE index);
+VALUE rb_vector_magnitude(VALUE self);
 VALUE rb_aset(VALUE self, VALUE args);
 VALUE rb_set_data(VALUE self, VALUE data);
 VALUE rb_fill(int argc, VALUE *argv, VALUE self);
