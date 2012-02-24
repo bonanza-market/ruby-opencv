@@ -245,6 +245,7 @@ VALUE rb_compute_correspond_epilines(VALUE klass, VALUE points, VALUE which_imag
 
 /* Feature detection and description */
 VALUE rb_extract_surf(int argc, VALUE *argv, VALUE self);
+VALUE rb_extract_orb(int argc, VALUE *argv, VALUE self);
 
 // HighGUI function
 VALUE rb_save_image(VALUE self, VALUE filename);

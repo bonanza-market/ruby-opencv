@@ -375,6 +375,7 @@ void define_ruby_class()
 			     RUBY_METHOD_FUNC(rb_compute_correspond_epilines), 3);
 
   rb_define_method(rb_klass, "extract_surf", RUBY_METHOD_FUNC(rb_extract_surf), -1);
+  rb_define_method(rb_klass, "rb_extract_orb", RUBY_METHOD_FUNC(rb_extract_orb), -1);
 
   rb_define_method(rb_klass, "save_image", RUBY_METHOD_FUNC(rb_save_image), 1);
 }
@@ -5924,6 +5925,50 @@ rb_extract_surf(int argc, VALUE *argv, VALUE self)
   }
   
   return rb_assoc_new(_keypoints, _descriptors);
+}
+
+
+/*
+ * call-seq:
+ *   rb_extract_orb(params[,mask]) -> [cvseq(cvsurfpoint), array(float)]
+ * Extracts ORB Features from an image
+ *
+ * <i>params</i> (CvSURFParams) - Various algorithm parameters put to the structure CvSURFParams.
+ * <i>mask</i> (CvMat) - The optional input 8-bit mask. The features are only found in the areas that contain more than 50% of non-zero mask pixels.
+ */
+VALUE
+rb_extract_orb(int argc, VALUE *argv, VALUE self)
+{
+  VALUE mask;
+  rb_scan_args(argc, argv, "01", &mask);
+  
+  VALUE result = Qnil;
+  try {
+    // std::vector<cv::KeyPoint> & keypoints, cv::Mat & descriptors, bool useProvidedKeypoints = false  
+    cv::ORB featuresFinder;
+    std::vector<cv::KeyPoint> keypoints;
+   
+    const cv::Mat selfMat(CVMAT(self));
+  
+    if (mask == Qnil) {
+      CvSize size = cvGetSize(CVARR(self));
+      mask = new_object(cvSize(size.width, size.height), CV_MAKETYPE(CV_8U, 1));
+      cvSetZero(CVARR(mask));
+    }
+    const cv::Mat maskMat(CVMAT(self));
+    
+    featuresFinder(selfMat, maskMat, keypoints);
+    
+    result = rb_ary_new2(keypoints.size());
+    for (size_t i = 0; i < keypoints.size(); ++i) {
+      rb_ary_store(result, i, cCvPoint::new_object(cvPoint(0,0)));
+    }
+  }
+  catch (cv::Exception& e) {
+    raise_cverror(e);
+  }
+
+  return result;
 }
 
 VALUE
