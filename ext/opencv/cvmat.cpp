@@ -375,7 +375,7 @@ void define_ruby_class()
 			     RUBY_METHOD_FUNC(rb_compute_correspond_epilines), 3);
 
   rb_define_method(rb_klass, "extract_surf", RUBY_METHOD_FUNC(rb_extract_surf), -1);
-  rb_define_method(rb_klass, "rb_extract_orb", RUBY_METHOD_FUNC(rb_extract_orb), -1);
+  rb_define_method(rb_klass, "extract_orb", RUBY_METHOD_FUNC(rb_extract_orb), -1);
 
   rb_define_method(rb_klass, "save_image", RUBY_METHOD_FUNC(rb_save_image), 1);
 }
@@ -5942,31 +5942,44 @@ rb_extract_orb(int argc, VALUE *argv, VALUE self)
   VALUE mask;
   rb_scan_args(argc, argv, "01", &mask);
   
-  VALUE result = Qnil;
-  try {
-    // std::vector<cv::KeyPoint> & keypoints, cv::Mat & descriptors, bool useProvidedKeypoints = false  
-    cv::ORB featuresFinder;
-    std::vector<cv::KeyPoint> keypoints;
-   
-    const cv::Mat selfMat(CVMAT(self));
+  const cv::Mat selfMat(CVMAT(self));
+  const CvSize size = cvGetSize(CVARR(self));
   
-    if (mask == Qnil) {
-      CvSize size = cvGetSize(CVARR(self));
-      mask = new_object(cvSize(size.width, size.height), CV_MAKETYPE(CV_8U, 1));
-      cvSetZero(CVARR(mask));
-    }
-    const cv::Mat maskMat(CVMAT(self));
-    
-    featuresFinder(selfMat, maskMat, keypoints);
-    
-    result = rb_ary_new2(keypoints.size());
-    for (size_t i = 0; i < keypoints.size(); ++i) {
-      rb_ary_store(result, i, cCvPoint::new_object(cvPoint(0,0)));
-    }
+  VALUE descriptors = new_object(cvSize(size.width, size.height), CV_MAKETYPE(CV_8U, 1));
+  cv::Mat descriptorsMat(CVMAT(descriptors));
+  
+  if (mask == Qnil) {
+    mask = new_object(cvSize(size.width, size.height), CV_MAKETYPE(CV_8U, 1));
+    cvSet(CVARR(mask), cvScalarAll(255));
+  }
+  const cv::Mat maskMat(CVMAT(mask));
+  
+  std::vector<cv::KeyPoint> keypoints;
+  try {  
+    cv::ORB featuresFinder;
+    featuresFinder(selfMat, maskMat, keypoints, descriptorsMat);
   }
   catch (cv::Exception& e) {
     raise_cverror(e);
   }
+  
+  VALUE keypointsList = rb_ary_new2(keypoints.size());
+  for (size_t i = 0; i < keypoints.size(); ++i) {
+    const cv::KeyPoint& keypoint = keypoints[i];
+    
+    VALUE keypointData = rb_hash_new();
+    
+    rb_hash_aset(keypointData, rb_str_new2("point"), cCvPoint::new_object(cvPoint(keypoint.pt.x, keypoint.pt.y)));
+    rb_hash_aset(keypointData, rb_str_new2("size"), rb_float_new(keypoint.size));
+    rb_hash_aset(keypointData, rb_str_new2("angle"), rb_float_new(keypoint.angle));
+    rb_hash_aset(keypointData, rb_str_new2("response"), rb_float_new(keypoint.response));
+    
+    rb_ary_store(keypointsList, i, keypointData);
+  }
+  
+  VALUE result = rb_ary_new2(2);
+  rb_ary_store(result, 0, keypointsList);
+  rb_ary_store(result, 1, descriptors);
 
   return result;
 }
