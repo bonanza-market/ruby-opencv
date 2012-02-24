@@ -5945,8 +5945,7 @@ rb_extract_orb(int argc, VALUE *argv, VALUE self)
   const cv::Mat selfMat(CVMAT(self));
   const CvSize size = cvGetSize(CVARR(self));
   
-  VALUE descriptors = new_object(cvSize(size.width, size.height), CV_MAKETYPE(CV_8U, 1));
-  cv::Mat descriptorsMat(CVMAT(descriptors));
+  cv::Mat descriptorsMat;
   
   if (mask == Qnil) {
     mask = new_object(cvSize(size.width, size.height), CV_MAKETYPE(CV_8U, 1));
@@ -5976,6 +5975,11 @@ rb_extract_orb(int argc, VALUE *argv, VALUE self)
     
     rb_ary_store(keypointsList, i, keypointData);
   }
+  
+  CvMat descriptorsCvMat = descriptorsMat;
+  VALUE descriptors = new_mat_kind_object(cvGetSize(&descriptorsCvMat), self, CV_8U, 1);
+  
+  cvCopy(&descriptorsCvMat, CVMAT(descriptors));
   
   VALUE result = rb_ary_new2(2);
   rb_ary_store(result, 0, keypointsList);
