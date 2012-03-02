@@ -90,6 +90,9 @@ __NAMESPACE_BEGIN_CVMAT
 #define DO_ORB_EDGE_THRESHOLD(op) NUM2INT(rb_hash_aref(op, ID2SYM(rb_intern("edge_threshold"))))
 #define DO_ORB_FIRST_LEVEL(op) NUM2INT(rb_hash_aref(op, ID2SYM(rb_intern("first_level"))))
 
+#define HIST_OPTION(op) NIL_P(op) ? rb_const_get(rb_class(), rb_intern("HIST_OPTION")) : rb_funcall(rb_const_get(rb_class(), rb_intern("HIST_OPTION")), rb_intern("merge"), 1, op)
+#define DO_HIST_BINS(op) NUM2INT(rb_hash_aref(op, ID2SYM(rb_intern("bins"))))
+
 VALUE rb_klass;
 
 VALUE
@@ -163,6 +166,11 @@ void define_ruby_class()
   rb_hash_aset(orb_option, ID2SYM(rb_intern("n_levels")), INT2NUM(3));
   rb_hash_aset(orb_option, ID2SYM(rb_intern("edge_threshold")), INT2NUM(31));
   rb_hash_aset(orb_option, ID2SYM(rb_intern("first_level")), INT2FIX(0));
+  
+  VALUE hist_option = rb_hash_new();
+  rb_define_const(rb_klass, "HIST_OPTION", hist_option);
+  rb_hash_aset(hist_option, ID2SYM(rb_intern("bins")), INT2NUM(-1));
+  
 
   rb_define_private_method(rb_klass, "initialize", RUBY_METHOD_FUNC(rb_initialize), -1);
   rb_define_singleton_method(rb_klass, "load", RUBY_METHOD_FUNC(rb_load_imageM), -1);
@@ -371,6 +379,8 @@ void define_ruby_class()
   rb_define_method(rb_klass, "inpaint", RUBY_METHOD_FUNC(rb_inpaint), 3);
 
   rb_define_method(rb_klass, "equalize_hist", RUBY_METHOD_FUNC(rb_equalize_hist), 0);
+  rb_define_method(rb_klass, "calc_hist", RUBY_METHOD_FUNC(rb_calc_hist), -1);
+  
   rb_define_method(rb_klass, "match_template", RUBY_METHOD_FUNC(rb_match_template), -1);
   rb_define_method(rb_klass, "match_shapes", RUBY_METHOD_FUNC(rb_match_shapes), -1);
 
@@ -5427,6 +5437,86 @@ rb_equalize_hist(VALUE self)
 
 /*
  * call-seq:
+ *   calc_hist(<i>[hist_options]</i>) - cvmatnd
+ #
+ * Return 
+ *
+ * <i>hist_options</i> should be Hash include these keys.
+ *   :bins
+ *      Number of bins to create per-channel. Defaults to -1, which will use the depth of the image as the bin count.
+ *
+ */
+VALUE
+rb_calc_hist(int argc, VALUE *argv, VALUE self)
+{
+  VALUE hist_options;
+  rb_scan_args(argc, argv, "01", &hist_options);
+  
+  hist_options = HIST_OPTION(hist_options);
+  int binCount = DO_HIST_BINS(hist_options);
+  if (binCount < 0) {
+    binCount = 256;
+  }
+  
+  cv::Mat maskMat;
+//  if (mask == Qnil) {
+//     maskMat = CVMAT(mask);
+//  }
+
+  float channelRanges[] = { 0, 256 };
+  const float* ranges[] = { channelRanges, channelRanges, channelRanges, channelRanges };
+  const int histSize[] = { binCount, binCount, binCount, binCount };
+  const int channels[] = { 0, 1, 2, 3 };
+  
+  VALUE result = Qnil;
+  try {
+    const cv::Mat src(CVMAT(self));
+    cv::MatND histMat;
+  
+    cv::calcHist(
+      &src, 1, 
+      channels, 
+      maskMat,
+      histMat, src.channels(), 
+      histSize, ranges,
+      true,
+      false
+    );
+    
+//    int resultSize = 0;
+//    for (int dimension = 0; dimension < histMat.dims; ++dimension) {
+//      resultSize += histSize[dimension];
+//    }
+//    
+//    result = rb_ary_new2(resultSize);
+//    for (int dimension = 0; dimension < histMat.dims; ++dimension) {
+//      const int dimensionBinCount = histSize[dimension];
+//      
+//      VALUE dimensionHist = rb_ary_new2(dimensionBinCount);
+//      for (int binIndex = 0; binIndex < dimensionBinCount; ++binIndex) {
+//        rb_float_new(histMat.at<float>())
+//        
+//      }
+//      rb_ary_store(result, dimension, dimensionHist);
+//    }
+    
+    const CvMatND histmatnd(histMat);
+//    CvMatND* test = cvCloneMatND(&histmatnd);
+    result = cCvMatND::new_object(&histmatnd);
+//    result = cCvMat::new_object(histMat.rows, histMat.cols, histMat.type());
+//    hist = new_mat_kind_object(cvGetSize(&histCvMat), self, CV_8U, 3);
+//      cv::MatND resultMat(CVMATND(result));
+//      maskMat.copyTo(resultMat);
+  }
+  catch (cv::Exception& e) {
+    raise_cverror(e);
+  }
+  
+  return result;
+}
+
+/*
+ * call-seq:
  *   match_template(<i>template[,method = :sqdiff]</i>) -> cvmat(result)
  *
  * Compares template against overlapped image regions.
@@ -6000,7 +6090,6 @@ rb_extract_orb(int argc, VALUE *argv, VALUE self)
   
   CvMat descriptorsCvMat = descriptorsMat;
   VALUE descriptors = new_mat_kind_object(cvGetSize(&descriptorsCvMat), self, CV_8U, 1);
-  
   cvCopy(&descriptorsCvMat, CVMAT(descriptors));
   
   VALUE result = rb_ary_new2(2);

@@ -94,6 +94,35 @@ rb_cvCreateMat(int rows, int cols, int type)
 }
 
 /*
+ * Creates CvMatND and underlying data
+ * When memory allocation is failed, run GC and retry it
+ */
+CvMatND* 
+rb_cvCreateMatND(int dims, const int* sizes, int type)
+{
+  CvMatND* ptr = NULL;
+  try {
+    ptr = cvCreateMatND(dims, sizes, type);
+  }
+  catch(cv::Exception& e) {
+    if (e.code != CV_StsNoMem)
+      rb_raise(rb_eRuntimeError, "%s", e.what());
+
+    rb_gc_start();
+    try {
+      ptr = cvCreateMatND(dims, sizes, type);
+    }
+    catch (cv::Exception& e) {
+      if (e.code == CV_StsNoMem)
+	rb_raise(rb_eNoMemError, "%s", e.what());
+      else
+	rb_raise(rb_eRuntimeError, "%s", e.what());
+    }
+  }
+  return ptr;
+}
+
+/*
  * Create IplImage header and allocate underlying data
  * When memory allocation is failed, run GC and retry it
  */

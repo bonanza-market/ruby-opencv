@@ -225,8 +225,11 @@ VALUE rb_hough_circles(int argc, VALUE *argv, VALUE self);
 VALUE rb_dist_transform(int argc, VALUE *argv, VALUE self);
 VALUE rb_inpaint(VALUE self, VALUE inpaint_method, VALUE mask, VALUE radius);
 
+/* Histograms */
 VALUE rb_equalize_hist(VALUE self);
-/* Matching*/
+VALUE rb_calc_hist(int argc, VALUE *argv, VALUE self);
+
+/* Matching */
 VALUE rb_match_template(int argc, VALUE *argv, VALUE self);
 VALUE rb_match_shapes(int argc, VALUE *argv, VALUE self);
 /* Object Tracking */
