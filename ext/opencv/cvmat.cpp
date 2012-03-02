@@ -84,6 +84,12 @@ __NAMESPACE_BEGIN_CVMAT
 #define FFM_MAXIMUM_DISTANCE(op) NUM2DBL(rb_hash_aref(op, ID2SYM(rb_intern("maximum_distance"))))
 #define FFM_DESIRABLE_LEVEL(op) NUM2DBL(rb_hash_aref(op, ID2SYM(rb_intern("desirable_level"))))
 
+#define ORB_OPTION(op) NIL_P(op) ? rb_const_get(rb_class(), rb_intern("ORB_OPTION")) : rb_funcall(rb_const_get(rb_class(), rb_intern("ORB_OPTION")), rb_intern("merge"), 1, op)
+#define DO_ORB_SCALE_FACTOR(op) NUM2DBL(rb_hash_aref(op, ID2SYM(rb_intern("scale_factor"))))
+#define DO_ORB_N_LEVELS(op) NUM2INT(rb_hash_aref(op, ID2SYM(rb_intern("n_levels"))))
+#define DO_ORB_EDGE_THRESHOLD(op) NUM2INT(rb_hash_aref(op, ID2SYM(rb_intern("edge_threshold"))))
+#define DO_ORB_FIRST_LEVEL(op) NUM2INT(rb_hash_aref(op, ID2SYM(rb_intern("first_level"))))
+
 VALUE rb_klass;
 
 VALUE
@@ -150,6 +156,13 @@ void define_ruby_class()
   rb_hash_aset(find_fundamental_matrix_option, ID2SYM(rb_intern("with_status")), Qfalse);
   rb_hash_aset(find_fundamental_matrix_option, ID2SYM(rb_intern("maximum_distance")), rb_float_new(1.0));
   rb_hash_aset(find_fundamental_matrix_option, ID2SYM(rb_intern("desirable_level")), rb_float_new(0.99));
+  
+  VALUE orb_option = rb_hash_new();
+  rb_define_const(rb_klass, "ORB_OPTION", orb_option);
+  rb_hash_aset(orb_option, ID2SYM(rb_intern("scale_factor")), rb_float_new(1.2f));
+  rb_hash_aset(orb_option, ID2SYM(rb_intern("n_levels")), INT2NUM(3));
+  rb_hash_aset(orb_option, ID2SYM(rb_intern("edge_threshold")), INT2NUM(31));
+  rb_hash_aset(orb_option, ID2SYM(rb_intern("first_level")), INT2FIX(0));
 
   rb_define_private_method(rb_klass, "initialize", RUBY_METHOD_FUNC(rb_initialize), -1);
   rb_define_singleton_method(rb_klass, "load", RUBY_METHOD_FUNC(rb_load_imageM), -1);
@@ -5939,8 +5952,10 @@ rb_extract_surf(int argc, VALUE *argv, VALUE self)
 VALUE
 rb_extract_orb(int argc, VALUE *argv, VALUE self)
 {
-  VALUE mask;
-  rb_scan_args(argc, argv, "01", &mask);
+  VALUE mask, orb_option;
+  rb_scan_args(argc, argv, "02", &mask, &orb_option);
+  
+  orb_option = ORB_OPTION(orb_option);
   
   const cv::Mat selfMat(CVMAT(self));
   const CvSize size = cvGetSize(CVARR(self));
@@ -5954,8 +5969,14 @@ rb_extract_orb(int argc, VALUE *argv, VALUE self)
   const cv::Mat maskMat(CVMAT(mask));
   
   std::vector<cv::KeyPoint> keypoints;
-  try {  
-    cv::ORB featuresFinder;
+  try {
+    // CommonParams(float scale_factor = 1.2f, unsigned int n_levels = DEFAULT_N_LEVELS,
+    //              int edge_threshold = 31, unsigned int first_level = DEFAULT_FIRST_LEVEL);
+    cv::ORB::CommonParams params(DO_ORB_SCALE_FACTOR(orb_option), 
+                                 DO_ORB_N_LEVELS(orb_option),
+                                 DO_ORB_EDGE_THRESHOLD(orb_option),
+                                 DO_ORB_FIRST_LEVEL(orb_option));
+    cv::ORB featuresFinder(500, params);
     featuresFinder(selfMat, maskMat, keypoints, descriptorsMat);
   }
   catch (cv::Exception& e) {
@@ -5972,6 +5993,7 @@ rb_extract_orb(int argc, VALUE *argv, VALUE self)
     rb_hash_aset(keypointData, rb_str_new2("size"), rb_float_new(keypoint.size));
     rb_hash_aset(keypointData, rb_str_new2("angle"), rb_float_new(keypoint.angle));
     rb_hash_aset(keypointData, rb_str_new2("response"), rb_float_new(keypoint.response));
+    rb_hash_aset(keypointData, rb_str_new2("octave"), rb_float_new(keypoint.octave));
     
     rb_ary_store(keypointsList, i, keypointData);
   }
