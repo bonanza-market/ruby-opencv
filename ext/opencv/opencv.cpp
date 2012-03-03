@@ -317,6 +317,12 @@ init_ruby_module()
   rb_define_const(rb_module, "GC_PR_BGD", INT2FIX(cv::GC_PR_BGD));
   rb_define_const(rb_module, "GC_PR_FGD", INT2FIX(cv::GC_PR_FGD));
 
+  /* Histogram comparison mode */
+  rb_define_const(rb_module, "CV_COMP_CORREL", INT2FIX(CV_COMP_CORREL));
+  rb_define_const(rb_module, "CV_COMP_CHISQR", INT2FIX(CV_COMP_CHISQR));
+  rb_define_const(rb_module, "CV_COMP_INTERSECT", INT2FIX(CV_COMP_INTERSECT));
+  rb_define_const(rb_module, "CV_COMP_BHATTACHARYYA", INT2FIX(CV_COMP_BHATTACHARYYA));
+
   /* Inpaint method */
   rb_define_const(rb_module, "CV_INPAINT_NS", INT2FIX(CV_INPAINT_NS));
   rb_define_const(rb_module, "CV_INPAINT_TELEA", INT2FIX(CV_INPAINT_TELEA));
@@ -529,6 +535,14 @@ init_ruby_module()
   rb_define_const(rb_module, "INPAINT_METHOD", inpaint_method);
   REGISTER_HASH(inpaint_method, "ns", CV_INPAINT_NS);
   REGISTER_HASH(inpaint_method, "telea", CV_INPAINT_TELEA);
+
+  VALUE compare_hist_method = rb_hash_new();
+  /* histogram comparison method method */
+  rb_define_const(rb_module, "COMPARE_HIST_METHOD", compare_hist_method);
+  REGISTER_CVMETHOD(compare_hist_method, "correl", CV_COMP_CORREL);
+  REGISTER_CVMETHOD(compare_hist_method, "chisqr", CV_COMP_CHISQR);
+  REGISTER_CVMETHOD(compare_hist_method, "intersect", CV_COMP_INTERSECT);
+  REGISTER_CVMETHOD(compare_hist_method, "bhattacharyya", CV_COMP_BHATTACHARYYA);
 
   VALUE comparison_method = rb_hash_new();
   /* Comparison method */

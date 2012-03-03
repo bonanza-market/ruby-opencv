@@ -92,6 +92,7 @@ __NAMESPACE_BEGIN_CVMAT
 
 #define HIST_OPTION(op) NIL_P(op) ? rb_const_get(rb_class(), rb_intern("HIST_OPTION")) : rb_funcall(rb_const_get(rb_class(), rb_intern("HIST_OPTION")), rb_intern("merge"), 1, op)
 #define DO_HIST_BINS(op) NUM2INT(rb_hash_aref(op, ID2SYM(rb_intern("bins"))))
+#define DO_HIST_MASK(op) rb_hash_aref(op, ID2SYM(rb_intern("mask")))
 
 VALUE rb_klass;
 
@@ -170,7 +171,8 @@ void define_ruby_class()
   VALUE hist_option = rb_hash_new();
   rb_define_const(rb_klass, "HIST_OPTION", hist_option);
   rb_hash_aset(hist_option, ID2SYM(rb_intern("bins")), INT2NUM(-1));
-  
+  rb_hash_aset(hist_option, ID2SYM(rb_intern("mask")), Qnil);
+
 
   rb_define_private_method(rb_klass, "initialize", RUBY_METHOD_FUNC(rb_initialize), -1);
   rb_define_singleton_method(rb_klass, "load", RUBY_METHOD_FUNC(rb_load_imageM), -1);
@@ -5359,8 +5361,8 @@ rb_hough_circles(int argc, VALUE *argv, VALUE self)
 {
   const int INVALID_TYPE = -1;
   VALUE method, dp, min_dist, param1, param2, min_radius, max_radius, storage;
-  rb_scan_args(argc, argv, "52", &method, &dp, &min_dist, &param1, &param2, 
-	       &min_radius, &max_radius);
+                                     rb_scan_args(argc, argv, "52", &method, &dp, &min_dist, &param1, &param2,
+                                   	       &min_radius, &max_radius);
   storage = cCvMemStorage::new_object();
   int method_flag = CVMETHOD("HOUGH_TRANSFORM_METHOD", method, INVALID_TYPE);
   if (method_flag == INVALID_TYPE)
@@ -5444,6 +5446,9 @@ rb_equalize_hist(VALUE self)
  * <i>hist_options</i> should be Hash include these keys.
  *   :bins
  *      Number of bins to create per-channel. Defaults to -1, which will use the depth of the image as the bin count.
+ *   :mask
+ *      Optional Optional mask. If the matrix is not empty, it must be an 8-bit array of the same size as arrays[i] .
+ *      The non-zero mask elements mark the array elements counted in the histogram.
  *
  */
 VALUE
@@ -5451,28 +5456,33 @@ rb_calc_hist(int argc, VALUE *argv, VALUE self)
 {
   VALUE hist_options;
   rb_scan_args(argc, argv, "01", &hist_options);
-  
+
+  const cv::Mat src(CVMAT(self));
+
   hist_options = HIST_OPTION(hist_options);
+
+  const float channelRanges[] = { 0, std::pow(2.0, (float)src.elemSize1() * 8.0) };
+  const float* ranges[] = { channelRanges, channelRanges, channelRanges, channelRanges };
+
   int binCount = DO_HIST_BINS(hist_options);
   if (binCount < 0) {
-    binCount = 256;
+    binCount = int(channelRanges[1]);
   }
-  
-  cv::Mat maskMat;
-//  if (mask == Qnil) {
-//     maskMat = CVMAT(mask);
-//  }
 
-  float channelRanges[] = { 0, 256 };
-  const float* ranges[] = { channelRanges, channelRanges, channelRanges, channelRanges };
   const int histSize[] = { binCount, binCount, binCount, binCount };
   const int channels[] = { 0, 1, 2, 3 };
-  
-  VALUE result = Qnil;
+
+  cv::Mat maskMat;
+  VALUE maskVal = DO_HIST_MASK(hist_options);
+  if (maskVal != Qnil) {
+     if (!(rb_obj_is_kind_of(maskVal, cCvMat::rb_class())) || cvGetElemType(CVARR(maskVal)) != CV_8UC1)
+       rb_raise(rb_eTypeError, "mask should be mask image.");
+     maskMat = CVMAT(maskVal);
+  }
+
   try {
-    const cv::Mat src(CVMAT(self));
     cv::MatND histMat;
-  
+
     cv::calcHist(
       &src, 1, 
       channels, 
@@ -5483,36 +5493,14 @@ rb_calc_hist(int argc, VALUE *argv, VALUE self)
       false
     );
     
-//    int resultSize = 0;
-//    for (int dimension = 0; dimension < histMat.dims; ++dimension) {
-//      resultSize += histSize[dimension];
-//    }
-//    
-//    result = rb_ary_new2(resultSize);
-//    for (int dimension = 0; dimension < histMat.dims; ++dimension) {
-//      const int dimensionBinCount = histSize[dimension];
-//      
-//      VALUE dimensionHist = rb_ary_new2(dimensionBinCount);
-//      for (int binIndex = 0; binIndex < dimensionBinCount; ++binIndex) {
-//        rb_float_new(histMat.at<float>())
-//        
-//      }
-//      rb_ary_store(result, dimension, dimensionHist);
-//    }
-    
     const CvMatND histmatnd(histMat);
-//    CvMatND* test = cvCloneMatND(&histmatnd);
-    result = cCvMatND::new_object(&histmatnd);
-//    result = cCvMat::new_object(histMat.rows, histMat.cols, histMat.type());
-//    hist = new_mat_kind_object(cvGetSize(&histCvMat), self, CV_8U, 3);
-//      cv::MatND resultMat(CVMATND(result));
-//      maskMat.copyTo(resultMat);
+    return cCvMatND::new_object(&histmatnd);
   }
   catch (cv::Exception& e) {
     raise_cverror(e);
   }
   
-  return result;
+  return Qnil;
 }
 
 /*
