@@ -89,6 +89,8 @@ __NAMESPACE_BEGIN_CVMAT
 #define DO_ORB_N_LEVELS(op) NUM2INT(rb_hash_aref(op, ID2SYM(rb_intern("n_levels"))))
 #define DO_ORB_EDGE_THRESHOLD(op) NUM2INT(rb_hash_aref(op, ID2SYM(rb_intern("edge_threshold"))))
 #define DO_ORB_FIRST_LEVEL(op) NUM2INT(rb_hash_aref(op, ID2SYM(rb_intern("first_level"))))
+#define DO_ORB_KEYPOINTS(op) (rb_hash_aref(op, ID2SYM(rb_intern("keypoints"))))
+#define DO_ORB_KEYPOINTS_ONLY(op) TRUE_OR_FALSE(rb_hash_aref(op, ID2SYM(rb_intern("keypoints_only"))), 0)
 
 #define HIST_OPTION(op) NIL_P(op) ? rb_const_get(rb_class(), rb_intern("HIST_OPTION")) : rb_funcall(rb_const_get(rb_class(), rb_intern("HIST_OPTION")), rb_intern("merge"), 1, op)
 #define DO_HIST_BINS(op) NUM2INT(rb_hash_aref(op, ID2SYM(rb_intern("bins"))))
@@ -167,6 +169,8 @@ void define_ruby_class()
   rb_hash_aset(orb_option, ID2SYM(rb_intern("n_levels")), INT2NUM(3));
   rb_hash_aset(orb_option, ID2SYM(rb_intern("edge_threshold")), INT2NUM(31));
   rb_hash_aset(orb_option, ID2SYM(rb_intern("first_level")), INT2FIX(0));
+  rb_hash_aset(orb_option, ID2SYM(rb_intern("keypoints")), Qnil);
+  rb_hash_aset(orb_option, ID2SYM(rb_intern("keypoints_only")), Qfalse);
   
   VALUE hist_option = rb_hash_new();
   rb_define_const(rb_klass, "HIST_OPTION", hist_option);
@@ -6018,14 +6022,27 @@ rb_extract_surf(int argc, VALUE *argv, VALUE self)
   return rb_assoc_new(_keypoints, _descriptors);
 }
 
-
 /*
  * call-seq:
- *   rb_extract_orb(params[,mask]) -> [cvseq(cvsurfpoint), array(float)]
+ *   rb_extract_orb(params[,mask]) -> [array(hash), cvmat]
  * Extracts ORB Features from an image
  *
- * <i>params</i> (CvSURFParams) - Various algorithm parameters put to the structure CvSURFParams.
+ * <i>params</i> (hash) - Various algorithm parameters, allowing the following keys:
+ *    :scale_factor   - Scale factor used to transform scale level n into scale level n-1. Defaults to 1.2
+ *    :n_levels       - Number of pyramid levels to consider when generating keypoints. Defaults to 3
+ *    :edge_threshold - Defaults to 31
+ *    :first_level    - The pyramid level of the image this function is being called on - level 0 is the largest level
+ *                      of the pyramid, so any value > 0 will generate pyramid levels larger than the original image.
+ *                      Defaults to 0
+ *    :keypoints      - If given, should be an array of tuples of [ x, y, size ] describing keypoints to generate 
+ *                      descriptors for. Defaults to nil
+ *    :keypoints_only - If true, descriptors will not be generated. Returned value will only be array(hash) containing
+ *                      keypoints (given keypoints will be ignored). Defaults to false.
+ *
  * <i>mask</i> (CvMat) - The optional input 8-bit mask. The features are only found in the areas that contain more than 50% of non-zero mask pixels.
+ *
+ * Returns array of keypoints (array of hashes) and descriptors (cvmat). Keypoints array contains entries with the
+ * following keys: 'point' => CvPoint, 'size' => float, 'angle' => float, 'response' => float, 'octave' => float
  */
 VALUE
 rb_extract_orb(int argc, VALUE *argv, VALUE self)
@@ -6047,15 +6064,32 @@ rb_extract_orb(int argc, VALUE *argv, VALUE self)
   const cv::Mat maskMat(CVMAT(mask));
   
   std::vector<cv::KeyPoint> keypoints;
+  VALUE inputKeypoints = DO_ORB_KEYPOINTS(orb_option);
+  const bool descriptorsOnly = inputKeypoints != Qnil;
+  if (descriptorsOnly) {
+    const int inputKeypointsLength = RARRAY_LEN(inputKeypoints);
+    for (int i = 0; i < inputKeypointsLength; ++i) {
+      VALUE inputKeypoint = rb_ary_entry(inputKeypoints, i);
+      keypoints.push_back(cv::KeyPoint(
+        (float)NUM2DBL(rb_ary_entry(inputKeypoint, 0)),
+        (float)NUM2DBL(rb_ary_entry(inputKeypoint, 1)),
+        (float)NUM2DBL(rb_ary_entry(inputKeypoint, 2))
+      ));
+    }
+  }
+  
   try {
-    // CommonParams(float scale_factor = 1.2f, unsigned int n_levels = DEFAULT_N_LEVELS,
-    //              int edge_threshold = 31, unsigned int first_level = DEFAULT_FIRST_LEVEL);
     cv::ORB::CommonParams params(DO_ORB_SCALE_FACTOR(orb_option), 
                                  DO_ORB_N_LEVELS(orb_option),
                                  DO_ORB_EDGE_THRESHOLD(orb_option),
                                  DO_ORB_FIRST_LEVEL(orb_option));
     cv::ORB featuresFinder(500, params);
-    featuresFinder(selfMat, maskMat, keypoints, descriptorsMat);
+    
+    if (DO_ORB_KEYPOINTS_ONLY(orb_option)) {
+      featuresFinder(selfMat, maskMat, keypoints);
+    } else {
+      featuresFinder(selfMat, maskMat, keypoints, descriptorsMat, descriptorsOnly);
+    }
   }
   catch (cv::Exception& e) {
     raise_cverror(e);
@@ -6076,13 +6110,22 @@ rb_extract_orb(int argc, VALUE *argv, VALUE self)
     rb_ary_store(keypointsList, i, keypointData);
   }
   
-  CvMat descriptorsCvMat = descriptorsMat;
-  VALUE descriptors = new_mat_kind_object(cvGetSize(&descriptorsCvMat), self, CV_8U, 1);
-  cvCopy(&descriptorsCvMat, CVMAT(descriptors));
-  
-  VALUE result = rb_ary_new2(2);
-  rb_ary_store(result, 0, keypointsList);
-  rb_ary_store(result, 1, descriptors);
+  VALUE result = Qnil;
+  if (DO_ORB_KEYPOINTS_ONLY(orb_option)) {
+    result = keypointsList;  
+  } else {
+    CvMat descriptorsCvMat = descriptorsMat;
+    VALUE descriptors = new_mat_kind_object(cvGetSize(&descriptorsCvMat), self, CV_8U, 1);
+    cvCopy(&descriptorsCvMat, CVMAT(descriptors));
+    
+    if (descriptorsOnly) {
+      result = descriptors;
+    } else {
+      result = rb_ary_new2(2);
+      rb_ary_store(result, 0, keypointsList);
+      rb_ary_store(result, 1, descriptors);
+    }
+  }
 
   return result;
 }
