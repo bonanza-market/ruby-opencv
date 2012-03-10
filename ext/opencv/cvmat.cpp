@@ -91,6 +91,7 @@ __NAMESPACE_BEGIN_CVMAT
 #define DO_ORB_FIRST_LEVEL(op) NUM2INT(rb_hash_aref(op, ID2SYM(rb_intern("first_level"))))
 #define DO_ORB_KEYPOINTS(op) (rb_hash_aref(op, ID2SYM(rb_intern("keypoints"))))
 #define DO_ORB_KEYPOINTS_ONLY(op) TRUE_OR_FALSE(rb_hash_aref(op, ID2SYM(rb_intern("keypoints_only"))), 0)
+#define DO_ORB_NUM_KEYPOINTS(op) NUM2INT(rb_hash_aref(op, ID2SYM(rb_intern("num_keypoints"))))
 
 #define HIST_OPTION(op) NIL_P(op) ? rb_const_get(rb_class(), rb_intern("HIST_OPTION")) : rb_funcall(rb_const_get(rb_class(), rb_intern("HIST_OPTION")), rb_intern("merge"), 1, op)
 #define DO_HIST_BINS(op) NUM2INT(rb_hash_aref(op, ID2SYM(rb_intern("bins"))))
@@ -171,6 +172,7 @@ void define_ruby_class()
   rb_hash_aset(orb_option, ID2SYM(rb_intern("first_level")), INT2FIX(0));
   rb_hash_aset(orb_option, ID2SYM(rb_intern("keypoints")), Qnil);
   rb_hash_aset(orb_option, ID2SYM(rb_intern("keypoints_only")), Qfalse);
+  rb_hash_aset(orb_option, ID2SYM(rb_intern("num_keypoints")), INT2NUM(500));
   
   VALUE hist_option = rb_hash_new();
   rb_define_const(rb_klass, "HIST_OPTION", hist_option);
@@ -6038,6 +6040,7 @@ rb_extract_surf(int argc, VALUE *argv, VALUE self)
  *                      descriptors for. Defaults to nil
  *    :keypoints_only - If true, descriptors will not be generated. Returned value will only be array(hash) containing
  *                      keypoints (given keypoints will be ignored). Defaults to false.
+ *    :num_keypoints  - If given, maximum number of desired keypoints to find. Defaults to 500
  *
  * <i>mask</i> (CvMat) - The optional input 8-bit mask. The features are only found in the areas that contain more than 50% of non-zero mask pixels.
  *
@@ -6083,7 +6086,7 @@ rb_extract_orb(int argc, VALUE *argv, VALUE self)
                                  DO_ORB_N_LEVELS(orb_option),
                                  DO_ORB_EDGE_THRESHOLD(orb_option),
                                  DO_ORB_FIRST_LEVEL(orb_option));
-    cv::ORB featuresFinder(500, params);
+    cv::ORB featuresFinder(DO_ORB_NUM_KEYPOINTS(orb_option), params);
     
     if (DO_ORB_KEYPOINTS_ONLY(orb_option)) {
       featuresFinder(selfMat, maskMat, keypoints);
