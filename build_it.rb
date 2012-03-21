@@ -7,7 +7,7 @@
 # The only other thing you need to do is manually declare this gem to be the gem's local directory
 # in the Gemfile of your Rails project.
 
-require 'ruby-debug'
+#require 'ruby-debug'
 
 puts "Building extconf..."
 `#{Gem.ruby} ./extconf.rb`
