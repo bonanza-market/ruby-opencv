@@ -113,6 +113,7 @@ VALUE rb_in_range(VALUE self, VALUE min, VALUE max);
 VALUE rb_abs_diff(VALUE self, VALUE val);
 VALUE rb_log(VALUE self);
 VALUE rb_normalize(int argc, VALUE *argv, VALUE self);
+VALUE rb_magnitude(VALUE self, VALUE y);
 
 /* Statistics */
 VALUE rb_count_non_zero(VALUE self);

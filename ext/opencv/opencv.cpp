@@ -424,6 +424,28 @@ init_ruby_module()
   REGISTER_HASH(inversion_method, "svd_sym", CV_SVD_SYM);
   REGISTER_HASH(inversion_method, "svd_symmetric", CV_SVD_SYM);
     
+  VALUE dxt_flag = rb_hash_new();
+  /* {:forward, :inverse, :scale, :rows}: DFT and DCT flags */
+  rb_define_const(rb_module, "DXT_FLAG", dxt_flag);
+  REGISTER_HASH(dxt_flag, "forward", CV_DXT_FORWARD);
+  REGISTER_HASH(dxt_flag, "inverse", CV_DXT_INVERSE);
+  REGISTER_HASH(dxt_flag, "scale", CV_DXT_SCALE);
+  REGISTER_HASH(dxt_flag, "rows", CV_DXT_ROWS);
+    
+  VALUE interpolation_method = rb_hash_new();
+  /* {:nn, :linear, :area, :cubic}: Interpolation method */
+  rb_define_const(rb_module, "INTERPOLATION_METHOD", interpolation_method);
+  REGISTER_HASH(interpolation_method, "nn", CV_INTER_NN);
+  REGISTER_HASH(interpolation_method, "linear", CV_INTER_LINEAR);
+  REGISTER_HASH(interpolation_method, "area", CV_INTER_AREA);
+  REGISTER_HASH(interpolation_method, "cubic", CV_INTER_CUBIC);
+  
+  VALUE warp_flag = rb_hash_new();
+  /* {:fill_outliers, :inverse_map}: Warp affine optional flags */
+  rb_define_const(rb_module, "WARP_FLAG", warp_flag);
+  REGISTER_HASH(warp_flag, "fill_outliers", CV_WARP_FILL_OUTLIERS);
+  REGISTER_HASH(warp_flag, "inverse_map", CV_WARP_INVERSE_MAP);
+
   VALUE homography_calc_method = rb_hash_new();
   /* {:all, :ransac, :lmeds}: Methods used to computed homography matrix */
   rb_define_const(rb_module, "HOMOGRAPHY_CALC_METHOD", homography_calc_method);
