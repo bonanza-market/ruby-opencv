@@ -94,6 +94,7 @@ VALUE rb_add(int argc, VALUE *argv, VALUE self);
 VALUE rb_sub(int argc, VALUE *argv, VALUE self);    
 VALUE rb_mul(int argc, VALUE *argv, VALUE self);
 VALUE rb_sqrt(VALUE self);
+VALUE rb_sqrt(VALUE self);
 VALUE rb_mat_mul(int argc, VALUE *argv, VALUE self);
 VALUE rb_div(int argc, VALUE *argv, VALUE self);    
 VALUE rb_and(int argc, VALUE *argv, VALUE self);
@@ -110,6 +111,7 @@ VALUE rb_le(VALUE self, VALUE val);
 VALUE rb_ne(VALUE self, VALUE val);
 VALUE rb_in_range(VALUE self, VALUE min, VALUE max);
 VALUE rb_abs_diff(VALUE self, VALUE val);
+VALUE rb_log(VALUE self);
 VALUE rb_normalize(int argc, VALUE *argv, VALUE self);
 
 /* Statistics */
@@ -217,6 +219,8 @@ VALUE rb_draw_contours_bang(int argc, VALUE *argv, VALUE self);
 VALUE rb_pyr_segmentation(VALUE self, VALUE level, VALUE threshold1, VALUE threshold2);
 VALUE rb_pyr_mean_shift_filtering(int argc, VALUE *argv, VALUE self);
 VALUE rb_watershed(VALUE self, VALUE markers);
+
+VALUE rb_grab_cut(VALUE self, VALUE mask, VALUE rect, VALUE bgdModel, VALUE fgdModel, VALUE iterCount, VALUE mode);
 
 VALUE rb_moments(int argc, VALUE *argv, VALUE self);
 
