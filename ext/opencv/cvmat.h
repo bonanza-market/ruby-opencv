@@ -258,6 +258,9 @@ VALUE rb_extract_orb(int argc, VALUE *argv, VALUE self);
 // HighGUI function
 VALUE rb_save_image(VALUE self, VALUE filename);
 
+VALUE rb_fit_line(VALUE self, VALUE distType, VALUE param, VALUE reps, VALUE aeps);
+VALUE rb_fit_ellipse(VALUE self);
+
 VALUE new_object(int rows, int cols, int type);
 VALUE new_object(CvSize size, int type);
 VALUE new_mat_kind_object(CvSize size, VALUE ref_obj);

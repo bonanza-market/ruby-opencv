@@ -272,6 +272,12 @@ init_ruby_module()
   rb_define_const(rb_module, "CV_DIST_MASK_3", INT2FIX(CV_DIST_MASK_3));
   rb_define_const(rb_module, "CV_DIST_MASK_5", INT2FIX(CV_DIST_MASK_5));
   rb_define_const(rb_module, "CV_DIST_MASK_PRECISE", INT2FIX(CV_DIST_MASK_PRECISE));
+  
+  /* Fit line distance types */
+  rb_define_const(rb_module, "CV_DIST_L12", INT2FIX(CV_DIST_L12));
+  rb_define_const(rb_module, "CV_DIST_FAIR", INT2FIX(CV_DIST_FAIR));
+  rb_define_const(rb_module, "CV_DIST_WELSCH", INT2FIX(CV_DIST_WELSCH));
+  rb_define_const(rb_module, "CV_DIST_HUBER", INT2FIX(CV_DIST_HUBER));
 
   /* Adaptive methods */
   rb_define_const(rb_module, "CV_ADAPTIVE_THRESH_MEAN_C", INT2FIX(CV_ADAPTIVE_THRESH_MEAN_C));

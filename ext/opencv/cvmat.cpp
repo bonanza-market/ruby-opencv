@@ -412,6 +412,9 @@ void define_ruby_class()
   rb_define_method(rb_klass, "extract_orb", RUBY_METHOD_FUNC(rb_extract_orb), -1);
 
   rb_define_method(rb_klass, "save_image", RUBY_METHOD_FUNC(rb_save_image), 1);
+  
+  rb_define_method(rb_klass, "fit_ellipse", RUBY_METHOD_FUNC(rb_fit_ellipse), 0);
+  rb_define_method(rb_klass, "fit_line", RUBY_METHOD_FUNC(rb_fit_line), 4);
 }
 
 
@@ -1422,6 +1425,47 @@ rb_save_image(VALUE self, VALUE filename)
     raise_cverror(e);
   }
   return self;
+}
+
+/*
+ * call-seq:
+ *   fit_line() -> cvmat
+ *
+ * self should be 2-channel or 3-channel mat (where channels are [x,y] or [x,y,z])
+ *
+ */
+VALUE
+rb_fit_line(VALUE self, VALUE distType, VALUE param, VALUE reps, VALUE aeps)
+{  
+  VALUE dest = new_mat_kind_object(cvGetSize(CVARR(self)), self);
+  try {
+    const cv::Mat selfMat(CVMAT(self));
+    cv::Mat destMat(CVMAT(dest));
+    cv::fitLine(selfMat, destMat, NUM2INT(distType), NUM2DBL(param), NUM2DBL(reps), NUM2DBL(aeps));
+  }
+  catch (cv::Exception& e) {
+    raise_cverror(e);
+  }
+  return dest;
+}
+
+/*
+ * call-seq:
+ *   fit_ellipse -> CvBox2D
+ *
+ */
+VALUE
+rb_fit_ellipse(VALUE self)
+{
+  VALUE box = cCvBox2D::new_object();
+  try {
+    const cv::Mat selfMat(CVMAT(self));
+    *CVBOX2D(box) = cv::fitEllipse(selfMat);
+  }
+  catch (cv::Exception& e) {
+    raise_cverror(e);
+  }
+  return box;
 }
 
 /*
