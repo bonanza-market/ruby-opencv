@@ -288,6 +288,46 @@ rb_bottom_right(VALUE self)
 				      rect->y + rect->height));
 }
 
+/*
+ * Return top-center point of rectangle.
+ */
+VALUE
+rb_top_center(VALUE self)
+{
+  CvRect* rect = CVRECT(self);
+  return cCvPoint::new_object(cvPoint(rect->x + rect->width / 2, rect->y));
+}
+
+/*
+ * Return bottom-center point of rectangle.
+ */
+VALUE
+rb_bottom_center(VALUE self)
+{
+  CvRect* rect = CVRECT(self);
+  return cCvPoint::new_object(cvPoint(rect->x + rect->width / 2, rect->y + rect->height));
+}
+
+/*
+ * Return center-right point of rectangle.
+ */
+VALUE
+rb_center_right(VALUE self)
+{
+  CvRect* rect = CVRECT(self);
+  return cCvPoint::new_object(cvPoint(rect->x + rect->width, rect->y + rect->height / 2));
+}
+
+/*
+ * Return center-left point of rectangle.
+ */
+VALUE
+rb_center_left(VALUE self)
+{
+  CvRect* rect = CVRECT(self);
+  return cCvPoint::new_object(cvPoint(rect->x + rect->width, rect->y));
+}
+
 VALUE
 new_object(CvRect rect)
 {

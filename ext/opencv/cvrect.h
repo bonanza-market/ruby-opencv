@@ -47,6 +47,11 @@ VALUE rb_set_bottom_left(VALUE self, VALUE point);
 VALUE rb_bottom_right(VALUE self);
 VALUE rb_set_bottom_right(VALUE self, VALUE point);
 
+VALUE rb_top_center(VALUE self);
+VALUE rb_bottom_center(VALUE self);
+VALUE rb_center_right(VALUE self);
+VALUE rb_center_left(VALUE self);
+
 VALUE new_object(CvRect rect);
 
 __NAMESPACE_END_CVRECT
