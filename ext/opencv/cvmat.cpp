@@ -1419,7 +1419,9 @@ rb_save_image(VALUE self, VALUE filename)
 {
   Check_Type(filename, T_STRING);
   try {
-    cvSaveImage(StringValueCStr(filename), CVARR(self));
+    const cv::Mat selfMat(CVMAT(self));
+    cv::imwrite(StringValueCStr(filename), selfMat);
+    //cvSaveImage(StringValueCStr(filename), CVARR(self));
   }
   catch (cv::Exception& e) {
     raise_cverror(e);
