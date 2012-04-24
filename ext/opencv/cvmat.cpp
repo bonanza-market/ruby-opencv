@@ -460,6 +460,8 @@ __NAMESPACE_BEGIN_CVMAT
 #define HIST_OPTION(op) NIL_P(op) ? rb_const_get(rb_class(), rb_intern("HIST_OPTION")) : rb_funcall(rb_const_get(rb_class(), rb_intern("HIST_OPTION")), rb_intern("merge"), 1, op)
 #define DO_HIST_BINS(op) NUM2INT(rb_hash_aref(op, ID2SYM(rb_intern("bins"))))
 #define DO_HIST_MASK(op) rb_hash_aref(op, ID2SYM(rb_intern("mask")))
+#define DO_HIST_MIN(op) rb_hash_aref(op, ID2SYM(rb_intern("min")))
+#define DO_HIST_MAX(op) rb_hash_aref(op, ID2SYM(rb_intern("max")))
 
 VALUE rb_klass;
 
@@ -542,7 +544,8 @@ void define_ruby_class()
   rb_define_const(rb_klass, "HIST_OPTION", hist_option);
   rb_hash_aset(hist_option, ID2SYM(rb_intern("bins")), INT2NUM(-1));
   rb_hash_aset(hist_option, ID2SYM(rb_intern("mask")), Qnil);
-
+  rb_hash_aset(hist_option, ID2SYM(rb_intern("min")), Qnil);
+  rb_hash_aset(hist_option, ID2SYM(rb_intern("max")), Qnil);
 
   rb_define_private_method(rb_klass, "initialize", RUBY_METHOD_FUNC(rb_initialize), -1);
   rb_define_singleton_method(rb_klass, "load", RUBY_METHOD_FUNC(rb_load_imageM), -1);
@@ -5955,8 +5958,14 @@ rb_calc_hist(int argc, VALUE *argv, VALUE self)
   const cv::Mat src(CVMAT(self));
 
   hist_options = HIST_OPTION(hist_options);
+  
+  VALUE minVal = DO_HIST_MIN(hist_options);
+  const float rangeMin = minVal != Qnil ? NUM2DBL(minVal) : 0;
+  
+  VALUE maxVal = DO_HIST_MAX(hist_options);
+  const float rangeMax = maxVal != Qnil ? NUM2DBL(maxVal) : std::pow(2.0, (float)src.elemSize1() * 8.0);
 
-  const float channelRanges[] = { 0, std::pow(2.0, (float)src.elemSize1() * 8.0) };
+  const float channelRanges[] = { rangeMin, rangeMax };
   const float* ranges[] = { channelRanges, channelRanges, channelRanges, channelRanges };
 
   int binCount = DO_HIST_BINS(hist_options);
