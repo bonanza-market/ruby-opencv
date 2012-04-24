@@ -445,6 +445,7 @@ init_ruby_module()
   REGISTER_HASH(interpolation_method, "linear", CV_INTER_LINEAR);
   REGISTER_HASH(interpolation_method, "area", CV_INTER_AREA);
   REGISTER_HASH(interpolation_method, "cubic", CV_INTER_CUBIC);
+  REGISTER_HASH(interpolation_method, "lanczos4", CV_INTER_LANCZOS4);
   
   VALUE warp_flag = rb_hash_new();
   /* {:fill_outliers, :inverse_map}: Warp affine optional flags */
