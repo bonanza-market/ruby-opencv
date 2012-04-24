@@ -6634,6 +6634,8 @@ rb_connected_components(int argc, VALUE *argv, VALUE self)
   VALUE labels = cCvMat::new_object(cvGetSize(CVARR(self)), CV_32S);
 
   try {
+    cvZero(CVARR(labels));
+    
     const cv::Mat selfMat(CVMAT(self));
     cv::Mat labelsMat(CVMAT(labels));
     
@@ -6644,7 +6646,7 @@ rb_connected_components(int argc, VALUE *argv, VALUE self)
   }
   
   VALUE result = rb_ary_new2(2);
-  rb_ary_store(result, 0, numLabels);
+  rb_ary_store(result, 0, INT2NUM(numLabels));
   rb_ary_store(result, 1, labels);
   return result;
 }
