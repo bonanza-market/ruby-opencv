@@ -3422,27 +3422,51 @@ rb_eigenvv(int argc, VALUE *argv, VALUE self)
 
 /*
  * call-seq:
- *   calc_covar_matrix()
- *
- * not yet.
+ *   calc_covar_matrix() => [ covar matrix, mean vector ]
  *
  */
 VALUE
 rb_calc_covar_matrix(int argc, VALUE *argv, VALUE self)
 {
-  rb_raise(rb_eNotImpError, "");
+  const CvMat* selfPtr = CVMAT(self);
+  const int numVectors = selfPtr->rows;
+  const int numSamples = selfPtr->cols;
+
+  VALUE output = cCvMat::new_object(cvSize(numSamples, numSamples), CV_32FC1);
+  VALUE meanvec = cCvMat::new_object(cvSize(numSamples, 1), CV_32FC1);
+
+  try {
+    cvCalcCovarMatrix((const void **)&selfPtr, numVectors, CVARR(output), CVARR(meanvec), CV_COVAR_NORMAL | CV_COVAR_ROWS);
+  }
+  catch (cv::Exception& e) {
+    raise_cverror(e);
+  }
+
+  return rb_ary_new3(2, output, meanvec);
 }
 
 /*
  * call-seq:
- *   mahalonobis(vec, mat) -> float
+ *   mahalonobis(vec1, vec2) -> float
  *
- * not yet.
+ *    self mat is used as the inverse covar matrix
  */
 VALUE
 rb_mahalonobis(int argc, VALUE *argv, VALUE self)
 {
-  rb_raise(rb_eNotImpError, "");
+  VALUE vec1, vec2;
+  rb_scan_args(argc, argv, "20", &vec1, &vec2);
+
+  double result = -1;
+
+  try {
+    result = cvMahalanobis(CVARR(vec1), CVARR(vec2), CVARR(self));
+  }
+  catch (cv::Exception& e) {
+    raise_cverror(e);
+  }
+
+  return DBL2NUM(result);
 }
 
 
