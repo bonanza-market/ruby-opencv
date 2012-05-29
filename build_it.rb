@@ -8,6 +8,7 @@
 # in the Gemfile of your Rails project.
 
 #require 'ruby-debug'
+require 'rubygems'
 
 puts "Building extconf..."
 `#{Gem.ruby} ./extconf.rb`
