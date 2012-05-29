@@ -549,6 +549,8 @@ void define_ruby_class()
 
   rb_define_private_method(rb_klass, "initialize", RUBY_METHOD_FUNC(rb_initialize), -1);
   rb_define_singleton_method(rb_klass, "load", RUBY_METHOD_FUNC(rb_load_imageM), -1);
+  rb_define_singleton_method(rb_klass, "decode", RUBY_METHOD_FUNC(rb_decode_imageM), -1);
+  
   // Ruby/OpenCV original functions
   rb_define_method(rb_klass, "method_missing", RUBY_METHOD_FUNC(rb_method_missing), -1);
   rb_define_method(rb_klass, "to_s", RUBY_METHOD_FUNC(rb_to_s), 0);
@@ -863,6 +865,53 @@ rb_load_imageM(int argc, VALUE *argv, VALUE self)
   }
   return OPENCV_OBJECT(rb_klass, mat);
 }
+
+/*
+ * call-seq:
+ *   CvMat::decode(<i>buffer[,iscolor = CV_LOAD_IMAGE_COLOR]</i>)
+ *
+ * Load an image from a string buffer.
+ *  iscolor = CV_LOAD_IMAGE_COLOR, the loaded image is forced to be a 3-channel color image
+ *  iscolor = CV_LOAD_IMAGE_GRAYSCALE, the loaded image is forced to be grayscale
+ *  iscolor = CV_LOAD_IMAGE_UNCHANGED, the loaded image will be loaded as is.
+ * Currently the following file format are supported.
+ * * Windows bitmaps - BMP,DIB
+ * * JPEG files - JPEG,JPG,JPE
+ * * Portable Network Graphics - PNG
+ * * Portable image format - PBM,PGM,PPM
+ * * Sun rasters - SR,RAS
+ * * TIFF files - TIFF,TIF
+ */
+VALUE
+rb_decode_imageM(int argc, VALUE *argv, VALUE self)
+{
+  VALUE buffer, iscolor;
+  rb_scan_args(argc, argv, "11", &buffer, &iscolor);
+  Check_Type(buffer, T_STRING);
+
+  int _iscolor;
+  if (NIL_P(iscolor)) {
+    _iscolor = CV_LOAD_IMAGE_COLOR;
+  }
+  else {
+    Check_Type(iscolor, T_FIXNUM);
+    _iscolor = FIX2INT(iscolor);
+  }
+
+  CvMat *mat = NULL;
+  try {
+    const CvMat input = cvMat(1, RSTRING_LEN(buffer), CV_8UC1, RSTRING_PTR(buffer));
+    mat = cvDecodeImageM(&input, _iscolor);
+  }
+  catch (cv::Exception& e) {
+    raise_cverror(e);
+  }
+  if (mat == NULL) {
+    rb_raise(rb_eStandardError, "invalid image data format");
+  }
+  return OPENCV_OBJECT(rb_klass, mat);
+}
+
 
 /*
  * nodoc
