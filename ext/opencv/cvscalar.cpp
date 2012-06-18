@@ -159,6 +159,27 @@ rb_sub(int argc, VALUE *argv, VALUE self)
 
 /*
  * call-seq:
+ *   add(val[,mask])
+ *
+ * Return new CvScalar self[I] + val[I]
+ *
+ * Or return new CvMat if <i>val</i> is CvMat or subclass.
+ */
+VALUE
+rb_add(int argc, VALUE *argv, VALUE self)
+{
+  VALUE val, mask;
+  rb_scan_args(argc, argv, "11", &val, &mask);
+	CvScalar *src = CVSCALAR(self);
+	CvScalar scl = VALUE_TO_CVSCALAR(val);
+	return new_object(cvScalar(src->val[0] + scl.val[0],
+														 src->val[1] + scl.val[1],
+														 src->val[2] + scl.val[2],
+														 src->val[3] + scl.val[3]));
+}
+
+/*
+ * call-seq:
  *   zero? -> true (all elements equal zero) or false
  */
 VALUE

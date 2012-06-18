@@ -32,6 +32,7 @@ VALUE rb_aset(VALUE self, VALUE index, VALUE value);
 VALUE rb_check_equality(VALUE self, VALUE compare_to);
 VALUE rb_check_inequality(VALUE self, VALUE compare_to);
 VALUE rb_sub(int argc, VALUE *argv, VALUE self);
+VALUE rb_add(int argc, VALUE *argv, VALUE self);
 
 VALUE rb_zero_q(VALUE self);
 
