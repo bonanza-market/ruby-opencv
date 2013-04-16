@@ -35,6 +35,8 @@ VALUE rb_set_dir(VALUE self, VALUE value);
 VALUE rb_get_hessian(VALUE self);
 VALUE rb_set_hessian(VALUE self, VALUE value);
 
+VALUE rb_flann(VALUE klass, VALUE objectDescriptors, VALUE imageDescriptors);
+
 VALUE new_object(CvSURFPoint *cvsurfpoint);
 
 __NAMESPACE_END_CVSURFPOINT

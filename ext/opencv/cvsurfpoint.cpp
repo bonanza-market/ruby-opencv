@@ -195,6 +195,38 @@ rb_set_hessian(VALUE self, VALUE value)
   return self;
 }
 
+/*
+ * call-seq:
+ *   
+ * 
+ * From: https://code.ros.org/trac/opencv/browser/trunk/opencv/samples/c/find_obj.cpp?rev=2065
+ */
+VALUE
+rb_flann(VALUE klass, VALUE objectDesc, VALUE imageDesc)
+{
+  const cv::Mat m_object(CVMAT(objectDesc));
+  const cv::Mat m_image(CVMAT(imageDesc));
+  
+  cv::Mat m_indices(m_object.rows, 2, CV_32S);
+  cv::Mat m_dists(m_object.rows, 2, CV_32F);
+  
+  cv::flann::Index flann_index(m_image, cv::flann::KDTreeIndexParams(4));  // using 4 randomized kdtrees
+  flann_index.knnSearch(m_object, m_indices, m_dists, 2, cv::flann::SearchParams(64)); // maximum number of leafs checked
+  
+  VALUE ptpairs = rb_ary_new();
+  
+  int* indices_ptr = m_indices.ptr<int>(0);
+  float* dists_ptr = m_dists.ptr<float>(0);
+  for (int i = 0; i < m_indices.rows; ++i) {
+      if (dists_ptr[2 * i] < 0.6 * dists_ptr[2 * i + 1]) {
+          rb_ary_push(ptpairs, rb_int_new(i));
+          rb_ary_push(ptpairs, rb_int_new(indices_ptr[2 * i]));
+      }
+  }
+  
+  return ptpairs;
+}
+
 VALUE
 new_object()
 {
