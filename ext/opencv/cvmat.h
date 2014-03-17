@@ -40,7 +40,7 @@ VALUE rb_depth(VALUE self);
 VALUE rb_channel(VALUE self);
 VALUE rb_data(VALUE self);
 
-VALUE rb_clone(VALUE self);
+VALUE rb_rcv_clone(VALUE self);
 VALUE rb_copy(int argc, VALUE *argv, VALUE self);
 VALUE copy(VALUE mat);
 

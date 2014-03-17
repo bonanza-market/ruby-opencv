@@ -567,7 +567,7 @@ void define_ruby_class()
   rb_define_method(rb_klass, "channel", RUBY_METHOD_FUNC(rb_channel), 0);
   rb_define_method(rb_klass, "data", RUBY_METHOD_FUNC(rb_data), 0);
 
-  rb_define_method(rb_klass, "clone", RUBY_METHOD_FUNC(rb_clone), 0);
+  rb_define_method(rb_klass, "rcv_clone", RUBY_METHOD_FUNC(rb_rcv_clone), 0);
   rb_define_method(rb_klass, "copy", RUBY_METHOD_FUNC(rb_copy), -1);
   rb_define_method(rb_klass, "to_8u", RUBY_METHOD_FUNC(rb_to_8u), 0);
   rb_define_method(rb_klass, "to_8s", RUBY_METHOD_FUNC(rb_to_8s), 0);
@@ -1093,8 +1093,9 @@ rb_data(VALUE self)
  *   copy.example  #=> raise NoMethodError
  */
 VALUE
-rb_clone(VALUE self)
+rb_rcv_clone(VALUE self)
 {
+
   VALUE clone = rb_obj_clone(self);
   try {
     DATA_PTR(clone) = cvClone(CVARR(self));
@@ -1186,7 +1187,7 @@ rb_copy(int argc, VALUE *argv, VALUE self)
 VALUE
 copy(VALUE mat)
 {
-  return rb_clone(mat);
+  return rb_rcv_clone(mat);
 }
 
 inline VALUE
@@ -3629,7 +3630,7 @@ rb_dct(int argc, VALUE *argv, VALUE self)
 VALUE
 rb_line(int argc, VALUE *argv, VALUE self)
 {
-  return rb_line_bang(argc, argv, rb_clone(self));
+  return rb_line_bang(argc, argv, rb_rcv_clone(self));
 }
 
 /*
@@ -3684,7 +3685,7 @@ rb_line_bang(int argc, VALUE *argv, VALUE self)
 VALUE
 rb_rectangle(int argc, VALUE *argv, VALUE self)
 {
-  return rb_rectangle_bang(argc, argv, rb_clone(self));
+  return rb_rectangle_bang(argc, argv, rb_rcv_clone(self));
 }
 
 /*
@@ -3738,7 +3739,7 @@ rb_rectangle_bang(int argc, VALUE *argv, VALUE self)
 VALUE
 rb_circle(int argc, VALUE *argv, VALUE self)
 {
-  return rb_circle_bang(argc, argv, rb_clone(self));
+  return rb_circle_bang(argc, argv, rb_rcv_clone(self));
 }
 
 /*
@@ -3793,7 +3794,7 @@ rb_circle_bang(int argc, VALUE *argv, VALUE self)
 VALUE
 rb_ellipse(int argc, VALUE *argv, VALUE self)
 {
-  return rb_ellipse_bang(argc, argv, rb_clone(self));
+  return rb_ellipse_bang(argc, argv, rb_rcv_clone(self));
 }
 
 /*
@@ -3851,7 +3852,7 @@ rb_ellipse_bang(int argc, VALUE *argv, VALUE self)
 VALUE
 rb_ellipse_box(int argc, VALUE *argv, VALUE self)
 {
-  return rb_ellipse_box_bang(argc, argv, rb_clone(self));
+  return rb_ellipse_box_bang(argc, argv, rb_rcv_clone(self));
 }
 
 /*
@@ -3979,7 +3980,7 @@ rb_fill_poly_bang(int argc, VALUE *argv, VALUE self)
 VALUE
 rb_fill_convex_poly(int argc, VALUE *argv, VALUE self)
 {
-  return rb_fill_convex_poly_bang(argc, argv, rb_clone(self));
+  return rb_fill_convex_poly_bang(argc, argv, rb_rcv_clone(self));
 }
 
 /*
@@ -4046,7 +4047,7 @@ rb_fill_convex_poly_bang(int argc, VALUE *argv, VALUE self)
 VALUE
 rb_poly_line(int argc, VALUE *argv, VALUE self)
 {
-  return rb_poly_line_bang(argc, argv, rb_clone(self));
+  return rb_poly_line_bang(argc, argv, rb_rcv_clone(self));
 }
 
 /*
@@ -4112,7 +4113,7 @@ rb_poly_line_bang(int argc, VALUE *argv, VALUE self)
 VALUE
 rb_put_text(int argc, VALUE* argv, VALUE self)
 {
-  return rb_put_text_bang(argc, argv, rb_clone(self));
+  return rb_put_text_bang(argc, argv, rb_rcv_clone(self));
 }
 
 /*
@@ -4830,7 +4831,7 @@ rb_log_polar(int argc, VALUE *argv, VALUE self)
 VALUE
 rb_erode(int argc, VALUE *argv, VALUE self)
 {
-  return rb_erode_bang(argc, argv, rb_clone(self));
+  return rb_erode_bang(argc, argv, rb_rcv_clone(self));
 }
 
 /*
@@ -4867,7 +4868,7 @@ rb_erode_bang(int argc, VALUE *argv, VALUE self)
 VALUE
 rb_dilate(int argc, VALUE *argv, VALUE self)
 {
-  return rb_dilate_bang(argc, argv, rb_clone(self));
+  return rb_dilate_bang(argc, argv, rb_rcv_clone(self));
 }
 
 /*
