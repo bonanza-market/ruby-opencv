@@ -11,7 +11,7 @@
 require 'rubygems'
 
 puts "Building extconf..."
-`#{Gem.ruby} ./extconf.rb`
+`#{Gem.ruby} ./ext/opencv/extconf.rb`
 
 # Co-opting builder.rb from bundler
 dest_path = ::File.expand_path('lib/',  File.dirname(__FILE__))
