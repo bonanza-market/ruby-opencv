@@ -270,7 +270,7 @@ VALUE rb_subspace_reconstruct(VALUE self, VALUE w, VALUE mean);
 VALUE rb_extract_orb(int argc, VALUE *argv, VALUE self);
 
 // HighGUI function
-VALUE rb_save_image(VALUE self, VALUE filename);
+VALUE rb_save_image(int argc, VALUE *argv, VALUE self);
 
 VALUE rb_fit_line(VALUE self, VALUE distType, VALUE param, VALUE reps, VALUE aeps);
 VALUE rb_fit_ellipse(VALUE self);
