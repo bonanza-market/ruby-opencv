@@ -819,63 +819,77 @@ rb_get_range_index(VALUE index, int* start, int *end) {
 }
 
 /*
- * Returns array of row or row span.
- * @overload get_rows(index, delta_row = 1)
- *   @param index [Integer] Zero-based index of the selected row
- *   @param delta_row [Integer] Index step in the row span.
- *   @return [CvMat] Selected row
- * @overload get_rows(range, delta_row = 1)
- *   @param range [Range] Zero-based index range of the selected row
- *   @param delta_row [Integer] Index step in the row span.
- *   @return [CvMat] Selected rows
- * @opencv_func cvGetRows
+ * call-seq:
+ *   get_rows(<i>n</i>)            -> Return row
+ *   get_rows(<i>n1, n2, ...</i>)  -> Return Array of row
+ *
+ * Return row(or rows) of matrix.
+ * argument should be Fixnum or CvSlice compatible object.
  */
 VALUE
-rb_get_rows(int argc, VALUE* argv, VALUE self)
+rb_get_rows(VALUE self, VALUE args)
 {
-  VALUE row_val, delta_val;
-  rb_scan_args(argc, argv, "11", &row_val, &delta_val);
+  int len = RARRAY_LEN(args);
+  if (len < 1)
+    rb_raise(rb_eArgError, "wrong number of argument.(more than 1)");
+  VALUE ary = rb_ary_new2(len);
+  for (int i = 0; i < len; ++i) {
+    VALUE value = rb_ary_entry(args, i);
 
-  int start, end;
-  rb_get_range_index(row_val, &start, &end);
-  int delta = NIL_P(delta_val) ? 1 : NUM2INT(delta_val);
-  CvMat* submat = RB_CVALLOC(CvMat);
-  try {
-    cvGetRows(CVARR(self), submat, start, end, delta);
+    CvMat* row = NULL;
+    try {
+      if (FIXNUM_P(value))
+	row = cvGetRow(CVARR(self), RB_CVALLOC(CvMat), FIX2INT(value));
+      else {
+	CvSlice slice = VALUE_TO_CVSLICE(value);
+	row = cvGetRows(CVARR(self), RB_CVALLOC(CvMat), slice.start_index, slice.end_index);
+      }
+    }
+    catch (cv::Exception& e) {
+      if (row != NULL)
+	cvReleaseMat(&row);
+      raise_cverror(e);
+    }
+    rb_ary_store(ary, i, DEPEND_OBJECT(rb_klass, row, self));
   }
-  catch (cv::Exception& e) {
-    cvFree(&submat);
-    raise_cverror(e);
-  }
-
-  return DEPEND_OBJECT(rb_klass, submat, self);
+  return RARRAY_LEN(ary) > 1 ? ary : rb_ary_entry(ary, 0);
 }
 
+
 /*
- * Returns array of column or column span.
- * @overload get_cols(index)
- *   @param index [Integer] Zero-based index of the selected column
- *   @return [CvMat] Selected column
- * @overload get_cols(range)
- *   @param range [Range] Zero-based index range of the selected column
- *   @return [CvMat] Selected columns
- * @opencv_func cvGetCols
+ * call-seq:
+ *   get_cols(<i>n</i>)            -> Return column
+ *   get_cols(<i>n1, n2, ...</i>)  -> Return Array of columns
+ *
+ * Return column(or columns) of matrix.
+ * argument should be Fixnum or CvSlice compatible object.
  */
 VALUE
-rb_get_cols(VALUE self, VALUE col)
+rb_get_cols(VALUE self, VALUE args)
 {
-  int start, end;
-  rb_get_range_index(col, &start, &end);
-  CvMat* submat = RB_CVALLOC(CvMat);
-  try {
-    cvGetCols(CVARR(self), submat, start, end);
+  int len = RARRAY_LEN(args);
+  if (len < 1)
+    rb_raise(rb_eArgError, "wrong number of argument.(more than 1)");
+  VALUE ary = rb_ary_new2(len);
+  for (int i = 0; i < len; ++i) {
+    VALUE value = rb_ary_entry(args, i);
+    CvMat* col = NULL;
+    try {
+      if (FIXNUM_P(value))
+	col = cvGetCol(CVARR(self), RB_CVALLOC(CvMat), FIX2INT(value));
+      else {
+	CvSlice slice = VALUE_TO_CVSLICE(value);
+	col = cvGetCols(CVARR(self), RB_CVALLOC(CvMat), slice.start_index, slice.end_index);
+      }
+    }
+    catch (cv::Exception& e) {
+      if (col != NULL)
+	cvReleaseMat(&col);
+      raise_cverror(e);
+    }
+    rb_ary_store(ary, i, DEPEND_OBJECT(rb_klass, col, self));
   }
-  catch (cv::Exception& e) {
-    cvFree(&submat);
-    raise_cverror(e);
-  }
-
-  return DEPEND_OBJECT(rb_klass, submat, self);
+  return RARRAY_LEN(ary) > 1 ? ary : rb_ary_entry(ary, 0);
 }
 
 /*
@@ -1260,33 +1274,17 @@ rb_set_bang(int argc, VALUE *argv, VALUE self)
  * @opencv_func cvSaveImage 
  */
 VALUE
-rb_save_image(int argc, VALUE *argv, VALUE self)
+rb_save_image(VALUE self, VALUE filename)
 {
-  VALUE _filename, _params;
-  rb_scan_args(argc, argv, "11", &_filename, &_params);
-  Check_Type(_filename, T_STRING);
-  int *params = NULL;
-  if (!NIL_P(_params)) {
-    params = hash_to_format_specific_param(_params);
-  }
-
+  Check_Type(filename, T_STRING);
   try {
     const cv::Mat selfMat(CVMAT(self));
     cv::imwrite(StringValueCStr(filename), selfMat);
-    //cvSaveImage(StringValueCStr(_filename), CVARR(self), params);
+    //cvSaveImage(StringValueCStr(filename), CVARR(self));
   }
   catch (cv::Exception& e) {
-    if (params != NULL) {
-      free(params);
-      params = NULL;
-    }
     raise_cverror(e);
   }
-  if (params != NULL) {
-    free(params);
-    params = NULL;
-  }
-
   return self;
 }
 
@@ -1450,13 +1448,15 @@ rb_range_bang(VALUE self, VALUE start, VALUE end)
  *   ch1 = mat.reshape(:channel => 1) #=> 9x3 1-channel matrix
  */
 VALUE
-rb_reshape(int argc, VALUE *argv, VALUE self)
+rb_reshape(VALUE self, VALUE hash)
 {
-  VALUE cn, rows;
+  Check_Type(hash, T_HASH);
+  VALUE channel = rb_hash_aref(hash, ID2SYM(rb_intern("channel")));
+  VALUE rows = rb_hash_aref(hash, ID2SYM(rb_intern("rows")));
   CvMat *mat = NULL;
-  rb_scan_args(argc, argv, "11", &cn, &rows);
   try {
-    mat = cvReshape(CVARR(self), RB_CVALLOC(CvMat), NUM2INT(cn), IF_INT(rows, 0));
+    mat = cvReshape(CVARR(self), RB_CVALLOC(CvMat), NIL_P(channel) ? 0 : NUM2INT(channel),
+		    NIL_P(rows) ? 0 : NUM2INT(rows));
   }
   catch (cv::Exception& e) {
     if (mat != NULL)

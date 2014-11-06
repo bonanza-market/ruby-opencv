@@ -21,11 +21,12 @@ __NAMESPACE_BEGIN_CVMAT
 
 VALUE rb_class();
 
-void define_ruby_class();
+void init_ruby_class();
 
 VALUE rb_allocate(VALUE klass);
 VALUE rb_initialize(int argc, VALUE *argv, VALUE self);
 VALUE rb_load_imageM(int argc, VALUE *argv, VALUE self);
+VALUE rb_encode_imageM(int argc, VALUE *argv, VALUE self);
 VALUE rb_decode_imageM(int argc, VALUE *argv, VALUE self);
 
 VALUE rb_method_missing(int argc, VALUE *argv, VALUE self);
@@ -70,10 +71,10 @@ VALUE rb_pixel_value(VALUE self, VALUE index);
 VALUE rb_vector_magnitude(VALUE self);
 VALUE rb_aset(VALUE self, VALUE args);
 VALUE rb_set_data(VALUE self, VALUE data);
-VALUE rb_fill(int argc, VALUE *argv, VALUE self);
-VALUE rb_fill_bang(int argc, VALUE *argv, VALUE self);
-VALUE rb_clear(VALUE self);
-VALUE rb_clear_bang(VALUE self);
+VALUE rb_set(int argc, VALUE *argv, VALUE self);
+VALUE rb_set_bang(int argc, VALUE *argv, VALUE self);
+VALUE rb_set_zero(VALUE self);
+VALUE rb_set_zero_bang(VALUE self);
 VALUE rb_set_identity(int argc, VALUE *argv, VALUE self);
 VALUE rb_set_identity_bang(int argc, VALUE *argv, VALUE self);
 VALUE rb_range(VALUE self, VALUE start, VALUE end);
@@ -114,6 +115,7 @@ VALUE rb_in_range(VALUE self, VALUE min, VALUE max);
 VALUE rb_abs_diff(VALUE self, VALUE val);
 VALUE rb_log(VALUE self);
 VALUE rb_normalize(int argc, VALUE *argv, VALUE self);
+VALUE rb_add_weighted(VALUE klass, VALUE src1, VALUE alpha, VALUE src2, VALUE beta, VALUE gamma);
 VALUE rb_magnitude(VALUE self, VALUE y);
 
 /* Statistics */
@@ -181,6 +183,8 @@ VALUE rb_pre_corner_detect(int argc, VALUE *argv, VALUE self);
 VALUE rb_corner_eigenvv(int argc, VALUE *argv, VALUE self);
 VALUE rb_corner_min_eigen_val(int argc, VALUE *argv, VALUE self);
 VALUE rb_corner_harris(int argc, VALUE *argv, VALUE self);
+VALUE rb_find_chessboard_corners(int argc, VALUE *argv, VALUE self);
+VALUE rb_find_corner_sub_pix(VALUE self, VALUE corners, VALUE win_size, VALUE zero_zone, VALUE criteria);
 VALUE rbi_find_corner_sub_pix(int argc, VALUE *argv, VALUE self);
 VALUE rb_good_features_to_track(int argc, VALUE *argv, VALUE self);
 
@@ -190,8 +194,9 @@ VALUE rb_quadrangle_sub_pix(int argc, VALUE *argv, VALUE self);
 VALUE rb_resize(int argc, VALUE *argv, VALUE self);
 VALUE rb_warp_affine(int argc, VALUE *argv, VALUE self);
 VALUE rb_rotation_matrix2D(VALUE self, VALUE center, VALUE angle, VALUE scale);
+VALUE rb_get_perspective_transform(VALUE self, VALUE source, VALUE dest);
 VALUE rb_warp_perspective(int argc, VALUE *argv, VALUE self);
-VALUE rb_find_homograpy(int argc, VALUE *argv, VALUE self);
+VALUE rb_find_homography(int argc, VALUE *argv, VALUE self);
 VALUE rb_remap(int argc, VALUE *argv, VALUE self);
 VALUE rb_log_polar(int argc, VALUE *argv, VALUE self);
 
@@ -218,6 +223,8 @@ VALUE rb_find_contours(int argc, VALUE *argv, VALUE self);
 VALUE rb_find_contours_bang(int argc, VALUE *argv, VALUE self);
 VALUE rb_draw_contours(int argc, VALUE *argv, VALUE self);
 VALUE rb_draw_contours_bang(int argc, VALUE *argv, VALUE self);
+VALUE rb_draw_chessboard_corners(VALUE self, VALUE pattern_size, VALUE corners, VALUE pattern_was_found);
+VALUE rb_draw_chessboard_corners_bang(VALUE self, VALUE pattern_size, VALUE corners, VALUE pattern_was_found);
 VALUE rb_pyr_segmentation(VALUE self, VALUE level, VALUE threshold1, VALUE threshold2);
 VALUE rb_pyr_mean_shift_filtering(int argc, VALUE *argv, VALUE self);
 VALUE rb_watershed(VALUE self, VALUE markers);
@@ -234,10 +241,12 @@ VALUE rb_inpaint(VALUE self, VALUE inpaint_method, VALUE mask, VALUE radius);
 /* Histograms */
 VALUE rb_equalize_hist(VALUE self);
 VALUE rb_calc_hist(int argc, VALUE *argv, VALUE self);
+VALUE rb_apply_color_map(VALUE self, VALUE colormap);
 
 /* Matching */
 VALUE rb_match_template(int argc, VALUE *argv, VALUE self);
 VALUE rb_match_shapes(int argc, VALUE *argv, VALUE self);
+
 /* Object Tracking */
 VALUE rb_mean_shift(VALUE self, VALUE window, VALUE criteria);
 VALUE rb_cam_shift(VALUE self, VALUE window, VALUE criteria);
@@ -254,6 +263,10 @@ VALUE rb_compute_correspond_epilines(VALUE klass, VALUE points, VALUE which_imag
 
 /* Feature detection and description */
 VALUE rb_extract_surf(int argc, VALUE *argv, VALUE self);
+
+VALUE rb_subspace_project(VALUE self, VALUE w, VALUE mean);
+VALUE rb_subspace_reconstruct(VALUE self, VALUE w, VALUE mean);
+
 VALUE rb_extract_orb(int argc, VALUE *argv, VALUE self);
 
 // HighGUI function
@@ -268,6 +281,8 @@ VALUE new_object(int rows, int cols, int type);
 VALUE new_object(CvSize size, int type);
 VALUE new_mat_kind_object(CvSize size, VALUE ref_obj);
 VALUE new_mat_kind_object(CvSize size, VALUE ref_obj, int cvmat_depth, int channel);
+
+CvMat* prepare_decoding(int argc, VALUE *argv, int* iscolor, int* need_release);
 
 __NAMESPACE_END_CVMAT
 
