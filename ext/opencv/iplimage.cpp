@@ -41,7 +41,7 @@ rb_allocate(VALUE klass)
 
 /*
  * call-seq:
- *   new(<i>width, height[, depth = CV_8U][, channel = 3]</i>)
+ *   new(width, height[, depth = CV_8U][, channel = 3])
  *
  * Create width * height image. Each element-value set 0.
  *
@@ -65,7 +65,7 @@ rb_initialize(int argc, VALUE *argv, VALUE self)
 
 /*
  * call-seq:
- *   IplImage::load(<i>filename[,iscolor = CV_LOAD_IMAGE_COLOR]</i>)
+ *   IplImage::load(filename[,iscolor = CV_LOAD_IMAGE_COLOR])
  *
  * Load an image from file.
  *  iscolor = CV_LOAD_IMAGE_COLOR, the loaded image is forced to be a 3-channel color image
@@ -149,8 +149,8 @@ rb_get_roi(VALUE self)
 
 /*
  * call-seq:
- *   set_roi(<i>rect</i>)
- *   set_roi(<i>rect</i>){|image| ...}
+ *   set_roi(rect)
+ *   set_roi(rect){|image| ...}
  *
  * Set ROI. <i>rect</i> should be CvRect or compatible object.
  * Return self.
@@ -210,8 +210,8 @@ rb_get_coi(VALUE self)
 
 /*
  * call-seq:
- *   set_coi(<i>coi</i>)
- *   set_coi(<i>coi</i>){|image| ...}
+ *   set_coi(coi)
+ *   set_coi(coi){|image| ...}
  *
  * Set COI. <i>coi</i> should be Fixnum.
  * Return self.
@@ -270,7 +270,7 @@ rb_get_mat(VALUE self)
 
 /*
  * call-seq:
- *   IplImage.smoothness(<i>lowFreqRatio, blankDensity, messyDensity, highFreqRatio</i>) -> [ symbol, float, float ]
+ *   IplImage.smoothness(lowFreqRatio, blankDensity, messyDensity, highFreqRatio) -> [ symbol, float, float ]
  *
  * Determines if the image's smoothness is either, :smooth, :messy, or :blank.
  *
@@ -372,7 +372,7 @@ compute_smoothness(const IplImage *pFourierImage, const double lowFreqRatio, con
 
   filteredFourierImage = create_frequency_filtered_image(pFourierImage, low, high);
   scalar = cvSum(filteredFourierImage);
-  totalIntensity = scalar.val[0];
+  totalIntensity = (int)scalar.val[0];
   cvReleaseImage(&filteredFourierImage);
   outLowDensity = den = totalIntensity / totalArea;
 
@@ -384,7 +384,7 @@ compute_smoothness(const IplImage *pFourierImage, const double lowFreqRatio, con
 
   filteredFourierImage = create_frequency_filtered_image(pFourierImage, low, high);
   scalar = cvSum(filteredFourierImage);
-  totalIntensity = scalar.val[0];
+  totalIntensity = (int)scalar.val[0];
   cvReleaseImage(&filteredFourierImage);
   outHighDensity = den = totalIntensity / totalArea;
 

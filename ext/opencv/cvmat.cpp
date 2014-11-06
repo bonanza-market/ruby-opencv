@@ -63,7 +63,7 @@ __NAMESPACE_BEGIN_CVMAT
 #define DO_ORB_KEYPOINTS_ONLY(opt) TRUE_OR_FALSE(LOOKUP_HASH(opt, "keypoints_only"))
 #define DO_ORB_NUM_KEYPOINTS(opt) NUM2INT(LOOKUP_HASH(opt, "num_keypoints"))
 
-#define HIST_OPTION(op) rb_get_option_table(rb_klass, "HIST_OPTION", opt)
+#define HIST_OPTION(opt) rb_get_option_table(rb_klass, "HIST_OPTION", opt)
 #define DO_HIST_BINS(opt) NUM2INT(LOOKUP_HASH(opt, "bins"))
 #define DO_HIST_MASK(opt) LOOKUP_HASH(opt, "mask")
 #define DO_HIST_MIN(opt) LOOKUP_HASH(opt, "min")
@@ -194,52 +194,6 @@ rb_load_imageM(int argc, VALUE *argv, VALUE self)
   }
   if (mat == NULL) {
     rb_raise(rb_eStandardError, "file does not exist or invalid format image.");
-  }
-  return OPENCV_OBJECT(rb_klass, mat);
-}
-
-/*
- * call-seq:
- *   CvMat::decode(<i>buffer[,iscolor = CV_LOAD_IMAGE_COLOR]</i>)
- *
- * Load an image from a string buffer.
- *  iscolor = CV_LOAD_IMAGE_COLOR, the loaded image is forced to be a 3-channel color image
- *  iscolor = CV_LOAD_IMAGE_GRAYSCALE, the loaded image is forced to be grayscale
- *  iscolor = CV_LOAD_IMAGE_UNCHANGED, the loaded image will be loaded as is.
- * Currently the following file format are supported.
- * * Windows bitmaps - BMP,DIB
- * * JPEG files - JPEG,JPG,JPE
- * * Portable Network Graphics - PNG
- * * Portable image format - PBM,PGM,PPM
- * * Sun rasters - SR,RAS
- * * TIFF files - TIFF,TIF
- */
-VALUE
-rb_decode_imageM(int argc, VALUE *argv, VALUE self)
-{
-  VALUE buffer, iscolor;
-  rb_scan_args(argc, argv, "11", &buffer, &iscolor);
-  Check_Type(buffer, T_STRING);
-
-  int _iscolor;
-  if (NIL_P(iscolor)) {
-    _iscolor = CV_LOAD_IMAGE_COLOR;
-  }
-  else {
-    Check_Type(iscolor, T_FIXNUM);
-    _iscolor = FIX2INT(iscolor);
-  }
-
-  CvMat *mat = NULL;
-  try {
-    const CvMat input = cvMat(1, RSTRING_LEN(buffer), CV_8UC1, RSTRING_PTR(buffer));
-    mat = cvDecodeImageM(&input, _iscolor);
-  }
-  catch (cv::Exception& e) {
-    raise_cverror(e);
-  }
-  if (mat == NULL) {
-    rb_raise(rb_eStandardError, "invalid image data format");
   }
   return OPENCV_OBJECT(rb_klass, mat);
 }
@@ -2331,35 +2285,6 @@ rb_log(VALUE self)
 
 /*
  * call-seq:
- *   normalize(...) -> cvmat
- *
- * Normalizes the norm or value range of an array
- */
-VALUE
-rb_normalize(int argc, VALUE *argv, VALUE self)
-{
-  VALUE alphaVal, betaVal, normTypeVal;
-  rb_scan_args(argc, argv, "03", &alphaVal, &betaVal, &normTypeVal);
-
-  const double alpha = alphaVal != Qnil ? NUM2DBL(alphaVal) : 1.0;
-  const double beta = betaVal != Qnil ? NUM2DBL(betaVal) : 0.0;
-  const int normType = normTypeVal != Qnil ? NUM2INT(normTypeVal) : cv::NORM_L2;
-
-  VALUE dest = new_mat_kind_object(cvGetSize(CVARR(self)), self);
-  try {
-    const cv::Mat selfMat(CVMAT(self));
-    cv::Mat destMat(CVMAT(dest));
-
-    cv::normalize(selfMat, destMat, alpha, beta, normType);
-
-  } catch (cv::Exception& e) {
-    raise_cverror(e);
-  }
-  return dest;
-}
-
-/*
- * call-seq:
  *   magnitude(y) -> cvmat
  *
  * Calculates the magnitude of 2D vectors
@@ -3701,7 +3626,7 @@ rb_scharr(int argc, VALUE *argv, VALUE self)
   try {
     const cv::Mat selfMat(CVMAT(self)); // WBH convert openCv1-style cvMat to openCv2-style cv::Mat
     cv::Mat destMat(CVMAT(dest));
-    cv::Laplacian(selfMat, destMat, ddepth, ksize, scale, delta);
+    cv::Scharr(selfMat, destMat, CV_MAT_DEPTH(self_ptr->type), NUM2INT(xorder), NUM2INT(yorder), scale);
   }
   catch (cv::Exception& e) {
     raise_cverror(e);
@@ -3777,7 +3702,7 @@ rb_laplace2(int argc, VALUE *argv, VALUE self)
   try {
     const cv::Mat selfMat(CVMAT(self)); // WBH convert openCv1-style cvMat to openCv2-style cv::Mat
     cv::Mat destMat(CVMAT(dest));
-    cv::Scharr(selfMat, destMat, CV_MAT_DEPTH(self_ptr->type), NUM2INT(xorder), NUM2INT(yorder), scale);
+    cv::Laplacian(selfMat, destMat, ddepth, ksize, scale, delta);
   }
   catch (cv::Exception& e) {
     raise_cverror(e);
@@ -4992,36 +4917,6 @@ rb_adaptive_threshold(int argc, VALUE *argv, VALUE self)
 
 /*
  * call-seq:
- *   threshold(<i>threshold, max_value, threshold_type[,use_otsu = false]</i>)
- *
- * Applies fixed-level threshold to array elements.
- *
- */
-VALUE
-rb_adaptive_threshold(int argc, VALUE *argv, VALUE self)
-{
-  VALUE dest, max_value, adaptive_method, threshold_type, block_size, constant;
-  rb_scan_args(argc, argv, "5", &max_value, &adaptive_method, &threshold_type, &block_size, &constant);
-
-  CvMat* self_ptr = CVMAT(self);
-  // Create our destination pixels
-  dest = new_mat_kind_object(cvGetSize(self_ptr), self, CV_MAT_DEPTH(self_ptr->type), 1);
-
-  try {
-    const cv::Mat selfMat(CVMAT(self)); // WBH convert openCv1-style cvMat to openCv2-style cv::Mat
-    cv::Mat destMat(CVMAT(dest));
-
-		cv::adaptiveThreshold(selfMat, destMat, max_value, adaptive_method, threshold_type, block_size, constant);
-  }
-  catch (cv::Exception& e) {
-    raise_cverror(e);
-  }
-
-  return dest;
-}
-
-/*
- * call-seq:
  *   distance_transform(<i>labels, distance_type, mask_size</i>)
  *
  */
@@ -5721,6 +5616,8 @@ rb_calc_hist(int argc, VALUE *argv, VALUE self)
      maskMat = CVMAT(maskVal);
   }
 
+  // Commented by WBH until we have time to re-implement MatND (removed by rebase, dunno if it needs to be changed)
+  /*
   try {
     cv::MatND histMat;
 
@@ -5740,6 +5637,7 @@ rb_calc_hist(int argc, VALUE *argv, VALUE self)
   catch (cv::Exception& e) {
     raise_cverror(e);
   }
+  */
 
   return Qnil;
 }
@@ -6308,6 +6206,8 @@ rb_extract_surf(int argc, VALUE *argv, VALUE self)
 VALUE
 rb_extract_orb(int argc, VALUE *argv, VALUE self)
 {
+  // Commented by WBH until we can research the replacement for cv::ORB::CommonParams (which no longer exists)
+  /*
   VALUE mask, orb_option;
   rb_scan_args(argc, argv, "02", &mask, &orb_option);
 
@@ -6389,6 +6289,7 @@ rb_extract_orb(int argc, VALUE *argv, VALUE self)
   }
 
   return result;
+  */
 }
 
 /*
