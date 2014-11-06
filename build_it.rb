@@ -7,26 +7,33 @@
 # The only other thing you need to do is manually declare this gem to be the gem's local directory
 # in the Gemfile of your Rails project.
 
+install_files_in = "ruby-2.0.0-p247@bonz-imagetools"
+
 require 'ruby-debug'
 require 'rubygems'
 
 puts "Building extconf..."
-`#{Gem.ruby} ./ext/opencv/extconf.rb`
+build_dir = "./ext/opencv"
+system("cd #{build_dir} && #{Gem.ruby} extconf.rb")
 
 # Co-opting builder.rb from bundler
 dest_path = ::File.expand_path('lib/',  File.dirname(__FILE__))
-mf = File.read('Makefile')
+mf = File.read("#{build_dir}/Makefile")
 mf = mf.gsub(/^RUBYARCHDIR\s*=\s*\$[^$]*/, "RUBYARCHDIR = #{dest_path}")
 mf = mf.gsub(/^RUBYLIBDIR\s*=\s*\$[^$]*/, "RUBYLIBDIR = #{dest_path}")
 
-File.open('Makefile', 'wb') {|f| f.print mf}
-success = system('make')
+File.open("#{build_dir}/Makefile", 'wb') {|f| f.print mf}
+success = system("cd #{build_dir} && make")
 if success
-  if system('make install')
+  if system("cd #{build_dir} && make install")
     puts "Build seems legit."
   else
     puts "Make install returned a non-zero errorcode."
   end
 else
   puts "Error running makefile. See above."
+end
+
+if install_files_in
+
 end
