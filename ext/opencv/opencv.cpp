@@ -568,10 +568,10 @@ init_ruby_module()
   VALUE compare_hist_method = rb_hash_new();
   /* histogram comparison method method */
   rb_define_const(rb_module, "COMPARE_HIST_METHOD", compare_hist_method);
-  REGISTER_CVMETHOD(compare_hist_method, "correl", CV_COMP_CORREL);
-  REGISTER_CVMETHOD(compare_hist_method, "chisqr", CV_COMP_CHISQR);
-  REGISTER_CVMETHOD(compare_hist_method, "intersect", CV_COMP_INTERSECT);
-  REGISTER_CVMETHOD(compare_hist_method, "bhattacharyya", CV_COMP_BHATTACHARYYA);
+  REGISTER_HASH(compare_hist_method, "correl", CV_COMP_CORREL);
+  REGISTER_HASH(compare_hist_method, "chisqr", CV_COMP_CHISQR);
+  REGISTER_HASH(compare_hist_method, "intersect", CV_COMP_INTERSECT);
+  REGISTER_HASH(compare_hist_method, "bhattacharyya", CV_COMP_BHATTACHARYYA);
 
   VALUE comparison_method = rb_hash_new();
   /* Comparison method */

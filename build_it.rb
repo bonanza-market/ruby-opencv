@@ -7,7 +7,7 @@
 # The only other thing you need to do is manually declare this gem to be the gem's local directory
 # in the Gemfile of your Rails project.
 
-#require 'ruby-debug'
+require 'ruby-debug'
 require 'rubygems'
 
 puts "Building extconf..."
@@ -20,8 +20,13 @@ mf = mf.gsub(/^RUBYARCHDIR\s*=\s*\$[^$]*/, "RUBYARCHDIR = #{dest_path}")
 mf = mf.gsub(/^RUBYLIBDIR\s*=\s*\$[^$]*/, "RUBYLIBDIR = #{dest_path}")
 
 File.open('Makefile', 'wb') {|f| f.print mf}
-['', ' install'].each do |target|
-  cmd = "make #{target}"
-	puts "Running #{cmd}..."
-  `#{cmd} 2>&1`
+success = system('make')
+if success
+  if system('make install')
+    puts "Build seems legit."
+  else
+    puts "Make install returned a non-zero errorcode."
+  end
+else
+  puts "Error running makefile. See above."
 end
