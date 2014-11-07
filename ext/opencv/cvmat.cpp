@@ -33,7 +33,7 @@ __NAMESPACE_BEGIN_CVMAT
 #define FF_CONNECTIVITY(opt) NUM2INT(LOOKUP_HASH(opt, "connectivity"))
 #define FF_FIXED_RANGE(opt) TRUE_OR_FALSE(LOOKUP_HASH(opt, "fixed_range"))
 #define FF_MASK_ONLY(opt) TRUE_OR_FALSE(LOOKUP_HASH(opt, "mask_only"))
-#define FF_MASK(opt) TRUE_OR_FALSE(LOOKUP_HASH(opt, "mask"))
+#define FF_MASK(opt) (LOOKUP_HASH(opt, "mask"))
 
 #define FIND_CONTOURS_OPTION(opt) rb_get_option_table(rb_klass, "FIND_CONTOURS_OPTION", opt)
 #define FC_MODE(opt) NUM2INT(LOOKUP_HASH(opt, "mode"))
