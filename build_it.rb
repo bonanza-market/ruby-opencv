@@ -40,6 +40,7 @@ if install_files_in
 
   gem_spec = Gem::Specification.load("ruby-opencv.gemspec")
 
+  # TODO: how to derive the 'x86_64-linux/2.0.0' bit?
   # e.g., /home/bill/.rvm/gems/ruby-2.0.0-p247@bonz-imagetools/bundler/gems/extensions/x86_64-linux/2.0.0/ruby-opencv-0.0.13.20140330211753
   build_to = default_gem_dir.sub(/rubies.*/, "gems/#{install_files_in}/bundler/gems/extensions/x86_64-linux/2.0.0/") + "#{gem_spec.name}-#{gem_spec.version}"
 

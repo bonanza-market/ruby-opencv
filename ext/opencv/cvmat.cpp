@@ -1230,19 +1230,6 @@ rb_set_bang(int argc, VALUE *argv, VALUE self)
 VALUE
 rb_save_image(int argc, VALUE *argv, VALUE self)
 {
-}
-
-/*
- * Saves an image to a specified file.
- * The image format is chosen based on the filename extension.
- * @overload save_image(filename)
- * @param filename [String] Name of the file
- * @return [CvMat] <tt>self</tt>
- * @opencv_func cvSaveImage
- */
-VALUE
-rb_saved_image(int argc, VALUE *argv, VALUE self)
-{
   VALUE _filename, _params;
   rb_scan_args(argc, argv, "11", &_filename, &_params);
   Check_Type(_filename, T_STRING);
@@ -6735,7 +6722,6 @@ init_ruby_class()
 //  rb_define_method(rb_klass, "connected_components", RUBY_METHOD_FUNC(rb_connected_components), -1);
 
   rb_define_method(rb_klass, "save_image", RUBY_METHOD_FUNC(rb_save_image), -1);
-  rb_define_method(rb_klass, "saved_image", RUBY_METHOD_FUNC(rb_saved_image), -1);
   rb_define_alias(rb_klass, "save", "save_image");
 
   rb_define_method(rb_klass, "encode_image", RUBY_METHOD_FUNC(rb_encode_imageM), -1);
