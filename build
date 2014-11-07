@@ -18,18 +18,18 @@ is_vendored = !Dir.pwd.end_with?('ruby-opencv')
 
 if is_vendored
   require 'bundler'
-  Bundler.setup(:default)
+  Bundler.setup(:default, :development)
   gem_spec = Gem::Specification.find_by_name 'ruby-opencv'
   
   puts '=> Building native extensions'
-
+  
   # Copied from Gem::Specification#build_extensions
   begin
     # We need to require things in $LOAD_PATH without looking for the
     # extension we are about to build.
     unresolved_deps = Gem::Specification.unresolved_deps.dup
     Gem::Specification.unresolved_deps.clear
-
+  
     require 'rubygems/config_file'
     require 'rubygems/ext'
     require 'rubygems/user_interaction'
@@ -39,6 +39,9 @@ if is_vendored
       builder.build_extensions
     end
   end
+
+  puts "=> Copying opencv.so to #{ gem_spec.extension_dir }"
+  `cp #{ gem_spec.gem_dir }/lib/opencv.so #{ gem_spec.extension_dir }/opencv.so`
 else
   target_gemset_name = 'bonz-imagetools'
   
