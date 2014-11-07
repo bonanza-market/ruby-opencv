@@ -15,7 +15,7 @@ require 'rubygems'
 require 'fileutils'
 
 puts '=> Building extconf...'
-build_dir = './ext/opencv'
+build_dir = "#{ File.dirname(__FILE__) }/ext/opencv"
 system("cd #{ build_dir } && ruby extconf.rb")
 
 # Co-opting builder.rb from bundler
