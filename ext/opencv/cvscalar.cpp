@@ -264,7 +264,11 @@ init_ruby_class()
   rb_define_alloc_func(rb_klass, rb_allocate);      
   rb_define_method(rb_klass, "initialize", RUBY_METHOD_FUNC(rb_initialize), -1);
   rb_define_method(rb_klass, "[]", RUBY_METHOD_FUNC(rb_aref), 1);
+  rb_define_method(rb_klass, "==", RUBY_METHOD_FUNC(rb_check_equality), 1);
+  rb_define_method(rb_klass, "!=", RUBY_METHOD_FUNC(rb_check_inequality), 1);
   rb_define_method(rb_klass, "[]=", RUBY_METHOD_FUNC(rb_aset), 2);
+  rb_define_method(rb_klass, "add", RUBY_METHOD_FUNC(rb_add), -1);
+  rb_define_alias(rb_klass, "+", "add");
   rb_define_method(rb_klass, "sub", RUBY_METHOD_FUNC(rb_sub), -1);
   rb_define_alias(rb_klass, "-", "sub");
 

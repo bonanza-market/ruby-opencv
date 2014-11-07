@@ -4894,39 +4894,24 @@ rb_threshold(int argc, VALUE *argv, VALUE self)
 VALUE
 rb_adaptive_threshold(int argc, VALUE *argv, VALUE self)
 {
-  VALUE max_value, options;
-  rb_scan_args(argc, argv, "11", &max_value, &options);
+  VALUE dest, max_value, adaptive_method, threshold_type, block_size, constant;
+  rb_scan_args(argc, argv, "5", &max_value, &adaptive_method, &threshold_type, &block_size, &constant);
 
-  int threshold_type = CV_THRESH_BINARY;
-  int adaptive_method = CV_ADAPTIVE_THRESH_MEAN_C;
-  int block_size = 3;
-  double param1 = 5;
-  if (!NIL_P(options)) {
-    Check_Type(options, T_HASH);
-    threshold_type = CVMETHOD("THRESHOLD_TYPE", LOOKUP_HASH(options, "threshold_type"),
-			      CV_THRESH_BINARY);
-    adaptive_method = CVMETHOD("ADAPTIVE_METHOD", LOOKUP_HASH(options, "adaptive_method"),
-			       CV_ADAPTIVE_THRESH_MEAN_C);
-    VALUE _block_size = LOOKUP_HASH(options, "block_size");
-    if (!NIL_P(_block_size)) {
-      block_size = NUM2INT(_block_size);
-    }
-    VALUE _param1 = LOOKUP_HASH(options, "param1");
-    if (!NIL_P(_param1)) {
-      param1 = NUM2INT(_param1);
-    }
-  }
-  CvArr* self_ptr = CVARR(self);
-  VALUE dst = new_mat_kind_object(cvGetSize(self_ptr), self);
+  CvMat* self_ptr = CVMAT(self);
+  // Create our destination pixels
+  dest = new_mat_kind_object(cvGetSize(self_ptr), self, CV_MAT_DEPTH(self_ptr->type), 1);
+
   try {
-    cvAdaptiveThreshold(self_ptr, CVARR(dst), NUM2DBL(max_value), adaptive_method, threshold_type,
-			block_size, param1);
+    const cv::Mat selfMat(CVMAT(self)); // WBH convert openCv1-style cvMat to openCv2-style cv::Mat
+    cv::Mat destMat(CVMAT(dest));
+
+		cv::adaptiveThreshold(selfMat, destMat, max_value, adaptive_method, threshold_type, block_size, constant);
   }
   catch (cv::Exception& e) {
     raise_cverror(e);
   }
-  
-  return dst;
+
+  return dest;
 }
 
 /*
@@ -5408,10 +5393,14 @@ rb_moments(int argc, VALUE *argv, VALUE self)
 {
   VALUE is_binary;
   rb_scan_args(argc, argv, "01", &is_binary);
-  CvArr *self_ptr = CVARR(self);
-  VALUE moments = Qnil;
+  IplImage image = *IPLIMAGE(self);
+  VALUE moments = rb_ary_new();
   try {
-    moments = cCvMoments::new_object(self_ptr, TRUE_OR_FALSE(is_binary, 0));
+    int cn = CV_MAT_CN(cvGetElemType(CVARR(self)));
+    for (int i = 1; i <= cn; ++i) {
+      cvSetImageCOI(&image, i);
+      rb_ary_push(moments, cCvMoments::new_object(&image, TRUE_OR_FALSE(is_binary, 0)));
+    }
   }
   catch (cv::Exception& e) {
     raise_cverror(e);

@@ -369,9 +369,13 @@ init_ruby_class()
   rb_define_method(rb_klass, "center", RUBY_METHOD_FUNC(rb_center), 0);
   rb_define_method(rb_klass, "points", RUBY_METHOD_FUNC(rb_points), 0);
   rb_define_method(rb_klass, "top_left", RUBY_METHOD_FUNC(rb_top_left), 0);
+  rb_define_method(rb_klass, "top_center", RUBY_METHOD_FUNC(rb_top_left), 0);
   rb_define_method(rb_klass, "top_right", RUBY_METHOD_FUNC(rb_top_right), 0);
   rb_define_method(rb_klass, "bottom_left", RUBY_METHOD_FUNC(rb_bottom_left), 0);
+  rb_define_method(rb_klass, "bottom_center", RUBY_METHOD_FUNC(rb_top_left), 0);
   rb_define_method(rb_klass, "bottom_right", RUBY_METHOD_FUNC(rb_bottom_right), 0);
+  rb_define_method(rb_klass, "center_left", RUBY_METHOD_FUNC(rb_bottom_right), 0);
+  rb_define_method(rb_klass, "center_right", RUBY_METHOD_FUNC(rb_bottom_right), 0);
 }
 
 __NAMESPACE_END_CVRECT
