@@ -12,6 +12,7 @@
 target_gemset_name = 'bonz-imagetools'
 
 require 'rubygems'
+require 'fileutils'
 
 puts 'Building extconf...'
 build_dir = './ext/opencv'
@@ -38,7 +39,8 @@ end
 # Copy dynamic library to target RVM gemset
 target_gemset_path = ENV['GEM_HOME'].gsub(/@ruby\-opencv/, "@#{ target_gemset_name }")
 gem_spec = Gem::Specification.load('ruby-opencv.gemspec')
-copy_to = "#{ target_gemset_path }/bundler/gems/extensions/#{ ENV['_system_arch'].downcase }-#{ ENV['_system_type'].downcase }/2.0.0/#{ gem_spec.name }-#{ gem_spec.version }"
-copy_command = "cp #{ build_dir }/opencv.so #{ copy_to }"
+copy_to = "#{ target_gemset_path }/bundler/gems/extensions/#{ ENV['_system_arch'].downcase }-#{ ENV['_system_type'].downcase }/2.1.0/#{ gem_spec.name }-#{ gem_spec.version }"
+FileUtils.mkpath(copy_to)
+copy_command = "cp #{ build_dir }/opencv.so #{ copy_to }/opencv.so"
 puts "Copying opencv.so: '#{ copy_command }'"
 system(copy_command)
