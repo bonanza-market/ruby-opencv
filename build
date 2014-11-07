@@ -18,7 +18,7 @@ is_vendored = !Dir.pwd.end_with?('ruby-opencv')
 
 if is_vendored
   require 'bundler'
-  Bundler.require(:default)
+  Bundler.setup(:default)
   gem_spec = Gem::Specification.find_by_name 'ruby-opencv'
   
   puts '=> Building native extensions'
