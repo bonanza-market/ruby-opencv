@@ -14,7 +14,7 @@ target_gemset_name = 'bonz-imagetools'
 require 'rubygems'
 require 'fileutils'
 
-puts 'Building extconf...'
+puts '=> Building extconf...'
 build_dir = './ext/opencv'
 system("cd #{ build_dir } && ruby extconf.rb")
 
@@ -28,17 +28,35 @@ File.write("#{ build_dir }/Makefile", makefile_contents, mode: 'wb')
 success = system("cd #{ build_dir } && make")
 if success
   if system("cd #{ build_dir } && make install")
-    puts 'Build seems legit.'
+    puts '=> Build seems legit.'
   else
-    puts 'Make install returned a non-zero errorcode.'
+    puts '=> Make install returned a non-zero errorcode.'
   end
 else
-  puts 'Error running makefile. See above.'
+  puts '=> Error running makefile. See above.'
+end
+
+gem_spec_filename = 'ruby-opencv.gemspec'
+gem_spec = Gem::Specification.load(gem_spec_filename)
+gem_filename = "#{ gem_spec.name }-#{ gem_spec.version }.gem"
+
+# Build the gem
+puts "=> Building #{ gem_spec_filename }"
+unless system("gem build #{ gem_spec_filename }")
+  puts '=> Gem build failed'
+  exit(1)
+end
+
+# Install gem in target RVM gemset
+puts "=> Installing #{ gem_filename }"
+unless system("#{ ENV['rvm_path'] }/wrappers/ruby-#{ RUBY_VERSION }@#{ target_gemset_name }/gem install #{ gem_filename }")
+  puts '=> Gem install failed'
+  exit(1)
 end
 
 # Copy dynamic library to target RVM gemset
+puts '=> Copying opencv.so'
 target_gemset_path = ENV['GEM_HOME'].gsub(/@ruby\-opencv/, "@#{ target_gemset_name }")
-gem_spec = Gem::Specification.load('ruby-opencv.gemspec')
 copy_to = "#{ target_gemset_path }/bundler/gems/extensions/#{ ENV['_system_arch'].downcase }-#{ ENV['_system_type'].downcase }/2.1.0/#{ gem_spec.name }-#{ gem_spec.version }"
 FileUtils.mkpath(copy_to)
 copy_command = "cp #{ build_dir }/opencv.so #{ copy_to }/opencv.so"
