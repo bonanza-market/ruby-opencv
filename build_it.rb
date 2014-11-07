@@ -35,5 +35,15 @@ else
 end
 
 if install_files_in
+  # e.g., /home/bill/.rvm/rubies/ruby-2.0.0-p247/lib/ruby/gems/2.0.0
+  default_gem_dir = Gem.default_dir
 
+  gem_spec = Gem::Specification.load("ruby-opencv.gemspec")
+
+  # e.g., /home/bill/.rvm/gems/ruby-2.0.0-p247@bonz-imagetools/bundler/gems/extensions/x86_64-linux/2.0.0/ruby-opencv-0.0.13.20140330211753
+  build_to = default_gem_dir.sub(/rubies.*/, "gems/#{install_files_in}/bundler/gems/extensions/x86_64-linux/2.0.0/") + "#{gem_spec.name}-#{gem_spec.version}"
+
+  copy_line = "cp #{build_dir}/opencv.so #{build_to}"
+  puts "Copying opencv.so: '#{copy_line}'"
+  system(copy_line)
 end
