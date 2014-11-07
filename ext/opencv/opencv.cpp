@@ -279,10 +279,6 @@ init_ruby_module()
   rb_define_const(rb_module, "CV_DIST_WELSCH", INT2FIX(CV_DIST_WELSCH));
   rb_define_const(rb_module, "CV_DIST_HUBER", INT2FIX(CV_DIST_HUBER));
 
-  /* Adaptive methods */
-  rb_define_const(rb_module, "CV_ADAPTIVE_THRESH_MEAN_C", INT2FIX(CV_ADAPTIVE_THRESH_MEAN_C));
-  rb_define_const(rb_module, "CV_ADAPTIVE_THRESH_GAUSSIAN_C", INT2FIX(CV_ADAPTIVE_THRESH_GAUSSIAN_C));
-
   /* Border type */
   rb_define_const(rb_module, "IPL_BORDER_CONSTANT", INT2FIX(IPL_BORDER_CONSTANT));
   rb_define_const(rb_module, "IPL_BORDER_REPLICATE", INT2FIX(IPL_BORDER_REPLICATE));
@@ -387,12 +383,6 @@ init_ruby_module()
   rb_define_const(rb_module, "CV_HIST_SPARSE", INT2FIX(CV_HIST_SPARSE));
   rb_define_const(rb_module, "CV_HIST_TREE", INT2FIX(CV_HIST_TREE));
   rb_define_const(rb_module, "CV_HIST_UNIFORM", INT2FIX(CV_HIST_UNIFORM));
-
-  /* Histogram comparison method */
-  rb_define_const(rb_module, "CV_COMP_CORREL", INT2FIX(CV_COMP_CORREL));
-  rb_define_const(rb_module, "CV_COMP_CHISQR", INT2FIX(CV_COMP_CHISQR));
-  rb_define_const(rb_module, "CV_COMP_INTERSECT", INT2FIX(CV_COMP_INTERSECT));
-  rb_define_const(rb_module, "CV_COMP_BHATTACHARYYA", INT2FIX(CV_COMP_BHATTACHARYYA));
 
   /* DFT and DCT flags */
   rb_define_const(rb_module, "CV_DXT_FORWARD", INT2FIX(CV_DXT_FORWARD));
