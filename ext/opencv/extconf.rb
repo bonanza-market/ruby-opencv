@@ -11,6 +11,11 @@ end
 
 require "mkmf"
 
+if enable_config('debug')
+  $CPPFLAGS << ' -ggdb3 -O0'
+  $CFLAGS << ' -ggdb3 -O0'
+end
+
 def cv_version_suffix(incdir)
   major, minor, subminor = nil, nil, nil
   open("#{incdir}/opencv2/core/version.hpp", 'r') { |f|

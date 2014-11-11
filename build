@@ -8,9 +8,18 @@
 #
 # The only other thing you need to do is manually declare this gem to be the gem's local directory
 # in the Gemfile of your Rails project.
+#
+# To include debug symbols, add the "debug" command line option. e.g. when vendored:
+#   > vendor/gems/ruby-opencv/build debug
+#
+# To verify that debug symbols are included, check if readelf has any output:
+#   > readelf --debug-dump=decodedline vendor/gems/extensions/x86_64-linux/2.1.0/ruby-opencv-0.0.13.20140330211753/opencv.so | head
+#
 
 require 'rubygems'
 require 'fileutils'
+
+is_debug_mode = ARGV.first.to_s == 'debug'
 
 # This file can be run from a dedicated ruby-opencv directory, or from a vendored directory. In the latter case, it's
 # not necessary to build or install the gem itself, just the native extension
@@ -21,7 +30,7 @@ if is_vendored
   Bundler.setup(:default)
   gem_spec = Gem::Specification.find_by_name 'ruby-opencv'
   
-  puts '=> Building native extensions'
+  puts "=> Building native extensions #{ '(debug)' if is_debug_mode }"
   
   # Copied from Gem::Specification#build_extensions
   begin
@@ -35,7 +44,10 @@ if is_vendored
     require 'rubygems/user_interaction'
     
     Gem::DefaultUserInteraction.use_ui Gem::ConsoleUI.new do
-      builder = Gem::Ext::Builder.new gem_spec
+      build_args = gem_spec.build_args
+      build_args << '--enable-debug' if is_debug_mode
+      
+      builder = Gem::Ext::Builder.new gem_spec, build_args
       builder.build_extensions
     end
   end
