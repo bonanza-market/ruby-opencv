@@ -230,6 +230,7 @@ VALUE rb_pyr_mean_shift_filtering(int argc, VALUE *argv, VALUE self);
 VALUE rb_watershed(VALUE self, VALUE markers);
 
 VALUE rb_grab_cut(VALUE self, VALUE mask, VALUE rect, VALUE bgdModel, VALUE fgdModel, VALUE iterCount, VALUE mode);
+VALUE rb_grab_cut2(VALUE self, VALUE mask, VALUE rect, VALUE bgdModel, VALUE fgdModel, VALUE iterCount, VALUE mode, VALUE bgdLabels, VALUE fgdLabels);
 
 VALUE rb_moments(int argc, VALUE *argv, VALUE self);
 

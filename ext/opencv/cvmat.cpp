@@ -5381,6 +5381,64 @@ rb_watershed(VALUE self, VALUE markers)
    }
    return mask;
  }
+ 
+/*
+  * call-seq:
+  *   grab_cut2 -> [ cvmat(mask:cv8uc1), cvmat(bgdCenters:cv32fc1), cvmat(fgdCenters:cv32fc1) ]
+  *
+  * Does grab cut segmentation.
+  */
+ VALUE
+ rb_grab_cut2(VALUE self, VALUE mask, VALUE rect, VALUE bgdModel, VALUE fgdModel, VALUE iterCount, VALUE mode, VALUE bgdLabels, VALUE fgdLabels)
+ {
+   if (!(rb_obj_is_kind_of(self, cCvMat::rb_class())) || cvGetElemType(CVARR(self)) != CV_8UC3)
+     rb_raise(rb_eTypeError, "image (self) should be 8-bit 3-channel image.");
+
+   if (!(rb_obj_is_kind_of(mask, cCvMat::rb_class())) || cvGetElemType(CVARR(mask)) != CV_8UC1)
+     rb_raise(rb_eTypeError, "argument 1 (mask) should be mask image.");
+
+   const int INVALID_TYPE = -1;
+   int valid_mode = CVMETHOD("GRAB_CUT_MODE", mode, INVALID_TYPE);
+
+   try {
+     const cv::Mat selfMat(CVMAT(self));
+     cv::Mat maskMat(CVMAT(mask));
+     cv::Mat bgMat(CVMAT(bgdModel));
+     cv::Mat fgMat(CVMAT(fgdModel));
+     
+     int labelsMode = cv::GC_LABELS_INIT_RANDOM;
+     
+     if (bgdLabels == Qnil) {
+       bgdLabels = new_object(cvSize(3, 5), CV_MAKETYPE(CV_32F, 2));
+       cvSetZero(CVARR(bgdLabels));
+     } else {
+       labelsMode = cv::GC_LABELS_USE_INITIAL;
+     }
+     cv::Mat bgdLabelsMat(CVMAT(bgdLabels));
+     
+     if (fgdLabels == Qnil) {
+       fgdLabels = new_object(cvSize(3, 5), CV_MAKETYPE(CV_32F, 2));
+       cvSetZero(CVARR(fgdLabels));
+     } else {
+       labelsMode = cv::GC_LABELS_USE_INITIAL;
+     }
+     cv::Mat fgdLabelsMat(CVMAT(fgdLabels));
+
+     cv::grabCut2(selfMat, maskMat, VALUE_TO_CVRECT(rect), bgMat, fgMat, bgdLabelsMat, fgdLabelsMat, NUM2INT(iterCount), valid_mode, labelsMode);
+
+     CvMat bgdLabelsTmp = bgdLabelsMat;
+     bgdLabels = new_object(bgdLabelsTmp.rows, bgdLabelsTmp.cols, bgdLabelsTmp.type);
+     cvCopy(&bgdLabelsTmp, CVMAT(bgdLabels));
+     
+     CvMat fgdLabelsTmp = fgdLabelsMat;
+     fgdLabels = new_object(fgdLabelsTmp.rows, fgdLabelsTmp.cols, fgdLabelsTmp.type);
+     cvCopy(&fgdLabelsTmp, CVMAT(fgdLabels));
+   } catch (cv::Exception& e) {
+     raise_cverror(e);
+   }
+     
+   return rb_ary_new3(3, mask, bgdLabels, fgdLabels);
+ }
 
 /*
  * call-seq:
@@ -6671,6 +6729,7 @@ init_ruby_class()
   rb_define_method(rb_klass, "pyr_mean_shift_filtering", RUBY_METHOD_FUNC(rb_pyr_mean_shift_filtering), -1);
   rb_define_method(rb_klass, "watershed", RUBY_METHOD_FUNC(rb_watershed), 1);
   rb_define_method(rb_klass, "grab_cut", RUBY_METHOD_FUNC(rb_grab_cut), 6);
+  rb_define_method(rb_klass, "grab_cut2", RUBY_METHOD_FUNC(rb_grab_cut2), 8);
 
   rb_define_method(rb_klass, "moments", RUBY_METHOD_FUNC(rb_moments), -1);
 
