@@ -2498,8 +2498,10 @@ rb_max(int argc, VALUE *argv, VALUE self)
 /*
  * call-seq:
  *
- * WBH started this but didn't end up needing it, so didn't complete debugging
- * (used bounding_rect instead)
+ * WBH started this but didn't end up needing it, so didn't complete debugging (used bounding_rect instead)
+ * Note that WBH of 11/2014 tried to revisit this method and was beset with 3 hours of frustration
+ * based around the fact that the ROI can only be set via a constructor, but constructing a new object
+ * means allocating and returning memory associated with that new object. GL with debugging that, future self.
  *
 VALUE
 rb_set_roi(int argc, VALUE *argv, VALUE self)
