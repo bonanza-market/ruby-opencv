@@ -33,7 +33,7 @@ end
 # This produces a flat list of contours that can be traversed with .h_next and .h_prev
 #
 puts "Detecting using CV_RETR_LIST and CV_CHAIN_APPROX_SIMPLE"
-contour = mat.find_contours(:mode => OpenCV::CV_RETR_LIST, :method => OpenCV::CV_CHAIN_APPROX_SIMPLE)
+contour = mat.find_contours(mode: OpenCV::CV_RETR_LIST, method: OpenCV::CV_CHAIN_APPROX_SIMPLE)
 cindex=1
 
 while contour
@@ -47,7 +47,7 @@ end
 #
 puts '-'*80
 puts "Detecting using CV_RETR_EXTERNAL and CV_CHAIN_APPROX_SIMPLE"
-contour = mat.find_contours(:mode => OpenCV::CV_RETR_EXTERNAL, :method => OpenCV::CV_CHAIN_APPROX_SIMPLE)
+contour = mat.find_contours(mode: OpenCV::CV_RETR_EXTERNAL, method: OpenCV::CV_CHAIN_APPROX_SIMPLE)
 cindex=1
 
 while contour
@@ -68,7 +68,7 @@ end
 #
 puts '-'*80
 puts "Detecting using CV_RETR_CCOMP and CV_CHAIN_APPROX_SIMPLE"
-contour = mat.find_contours(:mode => OpenCV::CV_RETR_CCOMP, :method => OpenCV::CV_CHAIN_APPROX_SIMPLE)
+contour = mat.find_contours(mode: OpenCV::CV_RETR_CCOMP, method: OpenCV::CV_CHAIN_APPROX_SIMPLE)
 
 # C00001
 puts "Contour #1 is #{contour.contour_area} px^2 (width: #{contour.bounding_rect.width}, height: #{contour.bounding_rect.height}, type: #{(contour.hole?)?"hole":"contour"})"
@@ -113,7 +113,7 @@ puts "Contour #6 is #{contour_down.contour_area} px^2 (width: #{contour_down.bou
 #
 puts '-'*80
 puts "Detecting using CV_RETR_TREE and CV_CHAIN_APPROX_SIMPLE"
-contour = mat.find_contours(:mode => OpenCV::CV_RETR_TREE, :method => OpenCV::CV_CHAIN_APPROX_SIMPLE)
+contour = mat.find_contours(mode: OpenCV::CV_RETR_TREE, method: OpenCV::CV_CHAIN_APPROX_SIMPLE)
 
 # C0
 puts "Contour #1 is #{contour.contour_area} px^2 (width: #{contour.bounding_rect.width}, height: #{contour.bounding_rect.height}, type: #{(contour.hole?)?"hole":"contour"})"

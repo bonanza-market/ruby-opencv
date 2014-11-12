@@ -13,7 +13,7 @@ t = window.set_trackbar("accuracy", 10, 1) { |v|
   accuracy = v
 }
 
-circle_options = { :color => CvColor::Blue, :line_type => :aa, :thickness => -1 }
+circle_options = { color: CvColor::Blue, line_type: :aa, thickness: -1 }
 
 loop do
   image = capture.query
@@ -25,10 +25,10 @@ loop do
 
   while contours
     # Draw contours
-    poly = contours.approx(:accuracy => accuracy)
+    poly = contours.approx(accuracy: accuracy)
     begin
       image.draw_contours!(poly, CvColor::Red, CvColor::Black, 2,
-                           :thickness => 2, :line_type => :aa)
+                           thickness: 2, line_type: :aa)
     end while (poly = poly.h_next)
 
     # Draw convexity defects

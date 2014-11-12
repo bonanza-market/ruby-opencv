@@ -21,11 +21,11 @@ class TestCvMat_imageprocessing < OpenCVTestCase
   def test_sobel
     mat0 = CvMat.load(FILENAME_LENA256x256, CV_LOAD_IMAGE_GRAYSCALE)
 
-    mat1 = mat0.sobel(1, 0).convert_scale_abs(:scale => 1, :shift => 0)
-    mat2 = mat0.sobel(0, 1).convert_scale_abs(:scale => 1, :shift => 0)
-    mat3 = mat0.sobel(1, 1).convert_scale_abs(:scale => 1, :shift => 0)
-    mat4 = mat0.sobel(1, 1, 3).convert_scale_abs(:scale => 1, :shift => 0)
-    mat5 = mat0.sobel(1, 1, 5).convert_scale_abs(:scale => 1, :shift => 0)
+    mat1 = mat0.sobel(1, 0).convert_scale_abs(scale: 1, shift: 0)
+    mat2 = mat0.sobel(0, 1).convert_scale_abs(scale: 1, shift: 0)
+    mat3 = mat0.sobel(1, 1).convert_scale_abs(scale: 1, shift: 0)
+    mat4 = mat0.sobel(1, 1, 3).convert_scale_abs(scale: 1, shift: 0)
+    mat5 = mat0.sobel(1, 1, 5).convert_scale_abs(scale: 1, shift: 0)
 
     assert_equal('30a26b7287fac75bb697bc7eef6bb53a', hash_img(mat1))
     assert_equal('b740afb13b556d55280fa785190ac902', hash_img(mat2))
@@ -60,9 +60,9 @@ class TestCvMat_imageprocessing < OpenCVTestCase
   def test_laplace
     mat0 = CvMat.load(FILENAME_LENA256x256, CV_LOAD_IMAGE_GRAYSCALE)
 
-    mat1 = mat0.laplace.convert_scale_abs(:scale => 1, :shift => 0)
-    mat2 = mat0.laplace(3).convert_scale_abs(:scale => 1, :shift => 0)
-    mat3 = mat0.laplace(5).convert_scale_abs(:scale => 1, :shift => 0)
+    mat1 = mat0.laplace.convert_scale_abs(scale: 1, shift: 0)
+    mat2 = mat0.laplace(3).convert_scale_abs(scale: 1, shift: 0)
+    mat3 = mat0.laplace(5).convert_scale_abs(scale: 1, shift: 0)
 
     assert_equal('824f8de75bfead5d83c4226f3948ce69', hash_img(mat1))
     assert_equal('824f8de75bfead5d83c4226f3948ce69', hash_img(mat2))
@@ -265,11 +265,11 @@ class TestCvMat_imageprocessing < OpenCVTestCase
     }
 
     corners1 = mat0.good_features_to_track(0.2, 5)
-    corners2 = mat0.good_features_to_track(0.2, 5, :mask => mask)
-    corners3 = mat0.good_features_to_track(0.2, 5, :block_size => 7)
-    corners4 = mat0.good_features_to_track(0.2, 5, :use_harris => true)
-    corners5 = mat0.good_features_to_track(0.2, 5, :k => 0.01)
-    corners6 = mat0.good_features_to_track(0.2, 5, :max => 1)
+    corners2 = mat0.good_features_to_track(0.2, 5, mask: mask)
+    corners3 = mat0.good_features_to_track(0.2, 5, block_size: 7)
+    corners4 = mat0.good_features_to_track(0.2, 5, use_harris: true)
+    corners5 = mat0.good_features_to_track(0.2, 5, k: 0.01)
+    corners6 = mat0.good_features_to_track(0.2, 5, max: 1)
 
     expected1 = [[24, 7], [20, 23], [17, 11], [26, 29], [30, 24],
                  [19, 16], [28, 2], [13, 18], [14, 4]]
@@ -314,7 +314,7 @@ class TestCvMat_imageprocessing < OpenCVTestCase
     assert_equal(7, corners6[0].y.to_i)
 
     assert_raise(ArgumentError) {
-      mat0.good_features_to_track(0.2, 5, :max => 0)
+      mat0.good_features_to_track(0.2, 5, max: 0)
     }
 
     assert_raise(TypeError) {
@@ -324,18 +324,18 @@ class TestCvMat_imageprocessing < OpenCVTestCase
       mat0.good_features_to_track(0.2, DUMMY_OBJ)
     }
     assert_raise(TypeError) {
-      mat0.good_features_to_track(0.2, 5, :mask => DUMMY_OBJ)
+      mat0.good_features_to_track(0.2, 5, mask: DUMMY_OBJ)
     }
     assert_raise(TypeError) {
-      mat0.good_features_to_track(0.2, 5, :block_size => DUMMY_OBJ)
+      mat0.good_features_to_track(0.2, 5, block_size: DUMMY_OBJ)
     }
     assert_raise(TypeError) {
-      mat0.good_features_to_track(0.2, 5, :k => DUMMY_OBJ)
+      mat0.good_features_to_track(0.2, 5, k: DUMMY_OBJ)
     }
     assert_raise(TypeError) {
-      mat0.good_features_to_track(0.2, 5, :max => DUMMY_OBJ)
+      mat0.good_features_to_track(0.2, 5, max: DUMMY_OBJ)
     }
-    mat0.good_features_to_track(0.2, 5, :use_harris => DUMMY_OBJ)
+    mat0.good_features_to_track(0.2, 5, use_harris: DUMMY_OBJ)
   end
 
   def test_rect_sub_pix
@@ -1143,12 +1143,12 @@ class TestCvMat_imageprocessing < OpenCVTestCase
       assert_equal(expected, mat1[i][0])
     }
 
-    mat2a = mat0.adaptive_threshold(255, :adaptive_method => :mean_c,
-                                    :threshold_type => :binary, :block_size => 5,
-                                    :param1 => 10)
-    mat2b = mat0.adaptive_threshold(255, :adaptive_method => CV_THRESH_BINARY,
-                                    :threshold_type => CV_ADAPTIVE_THRESH_MEAN_C, :block_size => 5,
-                                    :param1 => 10)
+    mat2a = mat0.adaptive_threshold(255, adaptive_method: :mean_c,
+                                    threshold_type: :binary, block_size: 5,
+                                    param1: 10)
+    mat2b = mat0.adaptive_threshold(255, adaptive_method: CV_THRESH_BINARY,
+                                    threshold_type: CV_ADAPTIVE_THRESH_MEAN_C, block_size: 5,
+                                    param1: 10)
     expected2 = [0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255]
     [mat2a, mat2b].each { |mat2|
       assert_equal(CvMat, mat2.class)
@@ -1162,12 +1162,12 @@ class TestCvMat_imageprocessing < OpenCVTestCase
     }
 
 
-    mat3a = mat0.adaptive_threshold(255, :adaptive_method => :gaussian_c,
-                                    :threshold_type => :binary_inv, :block_size => 5,
-                                    :param1 => 10)
-    mat3b = mat0.adaptive_threshold(255, :adaptive_method => CV_ADAPTIVE_THRESH_GAUSSIAN_C,
-                                    :threshold_type => CV_THRESH_BINARY_INV, :block_size => 5,
-                                    :param1 => 10)
+    mat3a = mat0.adaptive_threshold(255, adaptive_method: :gaussian_c,
+                                    threshold_type: :binary_inv, block_size: 5,
+                                    param1: 10)
+    mat3b = mat0.adaptive_threshold(255, adaptive_method: CV_ADAPTIVE_THRESH_GAUSSIAN_C,
+                                    threshold_type: CV_THRESH_BINARY_INV, block_size: 5,
+                                    param1: 10)
     expected3 = [255, 255, 255, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     [mat3a, mat3b].each { |mat3|
       assert_equal(CvMat, mat3.class)
@@ -1187,16 +1187,16 @@ class TestCvMat_imageprocessing < OpenCVTestCase
       mat0.adaptive_threshold(0, DUMMY_OBJ)
     }
     assert_raise(TypeError) {
-      mat0.adaptive_threshold(0, :adaptive_method => DUMMY_OBJ)
+      mat0.adaptive_threshold(0, adaptive_method: DUMMY_OBJ)
     }
     assert_raise(TypeError) {
-      mat0.adaptive_threshold(0, :threshold_type => DUMMY_OBJ)
+      mat0.adaptive_threshold(0, threshold_type: DUMMY_OBJ)
     }
     assert_raise(TypeError) {
-      mat0.adaptive_threshold(0, :block_size => DUMMY_OBJ)
+      mat0.adaptive_threshold(0, block_size: DUMMY_OBJ)
     }
     assert_raise(TypeError) {
-      mat0.adaptive_threshold(0, :param1 => DUMMY_OBJ)
+      mat0.adaptive_threshold(0, param1: DUMMY_OBJ)
     }
   end
 
@@ -1252,10 +1252,10 @@ class TestCvMat_imageprocessing < OpenCVTestCase
     mat2, comp2, mask2 = mat0.flood_fill(point, 0, CvScalar.new(64))
     mat3, comp3, mask3 = mat0.flood_fill(point, 0, CvScalar.new(0), CvScalar.new(64))
     mat4, comp4, mask4 = mat0.flood_fill(point, 0, CvScalar.new(0), CvScalar.new(64),
-                                         {:connectivity => 8, :fixed_range => true, :mask_only => true})
+                                         {connectivity: 8, fixed_range: true, mask_only: true})
     mat05 = mat0.clone
     mat5, comp5, mask5 = mat05.flood_fill!(point, 0, CvScalar.new(0), CvScalar.new(64),
-                                           {:connectivity => 8, :fixed_range => true, :mask_only => true})
+                                           {connectivity: 8, fixed_range: true, mask_only: true})
 
     assert_equal(9216.0, comp1.area)
     assert_equal(16, comp1.rect.x)
@@ -1319,9 +1319,9 @@ class TestCvMat_imageprocessing < OpenCVTestCase
       }
     }
 
-    [mat0.find_contours, mat0.find_contours(:mode => CV_RETR_LIST),
-     mat0.find_contours(:method => CV_CHAIN_APPROX_SIMPLE),
-     mat0.find_contours(:mode => CV_RETR_LIST, :method => CV_CHAIN_APPROX_SIMPLE)].each { |contours|
+    [mat0.find_contours, mat0.find_contours(mode: CV_RETR_LIST),
+     mat0.find_contours(method: CV_CHAIN_APPROX_SIMPLE),
+     mat0.find_contours(mode: CV_RETR_LIST, method: CV_CHAIN_APPROX_SIMPLE)].each { |contours|
       assert_not_nil(contours)
       assert_equal(8, contours.total)
       assert_not_nil(contours.h_next)
@@ -1336,7 +1336,7 @@ class TestCvMat_imageprocessing < OpenCVTestCase
       assert_nil(contours.h_next.h_next.h_next.v_next)
     }
     
-    contours = mat0.find_contours(:mode => CV_RETR_TREE)
+    contours = mat0.find_contours(mode: CV_RETR_TREE)
     assert_not_nil(contours)
     assert_equal(4, contours.total)
     assert_not_nil(contours.v_next)
@@ -1348,7 +1348,7 @@ class TestCvMat_imageprocessing < OpenCVTestCase
     assert_equal(8, contours.h_next.v_next.total)
     assert_nil(contours.h_next.v_next.v_next)
 
-    contours = mat0.find_contours(:mode => CV_RETR_CCOMP)
+    contours = mat0.find_contours(mode: CV_RETR_CCOMP)
     assert_not_nil(contours)
     assert_equal(4, contours.total)
     assert_not_nil(contours.v_next)
@@ -1360,7 +1360,7 @@ class TestCvMat_imageprocessing < OpenCVTestCase
     assert_equal(8, contours.h_next.v_next.total)
     assert_nil(contours.h_next.v_next.v_next)
 
-    contours = mat0.find_contours(:mode => CV_RETR_EXTERNAL)
+    contours = mat0.find_contours(mode: CV_RETR_EXTERNAL)
     assert_not_nil(contours)
     assert_equal(4, contours.total)
     assert_nil(contours.v_next)
@@ -1368,7 +1368,7 @@ class TestCvMat_imageprocessing < OpenCVTestCase
     assert_equal(4, contours.h_next.total)
     assert_nil(contours.h_next.v_next)
 
-    contours = mat0.find_contours(:mode => CV_RETR_TREE, :method => CV_CHAIN_APPROX_NONE)
+    contours = mat0.find_contours(mode: CV_RETR_TREE, method: CV_CHAIN_APPROX_NONE)
     assert_not_nil(contours)
     assert_equal(474, contours.total)
     assert_not_nil(contours.v_next)
@@ -1380,15 +1380,15 @@ class TestCvMat_imageprocessing < OpenCVTestCase
     assert_equal(240, contours.h_next.v_next.total)
     assert_nil(contours.h_next.v_next.v_next)
 
-    contours = mat0.find_contours(:mode => CV_RETR_EXTERNAL, :method => CV_CHAIN_CODE)
+    contours = mat0.find_contours(mode: CV_RETR_EXTERNAL, method: CV_CHAIN_CODE)
     assert_equal(474, contours.total)
     assert_equal(396, contours.h_next.total)
 
-    contours = mat0.find_contours(:mode => CV_RETR_EXTERNAL, :method => CV_CHAIN_APPROX_TC89_L1)
+    contours = mat0.find_contours(mode: CV_RETR_EXTERNAL, method: CV_CHAIN_APPROX_TC89_L1)
     assert_equal(4, contours.total)
     assert_equal(4, contours.h_next.total)
 
-    contours = mat0.find_contours(:mode => CV_RETR_EXTERNAL, :method => CV_CHAIN_APPROX_TC89_KCOS)
+    contours = mat0.find_contours(mode: CV_RETR_EXTERNAL, method: CV_CHAIN_APPROX_TC89_KCOS)
     assert_equal(4, contours.total)
     assert_equal(4, contours.h_next.total)
 
@@ -1600,7 +1600,7 @@ class TestCvMat_imageprocessing < OpenCVTestCase
     # Uncomment the following lines to show the result
     # seq = mat.hough_circles(:gradient, 1.5, 40, 100, 40, 10, 50)
     # seq.each { |circle|
-    #   mat0.circle!(circle.center, circle.radius, :color => CvColor::Red, :thickness => 2)
+    #   mat0.circle!(circle.center, circle.radius, color: CvColor::Red, thickness: 2)
     # }
     # snap mat0
 
@@ -1745,7 +1745,7 @@ class TestCvMat_imageprocessing < OpenCVTestCase
     # result = mat.match_template(templ)
     # pt1 = result.min_max_loc[2] # minimum location
     # pt2 = CvPoint.new(pt1.x + templ.width, pt1.y + templ.height)
-    # mat.rectangle!(pt1, pt2, :color => CvColor::Black, :thickness => 3)
+    # mat.rectangle!(pt1, pt2, color: CvColor::Black, thickness: 3)
     # snap mat, templ, result
 
     assert_raise(TypeError) {
@@ -1789,7 +1789,7 @@ class TestCvMat_imageprocessing < OpenCVTestCase
     radius = 40
     center = CvPoint.new(128, 128)
     mat = CvMat.new(center.y * 2, center.x * 2, :cv8u, 1).zero!
-    mat.circle!(center, radius, :color => CvColor::White, :thickness => -1)
+    mat.circle!(center, radius, color: CvColor::White, thickness: -1)
 
     num_points = 10
     alpha = 0.05
@@ -1873,8 +1873,8 @@ class TestCvMat_imageprocessing < OpenCVTestCase
     # result = mat.clone.GRAY2BGR
     # pts = mat.snake_image(points, alpha, beta, gamma, size, term_criteria)
     # w = GUI::Window.new('HoughCircle')
-    # result.poly_line!([pts], :color => CvColor::Red, :is_closed => true, :thickness => 2)
-    # result.poly_line!([points], :color => CvColor::Yellow, :is_closed => true, :thickness => 2)
+    # result.poly_line!([pts], color: CvColor::Red, is_closed: true, thickness: 2)
+    # result.poly_line!([points], color: CvColor::Yellow, is_closed: true, thickness: 2)
     # w.show result
     # GUI::wait_key
   end
@@ -1896,17 +1896,17 @@ class TestCvMat_imageprocessing < OpenCVTestCase
       end
     }
 
-    [curr.optical_flow_hs(prev, nil, nil, :lambda => 0.0005, :criteria => CvTermCriteria.new(1, 0.001)),
+    [curr.optical_flow_hs(prev, nil, nil, lambda: 0.0005, criteria: CvTermCriteria.new(1, 0.001)),
      curr.optical_flow_hs(prev)].each { |velx, vely|
       assert_in_delta(60, count_threshold(velx, 1), 20)
       assert_in_delta(50, count_threshold(vely, 1), 20)
     }
 
-    velx, vely = curr.optical_flow_hs(prev, nil, nil, :lambda => 0.001)
+    velx, vely = curr.optical_flow_hs(prev, nil, nil, lambda: 0.001)
     assert_in_delta(60, count_threshold(velx, 1), 20)
     assert_in_delta(50, count_threshold(vely, 1), 20)
 
-    velx, vely = curr.optical_flow_hs(prev, nil, nil, :criteria => CvTermCriteria.new(10, 0.01))
+    velx, vely = curr.optical_flow_hs(prev, nil, nil, criteria: CvTermCriteria.new(10, 0.01))
     assert_in_delta(130, count_threshold(velx, 1), 20)
     assert_in_delta(110, count_threshold(vely, 1), 20)
 
@@ -1915,11 +1915,11 @@ class TestCvMat_imageprocessing < OpenCVTestCase
     assert_in_delta(70, count_threshold(velx, 1), 20)
     assert_in_delta(60, count_threshold(vely, 1), 20)
 
-    velx, vely = curr.optical_flow_hs(prev, prev_velx, prev_vely, :lambda => 0.001)
+    velx, vely = curr.optical_flow_hs(prev, prev_velx, prev_vely, lambda: 0.001)
     assert_in_delta(80, count_threshold(velx, 1), 20)
     assert_in_delta(70, count_threshold(vely, 1), 20)
 
-    velx, vely = curr.optical_flow_hs(prev, prev_velx, prev_vely, :criteria => CvTermCriteria.new(10, 0.01))
+    velx, vely = curr.optical_flow_hs(prev, prev_velx, prev_vely, criteria: CvTermCriteria.new(10, 0.01))
     assert_in_delta(150, count_threshold(velx, 1), 20)
     assert_in_delta(130, count_threshold(vely, 1), 20)
     
@@ -1993,22 +1993,22 @@ class TestCvMat_imageprocessing < OpenCVTestCase
       end
     }
 
-    [curr.optical_flow_bm(prev, nil, nil, :block_size => CvSize.new(4, 4),
-                          :shift_size => CvSize.new(1, 1), :max_range => CvSize.new(4, 4)),
+    [curr.optical_flow_bm(prev, nil, nil, block_size: CvSize.new(4, 4),
+                          shift_size: CvSize.new(1, 1), max_range: CvSize.new(4, 4)),
      curr.optical_flow_bm(prev)].each { |velx, vely|
       assert_in_delta(350, count_threshold(velx, 1), 30)
       assert_in_delta(250, count_threshold(vely, 1), 30)
     }
 
-    velx, vely = curr.optical_flow_bm(prev, nil, nil, :block_size => CvSize.new(3, 3))
+    velx, vely = curr.optical_flow_bm(prev, nil, nil, block_size: CvSize.new(3, 3))
     assert_in_delta(280, count_threshold(velx, 1), 30)
     assert_in_delta(200, count_threshold(vely, 1), 30)
 
-    velx, vely = curr.optical_flow_bm(prev, nil, nil, :shift_size => CvSize.new(2, 2))
+    velx, vely = curr.optical_flow_bm(prev, nil, nil, shift_size: CvSize.new(2, 2))
     assert_in_delta(80, count_threshold(velx, 1), 30)
     assert_in_delta(60, count_threshold(vely, 1), 30)
 
-    velx, vely = curr.optical_flow_bm(prev, nil, nil, :max_range => CvSize.new(5, 5))
+    velx, vely = curr.optical_flow_bm(prev, nil, nil, max_range: CvSize.new(5, 5))
     assert_in_delta(400, count_threshold(velx, 1), 30)
     assert_in_delta(300, count_threshold(vely, 1), 30)
     
@@ -2075,7 +2075,7 @@ class TestCvMat_imageprocessing < OpenCVTestCase
     # [keypoints1, keypoints2].each { |kpts|
     #   tmp = mat0.GRAY2BGR
     #   kpts.each { |kp|
-    #     tmp.circle!(kp.pt, 3, :color => CvColor::Red, :thickness => 1, :line_type => :aa)
+    #     tmp.circle!(kp.pt, 3, color: CvColor::Red, thickness: 1, line_type: :aa)
     #   }
     #   results << tmp
     # }

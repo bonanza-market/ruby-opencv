@@ -19,7 +19,7 @@ result = match_image.match_template(template, :sqdiff_normed)
 
 pt1 = result.min_max_loc[2] # minimum location
 pt2 = CvPoint.new(pt1.x + template.width, pt1.y + template.height)
-match_image.rectangle!(pt1, pt2, :color => CvColor::Black, :thickness => 3)
+match_image.rectangle!(pt1, pt2, color: CvColor::Black, thickness: 3)
 
 window = GUI::Window.new('Display window') # Create a window for display.
 window.show(match_image) # Show our image inside it.

@@ -80,7 +80,7 @@ correspond.reset_roi
 
 points1.zip(points2) { |pt1, pt2|
   pt2.x += img1.cols
-  correspond.line!(pt1, pt2, :color => CvColor::White)
+  correspond.line!(pt1, pt2, color: CvColor::White)
 }
 
 GUI::Window.new('Object Correspond').show correspond

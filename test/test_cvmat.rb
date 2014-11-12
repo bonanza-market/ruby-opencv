@@ -1133,10 +1133,10 @@ class TestCvMat < OpenCVTestCase
       CvScalar.new(-c, -c, -c, -c)
     }
 
-    m1 = m0.convert_scale(:depth => :cv8u)
-    m2 = m0.convert_scale(:scale => 1.5)
-    m3 = m0.convert_scale(:shift => 10.0)
-    m4 = m0.convert_scale(:depth => CV_16U)
+    m1 = m0.convert_scale(depth: :cv8u)
+    m2 = m0.convert_scale(scale: 1.5)
+    m3 = m0.convert_scale(shift: 10.0)
+    m4 = m0.convert_scale(depth: CV_16U)
 
     [m1, m2, m3, m4].each { |m|
       assert_equal(m0.height, m.height)
@@ -1163,10 +1163,10 @@ class TestCvMat < OpenCVTestCase
       CvScalar.new(c, c, c, c)
     }
     
-    m1 = m0.convert_scale_abs(:depth => :cv64f)
-    m2 = m0.convert_scale_abs(:scale => 2)
-    m3 = m0.convert_scale_abs(:shift => 10.0)
-    m4 = m0.convert_scale_abs(:depth => CV_64F)
+    m1 = m0.convert_scale_abs(depth: :cv64f)
+    m2 = m0.convert_scale_abs(scale: 2)
+    m3 = m0.convert_scale_abs(shift: 10.0)
+    m4 = m0.convert_scale_abs(depth: CV_64F)
 
     [m1, m2, m3, m4].each { |m|
       assert_equal(m0.height, m.height)
@@ -2289,9 +2289,9 @@ class TestCvMat < OpenCVTestCase
     }
 
     [mat0.mul_transposed,
-     mat0.mul_transposed(:delta => nil),
-     mat0.mul_transposed(:order => 0),
-     mat0.mul_transposed(:scale => 1.0)].each { |m|
+     mat0.mul_transposed(delta: nil),
+     mat0.mul_transposed(order: 0),
+     mat0.mul_transposed(scale: 1.0)].each { |m|
       expected = [20, 44,
                   44, 100]
       assert_equal(2, m.rows)
@@ -2302,7 +2302,7 @@ class TestCvMat < OpenCVTestCase
       }
     }
 
-    m = mat0.mul_transposed(:delta => delta)
+    m = mat0.mul_transposed(delta: delta)
     expected = [5, 11,
                 11, 25]
     assert_equal(2, m.rows)
@@ -2312,7 +2312,7 @@ class TestCvMat < OpenCVTestCase
       assert_in_delta(x, m[i][0], 0.1)
     }
 
-    m = mat0.mul_transposed(:delta => delta, :order => 1, :scale => 2.0)
+    m = mat0.mul_transposed(delta: delta, order: 1, scale: 2.0)
     expected = [20, 28,
                 28, 40]
     assert_equal(2, m.rows)
@@ -2681,7 +2681,7 @@ class TestCvMat < OpenCVTestCase
       mat2[i, 1] = CvScalar.new(pt[1])
     }
     f_mat1 = CvMat.find_fundamental_mat(mat1, mat2, CV_FM_7POINT)
-    f_mat2, status = CvMat.find_fundamental_mat(mat1, mat2, CV_FM_7POINT, :with_status => true)
+    f_mat2, status = CvMat.find_fundamental_mat(mat1, mat2, CV_FM_7POINT, with_status: true)
 
     expected = [0.000009, 0.000029, -0.010343,
                 -0.000033, 0.000000, 0.014590,
@@ -2719,7 +2719,7 @@ class TestCvMat < OpenCVTestCase
     }
 
     f_mat1 = CvMat.find_fundamental_mat(mat1, mat2, CV_FM_8POINT)
-    f_mat2, status = CvMat.find_fundamental_mat(mat1, mat2, CV_FM_8POINT, :with_status => true)
+    f_mat2, status = CvMat.find_fundamental_mat(mat1, mat2, CV_FM_8POINT, with_status: true)
 
     expected = [0.000001, 0.000004, -0.001127,
                 -0.000005, 0.000038, -0.003778,
@@ -2750,8 +2750,8 @@ class TestCvMat < OpenCVTestCase
       mat2[i, 1] = CvScalar.new(pt[1])
     }
 
-    [CvMat.find_fundamental_mat(mat1, mat2, CV_FM_RANSAC, :with_status => false,
-                                :maximum_distance => 1.0, :desirable_level => 0.99),
+    [CvMat.find_fundamental_mat(mat1, mat2, CV_FM_RANSAC, with_status: false,
+                                maximum_distance: 1.0, desirable_level: 0.99),
      CvMat.find_fundamental_mat(mat1, mat2, CV_FM_RANSAC)].each { |f_mat|
       assert_equal(3, f_mat.rows)
       assert_equal(3, f_mat.cols)
@@ -2764,8 +2764,8 @@ class TestCvMat < OpenCVTestCase
     }
     
     # RANSAC with options
-    f_mat, status = CvMat.find_fundamental_mat(mat1, mat2, CV_FM_RANSAC, :with_status => true,
-                                               :maximum_distance => 2.0, :desirable_level => 0.8)
+    f_mat, status = CvMat.find_fundamental_mat(mat1, mat2, CV_FM_RANSAC, with_status: true,
+                                               maximum_distance: 2.0, desirable_level: 0.8)
     assert_equal(3, f_mat.rows)
     assert_equal(3, f_mat.cols)
     assert_equal(1, status.rows)
@@ -2796,8 +2796,8 @@ class TestCvMat < OpenCVTestCase
       mat2[i, 1] = CvScalar.new(pt[1])
     }
 
-    [CvMat.find_fundamental_mat(mat1, mat2, CV_FM_LMEDS, :with_status => false,
-                                :maximum_distance => 1.0, :desirable_level => 0.99),
+    [CvMat.find_fundamental_mat(mat1, mat2, CV_FM_LMEDS, with_status: false,
+                                maximum_distance: 1.0, desirable_level: 0.99),
      CvMat.find_fundamental_mat(mat1, mat2, CV_FM_LMEDS)].each { |f_mat|
       assert_equal(3, f_mat.rows)
       assert_equal(3, f_mat.cols)
@@ -2810,8 +2810,8 @@ class TestCvMat < OpenCVTestCase
     }
     
     # LMedS with options
-    f_mat, status = CvMat.find_fundamental_mat(mat1, mat2, CV_FM_LMEDS, :with_status => true,
-                                               :desirable_level => 0.8)
+    f_mat, status = CvMat.find_fundamental_mat(mat1, mat2, CV_FM_LMEDS, with_status: true,
+                                               desirable_level: 0.8)
     assert_equal(3, f_mat.rows)
     assert_equal(3, f_mat.cols)
     assert_equal(1, status.rows)
@@ -2830,17 +2830,17 @@ class TestCvMat < OpenCVTestCase
 
     [CV_FM_7POINT, CV_FM_8POINT, CV_FM_RANSAC, CV_FM_LMEDS].each { |method|
       assert_raise(TypeError) {
-        CvMat.find_fundamental_mat(DUMMY_OBJ, mat2, method, :with_status => true)
+        CvMat.find_fundamental_mat(DUMMY_OBJ, mat2, method, with_status: true)
       }
       assert_raise(TypeError) {
-        CvMat.find_fundamental_mat(mat1, DUMMY_OBJ, method, :with_status => true)
+        CvMat.find_fundamental_mat(mat1, DUMMY_OBJ, method, with_status: true)
       }
       assert_raise(TypeError) {
         CvMat.find_fundamental_mat(mat1, mat2, method, DUMMY_OBJ)
       }
     }
     assert_raise(TypeError) {
-      CvMat.find_fundamental_mat(mat1, mat2, DUMMY_OBJ, :with_status => true)
+      CvMat.find_fundamental_mat(mat1, mat2, DUMMY_OBJ, with_status: true)
     }
   end
 

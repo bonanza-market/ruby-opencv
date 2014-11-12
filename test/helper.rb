@@ -26,9 +26,9 @@ class OpenCVTestCase < Test::Unit::TestCase
       if val.is_a? Hash
         val
       elsif val.is_a? Array
-        {:title => val[0], :image => val[1] }
+        {title: val[0], image: val[1] }
       else
-        {:title => "snap-#{n}", :image => val }
+        {title: "snap-#{n}", image: val }
       end
     }
 

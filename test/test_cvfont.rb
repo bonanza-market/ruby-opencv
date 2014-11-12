@@ -36,8 +36,8 @@ class TestCvFont < OpenCVTestCase
     assert_equal(8, font.line_type)
     assert_false(font.italic)
 
-    font = CvFont.new(:plain, :hscale => 2.5, :vscale => 3.5,
-                      :shear => 0.5, :thickness => 3, :line_type => 2, :italic => false)
+    font = CvFont.new(:plain, hscale: 2.5, vscale: 3.5,
+                      shear: 0.5, thickness: 3, line_type: 2, italic: false)
     assert_equal(1, font.face)
     assert_equal(2.5, font.hscale)
     assert_equal(3.5, font.vscale)
@@ -46,7 +46,7 @@ class TestCvFont < OpenCVTestCase
     assert_equal(2, font.line_type)
     assert_false(font.italic)
 
-    font = CvFont.new(:simplex, :italic => true)
+    font = CvFont.new(:simplex, italic: true)
     assert_equal(16, font.face)
     assert(font.italic)
 

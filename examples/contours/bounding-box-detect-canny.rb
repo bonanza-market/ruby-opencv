@@ -20,7 +20,7 @@ canny = cvmat.canny(50, 150)
 # Look for contours
 # We want them to be returned as a flat list (CV_RETR_LIST) and simplified (CV_CHAIN_APPROX_SIMPLE)
 # Both are the defaults but included here for clarity
-contour = canny.find_contours(:mode => OpenCV::CV_RETR_LIST, :method => OpenCV::CV_CHAIN_APPROX_SIMPLE)
+contour = canny.find_contours(mode: OpenCV::CV_RETR_LIST, method: OpenCV::CV_CHAIN_APPROX_SIMPLE)
 
 # The Canny Algorithm returns two matches for every contour (see O'Reilly: Learning OpenCV Page 235)
 # We need only the external edges so we ignore holes.
@@ -44,7 +44,7 @@ while contour
     puts "that contour is #{contour.arc_length} pixels long "
 
     # Draw that bounding rectangle
-    cvmat.rectangle! box.top_left, box.bottom_right, :color => OpenCV::CvColor::Black
+    cvmat.rectangle! box.top_left, box.bottom_right, color: OpenCV::CvColor::Black
 
     # You can also detect the "minimal rectangle" which has an angle, width, height and center coordinates
     # and is not neccessarily horizonally or vertically aligned.

@@ -43,9 +43,9 @@ class TestCvHaarClassifierCascade < OpenCVTestCase
     assert_equal(1, detected.size)
     assert_equal(CvAvgComp, detected[0].class)
 
-    detected = @cascade.detect_objects(img, :scale_factor => 2.0, :flags => CV_HAAR_DO_CANNY_PRUNING,
-                                       :min_neighbors => 5, :min_size => CvSize.new(10, 10),
-                                       :max_size => CvSize.new(100, 100))
+    detected = @cascade.detect_objects(img, scale_factor: 2.0, flags: CV_HAAR_DO_CANNY_PRUNING,
+                                       min_neighbors: 5, min_size: CvSize.new(10, 10),
+                                       max_size: CvSize.new(100, 100))
     assert_equal(CvSeq, detected.class)
     assert_equal(1, detected.size)
     assert_equal(CvAvgComp, detected[0].class)

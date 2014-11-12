@@ -145,7 +145,7 @@ if dst_corners
     r1 = dst_corners[i % 4]
     r2 = dst_corners[(i + 1) % 4]
     correspond.line!(CvPoint.new(r1.x, r1.y + object.height), CvPoint.new(r2.x, r2.y + object.height),
-                     :color => CvColor::Red, :thickness => 2, :line_type => :aa)
+                     color: CvColor::Red, thickness: 2, line_type: :aa)
   }
 end
 
@@ -155,12 +155,12 @@ ptpairs = find_pairs(object_keypoints, object_descriptors, image_keypoints, imag
   r1 = object_keypoints[ptpairs[i]]
   r2 = image_keypoints[ptpairs[i + 1]]
   correspond.line!(r1.pt, CvPoint.new(r2.pt.x, r2.pt.y + object.height),
-                   :color => CvColor::Red, :line_type => :aa)
+                   color: CvColor::Red, line_type: :aa)
 }
 
 object_keypoints.each { |r|
   radius = (r.size * 1.2 / 9.0 * 2).to_i
-  object_color.circle!(r.pt, radius, :color => CvColor::Red, :line_type => :aa)
+  object_color.circle!(r.pt, radius, color: CvColor::Red, line_type: :aa)
 }
 
 GUI::Window.new('Object Correspond').show correspond

@@ -214,7 +214,7 @@ class TestCvHistogram < OpenCVTestCase
     # Uncomment the following line to show the result
     # min_val, max_val, min_loc, max_loc = back_project.min_max_loc
     # result = img.rectangle(max_loc, CvPoint.new(max_loc.x + template.width, max_loc.y + template.height),
-    #                        :thickness => 2)
+    #                        thickness: 2)
     # snap img, template, back_project, result
   end
 

@@ -24,8 +24,8 @@ puts usage
 
 # drawing option
 opt = {
-  :color => CvColor::Black,
-  :tickness => 1
+  color: CvColor::Black,
+  tickness: 1
 }
 
 point = nil
