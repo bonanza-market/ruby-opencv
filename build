@@ -52,8 +52,14 @@ if is_vendored
     end
   end
 
-  puts "=> Copying opencv.so to #{ gem_spec.extension_dir }"
-  `cp #{ gem_spec.gem_dir }/lib/opencv.so #{ gem_spec.extension_dir }/opencv.so`
+  library_filename = if RUBY_PLATFORM =~ /darwin|mac os/
+    'opencv.bundle'
+  else
+    'opencv.so'
+  end
+
+  puts "=> Copying #{ library_filename } to #{ gem_spec.extension_dir }"
+  `cp #{ gem_spec.gem_dir }/lib/#{ library_filename } #{ gem_spec.extension_dir }/#{ library_filename }`
 else
   target_gemset_name = 'bonz-imagetools'
   
