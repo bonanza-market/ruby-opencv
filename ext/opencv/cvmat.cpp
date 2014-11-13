@@ -5354,112 +5354,122 @@ rb_watershed(VALUE self, VALUE markers)
 }
 
 /*
-  * call-seq:
-  *   grab_cut -> cvmat(mask:cv8uc1)
-  *
-  * Does grab cut segmentation.
-  */
- VALUE
- rb_grab_cut(VALUE self, VALUE mask, VALUE rect, VALUE bgdModel, VALUE fgdModel, VALUE iterCount, VALUE mode)
- {
-   if (!(rb_obj_is_kind_of(self, cCvMat::rb_class())) || cvGetElemType(CVARR(self)) != CV_8UC3)
-     rb_raise(rb_eTypeError, "image (self) should be 8-bit 3-channel image.");
+ * call-seq:
+ *   grab_cut -> cvmat(mask:cv8uc1)
+ *
+ * Does grab cut segmentation.
+ */
+VALUE
+rb_grab_cut(VALUE self, VALUE mask, VALUE rect, VALUE bgdModel, VALUE fgdModel, VALUE iterCount, VALUE mode)
+{
+  if (!(rb_obj_is_kind_of(self, cCvMat::rb_class())) || cvGetElemType(CVARR(self)) != CV_8UC3)
+    rb_raise(rb_eTypeError, "image (self) should be 8-bit 3-channel image.");
 
-   if (!(rb_obj_is_kind_of(mask, cCvMat::rb_class())) || cvGetElemType(CVARR(mask)) != CV_8UC1)
-     rb_raise(rb_eTypeError, "argument 1 (mask) should be mask image.");
+  if (!(rb_obj_is_kind_of(mask, cCvMat::rb_class())) || cvGetElemType(CVARR(mask)) != CV_8UC1)
+    rb_raise(rb_eTypeError, "argument 1 (mask) should be mask image.");
 
-   const int INVALID_TYPE = -1;
-   int valid_mode = CVMETHOD("GRAB_CUT_MODE", mode, INVALID_TYPE);
+  const int INVALID_TYPE = -1;
+  int valid_mode = CVMETHOD("GRAB_CUT_MODE", mode, INVALID_TYPE);
 
-   try {
-     const cv::Mat selfMat(CVMAT(self));
-     cv::Mat maskMat(CVMAT(mask));
-     cv::Mat bgMat(CVMAT(bgdModel));
-     cv::Mat fgMat(CVMAT(fgdModel));
+  try {
+    const cv::Mat selfMat(CVMAT(self));
+    cv::Mat maskMat(CVMAT(mask));
+    cv::Mat bgMat(CVMAT(bgdModel));
+    cv::Mat fgMat(CVMAT(fgdModel));
 
-     cv::grabCut(selfMat, maskMat, VALUE_TO_CVRECT(rect), bgMat, fgMat, NUM2INT(iterCount), valid_mode);
-   } catch (cv::Exception& e) {
-     raise_cverror(e);
-   }
-   return mask;
- }
+    cv::grabCut(selfMat, maskMat, VALUE_TO_CVRECT(rect), bgMat, fgMat, NUM2INT(iterCount), valid_mode);
+  } catch (cv::Exception& e) {
+    raise_cverror(e);
+  }
+  return mask;
+}
  
 /*
-  * call-seq:
-  *   grab_cut2 -> [ cvmat(mask:cv8uc1), cvmat(bgdCenters:cv32fc1), cvmat(fgdCenters:cv32fc1) ]
-  *
-  * Does grab cut segmentation.
-  */
- VALUE
- rb_grab_cut2(VALUE self, VALUE mask, VALUE rect, VALUE bgdModel, VALUE fgdModel, VALUE iterCount, VALUE mode,
-              VALUE bgdLabels, VALUE fgdLabels, VALUE bgdCenters, VALUE fgdCenters)
- {
-   if (!(rb_obj_is_kind_of(self, cCvMat::rb_class())) || cvGetElemType(CVARR(self)) != CV_8UC3)
-     rb_raise(rb_eTypeError, "image (self) should be 8-bit 3-channel image.");
+ * call-seq:
+ *   grab_cut2 -> [ cvmat(mask:cv8uc1), cvmat(bgdCenters:cv32fc1), cvmat(fgdCenters:cv32fc1) ]
+ *
+ * Does grab cut segmentation.
+ */
+VALUE
+rb_grab_cut2(VALUE self, VALUE mask, VALUE rect, VALUE bgdModel, VALUE fgdModel, VALUE iterCount, VALUE mode,
+             VALUE bgdLabels, VALUE fgdLabels, VALUE bgdCenters, VALUE fgdCenters)
+{
+  if (!(rb_obj_is_kind_of(self, cCvMat::rb_class())) || cvGetElemType(CVARR(self)) != CV_8UC3)
+    rb_raise(rb_eTypeError, "image (self) should be 8-bit 3-channel image.");
 
-   if (!(rb_obj_is_kind_of(mask, cCvMat::rb_class())) || cvGetElemType(CVARR(mask)) != CV_8UC1)
-     rb_raise(rb_eTypeError, "argument 1 (mask) should be mask image.");
+  if (!(rb_obj_is_kind_of(mask, cCvMat::rb_class())) || cvGetElemType(CVARR(mask)) != CV_8UC1)
+    rb_raise(rb_eTypeError, "argument 1 (mask) should be mask image.");
 
-   const int INVALID_TYPE = -1;
-   int valid_mode = CVMETHOD("GRAB_CUT_MODE", mode, INVALID_TYPE);
+  const int INVALID_TYPE = -1;
+  int valid_mode = CVMETHOD("GRAB_CUT_MODE", mode, INVALID_TYPE);
 
-   try {
-     const cv::Mat selfMat(CVMAT(self));
-     cv::Mat maskMat(CVMAT(mask));
-     cv::Mat bgMat(CVMAT(bgdModel));
-     cv::Mat fgMat(CVMAT(fgdModel));
-     
-     int labelsMode = cv::GC_LABELS_INIT_KMEANS;
+  try {
+    const cv::Mat selfMat(CVMAT(self));
+    cv::Mat maskMat(CVMAT(mask));
+    cv::Mat bgMat(CVMAT(bgdModel));
+    cv::Mat fgMat(CVMAT(fgdModel));
+    
+    int labelsMode = cv::GC_LABELS_INIT_KMEANS;
 
-     if (bgdLabels == Qnil) {
-       bgdLabels = new_object(cvSize(1, 1), CV_MAKETYPE(CV_32F, 2));
-       cvSetZero(CVARR(bgdLabels));
-     } else {
-       labelsMode = cv::GC_LABELS_USE_INITIAL;
-     }
-     cv::Mat bgdLabelsMat(CVMAT(bgdLabels));
+    if (bgdLabels == Qnil) {
+      bgdLabels = new_object(cvSize(1, 1), CV_MAKETYPE(CV_32F, 2));
+      cvSetZero(CVARR(bgdLabels));
+    } else {
+      labelsMode = cv::GC_LABELS_USE_INITIAL;
+    }
+    cv::Mat bgdLabelsMat(CVMAT(bgdLabels));
 
-     if (fgdLabels == Qnil) {
-       fgdLabels = new_object(cvSize(1, 1), CV_MAKETYPE(CV_32F, 2));
-       cvSetZero(CVARR(fgdLabels));
-     } else {
-       labelsMode = cv::GC_LABELS_USE_INITIAL;
-     }
-     cv::Mat fgdLabelsMat(CVMAT(fgdLabels));
+    if (fgdLabels == Qnil) {
+      fgdLabels = new_object(cvSize(1, 1), CV_MAKETYPE(CV_32F, 2));
+      cvSetZero(CVARR(fgdLabels));
+    } else {
+      labelsMode = cv::GC_LABELS_USE_INITIAL;
+    }
+    cv::Mat fgdLabelsMat(CVMAT(fgdLabels));
 
-     int centersMode = cv::GC_CENTERS_MODE_INIT_RANDOM;
+    int centersMode = cv::GC_CENTERS_MODE_INIT_RANDOM;
 
-     if (bgdCenters == Qnil) {
-       bgdCenters = new_object(cvSize(3, 5), CV_MAKETYPE(CV_32F, 2));
-       cvSetZero(CVARR(bgdCenters));
-     } else {
-       centersMode = cv::GC_CENTERS_MODE_USE_INITIAL;
-     }
-     cv::Mat bgdCentersMat(CVMAT(bgdCenters));
+    if (bgdCenters == Qnil) {
+      // K=5 (# of clusters) for 3-dimensions (RGB)
+      bgdCenters = new_object(cvSize(3, 5), CV_MAKETYPE(CV_32F, 2));
+      cvSetZero(CVARR(bgdCenters));
+    } else {
+      centersMode = cv::GC_CENTERS_MODE_USE_INITIAL;
+    }
+    cv::Mat bgdCentersMat(CVMAT(bgdCenters));
 
-     if (fgdCenters == Qnil) {
-       fgdCenters = new_object(cvSize(3, 5), CV_MAKETYPE(CV_32F, 2));
-       cvSetZero(CVARR(fgdCenters));
-     } else {
-       centersMode = cv::GC_CENTERS_MODE_USE_INITIAL;
-     }
-     cv::Mat fgdCentersMat(CVMAT(fgdCenters));
+    if (fgdCenters == Qnil) {
+      // K=5 (# of clusters) for 3-dimensions (RGB)
+      fgdCenters = new_object(cvSize(3, 5), CV_MAKETYPE(CV_32F, 2));
+      cvSetZero(CVARR(fgdCenters));
+    } else {
+      centersMode = cv::GC_CENTERS_MODE_USE_INITIAL;
+    }
+    cv::Mat fgdCentersMat(CVMAT(fgdCenters));
 
-     cv::grabCut2(selfMat, maskMat, VALUE_TO_CVRECT(rect), bgMat, fgMat, bgdLabelsMat, fgdLabelsMat, bgdCentersMat, fgdCentersMat, NUM2INT(iterCount), valid_mode, labelsMode, centersMode);
+    cv::grabCut2(selfMat, maskMat, VALUE_TO_CVRECT(rect), bgMat, fgMat, bgdLabelsMat, fgdLabelsMat, bgdCentersMat, fgdCentersMat, NUM2INT(iterCount), valid_mode, labelsMode, centersMode);
 
-     CvMat bgdLabelsTmp = bgdLabelsMat;
-     bgdLabels = new_object(bgdLabelsTmp.rows, bgdLabelsTmp.cols, bgdLabelsTmp.type);
-     cvCopy(&bgdLabelsTmp, CVMAT(bgdLabels));
-     
-     CvMat fgdLabelsTmp = fgdLabelsMat;
-     fgdLabels = new_object(fgdLabelsTmp.rows, fgdLabelsTmp.cols, fgdLabelsTmp.type);
-     cvCopy(&fgdLabelsTmp, CVMAT(fgdLabels));
-   } catch (cv::Exception& e) {
-     raise_cverror(e);
-   }
-     
-   return rb_ary_new3(5, mask, bgdLabels, fgdLabels, bgdCenters, fgdCenters);
- }
+    CvMat bgdLabelsTmp = bgdLabelsMat;
+    bgdLabels = new_object(bgdLabelsTmp.rows, bgdLabelsTmp.cols, bgdLabelsTmp.type);
+    cvCopy(&bgdLabelsTmp, CVMAT(bgdLabels));
+    
+    CvMat fgdLabelsTmp = fgdLabelsMat;
+    fgdLabels = new_object(fgdLabelsTmp.rows, fgdLabelsTmp.cols, fgdLabelsTmp.type);
+    cvCopy(&fgdLabelsTmp, CVMAT(fgdLabels));
+    
+    CvMat bgdCentersTmp = bgdCentersMat;
+    bgdCenters = new_object(bgdCentersTmp.rows, bgdCentersTmp.cols, bgdCentersTmp.type);
+    cvCopy(&bgdCentersTmp, CVMAT(bgdCenters));
+    
+    CvMat fgdCentersTmp = fgdCentersMat;
+    fgdCenters = new_object(fgdCentersTmp.rows, fgdCentersTmp.cols, fgdCentersTmp.type);
+    cvCopy(&fgdCentersTmp, CVMAT(fgdCenters));
+  } catch (cv::Exception& e) {
+    raise_cverror(e);
+  }
+    
+  return rb_ary_new3(5, mask, bgdLabels, fgdLabels, bgdCenters, fgdCenters);
+}
 
 /*
  * call-seq:
