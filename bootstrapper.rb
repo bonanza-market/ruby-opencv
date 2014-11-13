@@ -6,10 +6,14 @@
 #
 #   require_relative '../vendor/gems/ruby-opencv/bootstrapper'
 #   RubyOpenCVBootstrapper.bootstrap
-#   RubyOpenCVBootstrapper.check_opencv_version(...)
 #
 # make sure to add these lines before the Bundler.require line that will (presumably) require ruby-opencv, but after
 # boot.rb is required (so bundler/setup has been required by the time these lines are executed).
+#
+# Once ruby-opencv has been required, you can run the following to check that the version of opencv is what you expect
+# it to be:
+
+#   RubyOpenCVBootstrapper.check_opencv_version(...)
 # 
 module RubyOpenCVBootstrapper
   extend self
@@ -32,8 +36,23 @@ module RubyOpenCVBootstrapper
     end
   end
   
-  def check_opencv_version(git_url)
+  def check_opencv_version(git_url, branch: 'master')
+    extension_git_tag = OpenCV.build_information.scan(/Version control:\s+[\d\.]+\-(?:\d+\-)?(.+)\n/).flatten.first
+    if extension_git_tag.blank?
+      puts "=> Unable to determine version of OpenCV that #{ library_filename } was built against, skipping version check"
+      return
+    end
     
+    remote_git_tag = `git ls-remote --heads #{ git_url } #{ branch }`.strip
+    if remote_git_tag.blank?
+      puts '=> Unable to determine remote OpenCV revision, skipping version check'
+      return
+    end
+    remote_git_tag = remote_git_tag.first(8)
+
+    if extension_git_tag != remote_git_tag
+      puts "=> WARNING: ruby-opencv built against OpenCV tag #{ extension_git_tag } but latest OpenCV tag is #{ remote_git_tag }"
+    end
   end
   
   private
