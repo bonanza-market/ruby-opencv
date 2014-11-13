@@ -51,7 +51,7 @@ module RubyOpenCVBootstrapper
     remote_git_tag = remote_git_tag.first(8)
 
     if extension_git_tag != remote_git_tag
-      puts "=> WARNING: ruby-opencv built against OpenCV tag #{ extension_git_tag } but latest OpenCV tag is #{ remote_git_tag }"
+      puts "WARNING: ruby-opencv built against OpenCV tag #{ extension_git_tag } but latest OpenCV tag is #{ remote_git_tag }"
     end
   end
   
