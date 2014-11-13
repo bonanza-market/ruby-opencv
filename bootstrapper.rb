@@ -1,0 +1,69 @@
+# When this gem is vendored and referenced by :path in the Gemfile, this module can be used to ensure that the 
+# correct version of the native extension is built and installed, as well as checking that the version of OpenCV that
+# ruby-opencv has been built against matches the expected version
+# 
+# e.g. in a rails application, with the gem vendored in vendor/gems/ruby-opencv, add this to application.rb:
+#
+#   require_relative '../vendor/gems/ruby-opencv/bootstrapper'
+#   RubyOpenCVBootstrapper.bootstrap
+#   RubyOpenCVBootstrapper.check_opencv_version(...)
+#
+# make sure to add these lines before the Bundler.require line that will (presumably) require ruby-opencv, but after
+# boot.rb is required (so bundler/setup has been required by the time these lines are executed).
+# 
+module RubyOpenCVBootstrapper
+  extend self
+  
+  def bootstrap
+    gem_spec = Gem::Specification.find_by_name 'ruby-opencv'
+    
+    library_path = File.join(gem_spec.extension_dir, library_filename)
+    if !File.exists?(library_path)
+      puts "=> #{ library_filename } doesn't exist; building now"
+      build(gem_spec)
+    else
+      
+    end
+  end
+  
+  def check_opencv_version(git_url)
+    
+  end
+  
+  private
+  
+  def build(gem_spec, debug: false)
+    # Copied from Gem::Specification#build_extensions
+    begin
+      # We need to require things in $LOAD_PATH without looking for the
+      # extension we are about to build.
+      unresolved_deps = Gem::Specification.unresolved_deps.dup
+      Gem::Specification.unresolved_deps.clear
+
+      require 'rubygems/config_file'
+      require 'rubygems/ext'
+      require 'rubygems/user_interaction'
+
+      Gem::DefaultUserInteraction.use_ui Gem::ConsoleUI.new do
+        build_args = gem_spec.build_args
+        build_args << '--enable-debug' if debug
+
+        builder = Gem::Ext::Builder.new gem_spec, build_args
+        builder.build_extensions
+      end
+    ensure
+      Gem::Specification.unresolved_deps.replace unresolved_deps
+    end
+    
+    puts "=> Copying #{ library_filename } to #{ gem_spec.extension_dir }"
+    `cp #{ gem_spec.gem_dir }/lib/#{ library_filename } #{ gem_spec.extension_dir }/#{ library_filename }`
+  end
+  
+  def library_filename
+    if RUBY_PLATFORM =~ /darwin|mac os/
+      'opencv.bundle'
+    else
+      'opencv.so'
+    end
+  end
+end
