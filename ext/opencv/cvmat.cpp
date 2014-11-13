@@ -5391,7 +5391,8 @@ rb_watershed(VALUE self, VALUE markers)
   * Does grab cut segmentation.
   */
  VALUE
- rb_grab_cut2(VALUE self, VALUE mask, VALUE rect, VALUE bgdModel, VALUE fgdModel, VALUE iterCount, VALUE mode, VALUE bgdLabels, VALUE fgdLabels)
+ rb_grab_cut2(VALUE self, VALUE mask, VALUE rect, VALUE bgdModel, VALUE fgdModel, VALUE iterCount, VALUE mode,
+              VALUE bgdLabels, VALUE fgdLabels, VALUE bgdCenters, VALUE fgdCenters)
  {
    if (!(rb_obj_is_kind_of(self, cCvMat::rb_class())) || cvGetElemType(CVARR(self)) != CV_8UC3)
      rb_raise(rb_eTypeError, "image (self) should be 8-bit 3-channel image.");
@@ -5408,25 +5409,43 @@ rb_watershed(VALUE self, VALUE markers)
      cv::Mat bgMat(CVMAT(bgdModel));
      cv::Mat fgMat(CVMAT(fgdModel));
      
-     int labelsMode = cv::GC_LABELS_INIT_RANDOM;
-     
+     int labelsMode = cv::GC_LABELS_INIT_KMEANS;
+
      if (bgdLabels == Qnil) {
-       bgdLabels = new_object(cvSize(3, 5), CV_MAKETYPE(CV_32F, 2));
+       bgdLabels = new_object(cvSize(1, 1), CV_MAKETYPE(CV_32F, 2));
        cvSetZero(CVARR(bgdLabels));
      } else {
        labelsMode = cv::GC_LABELS_USE_INITIAL;
      }
      cv::Mat bgdLabelsMat(CVMAT(bgdLabels));
-     
+
      if (fgdLabels == Qnil) {
-       fgdLabels = new_object(cvSize(3, 5), CV_MAKETYPE(CV_32F, 2));
+       fgdLabels = new_object(cvSize(1, 1), CV_MAKETYPE(CV_32F, 2));
        cvSetZero(CVARR(fgdLabels));
      } else {
        labelsMode = cv::GC_LABELS_USE_INITIAL;
      }
      cv::Mat fgdLabelsMat(CVMAT(fgdLabels));
 
-     cv::grabCut2(selfMat, maskMat, VALUE_TO_CVRECT(rect), bgMat, fgMat, bgdLabelsMat, fgdLabelsMat, NUM2INT(iterCount), valid_mode, labelsMode);
+     int centersMode = cv::GC_CENTERS_MODE_INIT_RANDOM;
+
+     if (bgdCenters == Qnil) {
+       bgdCenters = new_object(cvSize(3, 5), CV_MAKETYPE(CV_32F, 2));
+       cvSetZero(CVARR(bgdCenters));
+     } else {
+       centersMode = cv::GC_CENTERS_MODE_USE_INITIAL;
+     }
+     cv::Mat bgdCentersMat(CVMAT(bgdCenters));
+
+     if (fgdCenters == Qnil) {
+       fgdCenters = new_object(cvSize(3, 5), CV_MAKETYPE(CV_32F, 2));
+       cvSetZero(CVARR(fgdCenters));
+     } else {
+       centersMode = cv::GC_CENTERS_MODE_USE_INITIAL;
+     }
+     cv::Mat fgdCentersMat(CVMAT(fgdCenters));
+
+     cv::grabCut2(selfMat, maskMat, VALUE_TO_CVRECT(rect), bgMat, fgMat, bgdLabelsMat, fgdLabelsMat, bgdCentersMat, fgdCentersMat, NUM2INT(iterCount), valid_mode, labelsMode, centersMode);
 
      CvMat bgdLabelsTmp = bgdLabelsMat;
      bgdLabels = new_object(bgdLabelsTmp.rows, bgdLabelsTmp.cols, bgdLabelsTmp.type);
@@ -5439,7 +5458,7 @@ rb_watershed(VALUE self, VALUE markers)
      raise_cverror(e);
    }
      
-   return rb_ary_new3(3, mask, bgdLabels, fgdLabels);
+   return rb_ary_new3(5, mask, bgdLabels, fgdLabels, bgdCenters, fgdCenters);
  }
 
 /*
@@ -6727,7 +6746,7 @@ init_ruby_class()
   rb_define_method(rb_klass, "pyr_mean_shift_filtering", RUBY_METHOD_FUNC(rb_pyr_mean_shift_filtering), -1);
   rb_define_method(rb_klass, "watershed", RUBY_METHOD_FUNC(rb_watershed), 1);
   rb_define_method(rb_klass, "grab_cut", RUBY_METHOD_FUNC(rb_grab_cut), 6);
-  rb_define_method(rb_klass, "grab_cut2", RUBY_METHOD_FUNC(rb_grab_cut2), 8);
+  rb_define_method(rb_klass, "grab_cut2", RUBY_METHOD_FUNC(rb_grab_cut2), 10);
 
   rb_define_method(rb_klass, "moments", RUBY_METHOD_FUNC(rb_moments), -1);
 
