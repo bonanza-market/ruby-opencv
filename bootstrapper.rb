@@ -19,10 +19,16 @@ module RubyOpenCVBootstrapper
     
     library_path = File.join(gem_spec.extension_dir, library_filename)
     if !File.exists?(library_path)
-      puts "=> #{ library_filename } doesn't exist; building now"
+      puts "=> #{ library_filename } doesn't exist; building"
       build(gem_spec)
     else
+      source_files = gem_spec.extensions + gem_spec.files.grep(/\.(cpp|c|h)\Z/)
+      source_files.map! { |source_file| File.join(gem_spec.gem_dir, source_file) }
       
+      unless FileUtils.uptodate?(library_path, source_files)
+        puts "=> #{ library_filename } out of date; building"
+        build(gem_spec)
+      end
     end
   end
   
@@ -33,7 +39,8 @@ module RubyOpenCVBootstrapper
   private
   
   def build(gem_spec, debug: false)
-    # Copied from Gem::Specification#build_extensions
+    # Copied from Gem::Specification#build_extensions, with all the conditions that prevent the extension from being
+    # built removed
     begin
       # We need to require things in $LOAD_PATH without looking for the
       # extension we are about to build.
