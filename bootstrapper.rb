@@ -5,7 +5,7 @@
 # e.g. in a rails application, with the gem vendored in vendor/gems/ruby-opencv, add this to application.rb:
 #
 #   require_relative '../vendor/gems/ruby-opencv/bootstrapper'
-#   RubyOpenCVBootstrapper.bootstrap
+#   RubyOpenCVBootstrapper.bootstrap('2.4.10')
 #
 # make sure to add these lines before the Bundler.require line that will (presumably) require ruby-opencv, but after
 # boot.rb is required (so bundler/setup has been required by the time these lines are executed).
@@ -18,20 +18,20 @@
 module RubyOpenCVBootstrapper
   extend self
   
-  def bootstrap
+  def bootstrap(expected_opencv_version)
     gem_spec = Gem::Specification.find_by_name 'ruby-opencv'
     
     library_path = File.join(gem_spec.extension_dir, library_filename)
     if !File.exists?(library_path)
       puts "=> #{ library_filename } doesn't exist; building"
-      build(gem_spec)
+      build(gem_spec, expected_opencv_version)
     else
       source_files = gem_spec.extensions + gem_spec.files.grep(/\.(cpp|c|h)\Z/)
       source_files.map! { |source_file| File.join(gem_spec.gem_dir, source_file) }
       
       unless FileUtils.uptodate?(library_path, source_files)
         puts "=> #{ library_filename } out of date; building"
-        build(gem_spec)
+        build(gem_spec, expected_opencv_version)
       end
     end
   end
@@ -57,7 +57,13 @@ module RubyOpenCVBootstrapper
   
   private
   
-  def build(gem_spec, debug: false)
+  def build(gem_spec, expected_opencv_version, debug: false)
+    # Make sure we're building against the correct OpenCV version
+    opencv_core_lib = File.realpath(opencv_core_library_path)
+    unless opencv_core_lib.end_with?(expected_opencv_version)
+      puts "WARNING: Installed opencv version is #{ opencv_core_lib.sub("#{ opencv_core_library_path }.", '') }, not #{ expected_opencv_version }"
+    end
+    
     # Copied from Gem::Specification#build_extensions, with all the conditions that prevent the extension from being
     # built removed
     begin
@@ -91,5 +97,9 @@ module RubyOpenCVBootstrapper
     else
       'opencv.so'
     end
+  end
+  
+  def opencv_core_library_path
+    '/usr/local/lib/libopencv_core.so'
   end
 end
