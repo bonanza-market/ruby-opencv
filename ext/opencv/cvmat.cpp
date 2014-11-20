@@ -1120,58 +1120,76 @@ rb_aset(VALUE self, VALUE args)
 VALUE
 rb_set_data(VALUE self, VALUE data)
 {
-  data = rb_funcall(data, rb_intern("flatten"), 0);
-  const int DATA_LEN = RARRAY_LEN(data);
   CvMat *self_ptr = CVMAT(self);
   int depth = CV_MAT_DEPTH(self_ptr->type);
-  void* array = NULL;
 
-  switch (depth) {
-  case CV_8U:
-    array = rb_cvAlloc(sizeof(uchar) * DATA_LEN);
-    for (int i = 0; i < DATA_LEN; ++i)
-      ((uchar*)array)[i] = (uchar)(NUM2INT(rb_ary_entry(data, i)));
-    break;
-  case CV_8S:
-    array = rb_cvAlloc(sizeof(char) * DATA_LEN);
-    for (int i = 0; i < DATA_LEN; ++i)
-      ((char*)array)[i] = (char)(NUM2INT(rb_ary_entry(data, i)));
-    break;
-  case CV_16U:
-    array = rb_cvAlloc(sizeof(ushort) * DATA_LEN);
-    for (int i = 0; i < DATA_LEN; ++i)
-      ((ushort*)array)[i] = (ushort)(NUM2INT(rb_ary_entry(data, i)));
-    break;
-  case CV_16S:
-    array = rb_cvAlloc(sizeof(short) * DATA_LEN);
-    for (int i = 0; i < DATA_LEN; ++i)
-      ((short*)array)[i] = (short)(NUM2INT(rb_ary_entry(data, i)));
-    break;
-  case CV_32S:
-    array = rb_cvAlloc(sizeof(int) * DATA_LEN);
-    for (int i = 0; i < DATA_LEN; ++i)
-      ((int*)array)[i] = NUM2INT(rb_ary_entry(data, i));
-    break;
-  case CV_32F:
-    array = rb_cvAlloc(sizeof(float) * DATA_LEN);
-    for (int i = 0; i < DATA_LEN; ++i)
-      ((float*)array)[i] = (float)NUM2DBL(rb_ary_entry(data, i));
-    break;
-  case CV_64F:
-    array = rb_cvAlloc(sizeof(double) * DATA_LEN);
-    for (int i = 0; i < DATA_LEN; ++i)
-      ((double*)array)[i] = NUM2DBL(rb_ary_entry(data, i));
-    break;
-  default:
-    rb_raise(rb_eArgError, "Invalid CvMat depth");
-    break;
-  }
+  if (TYPE(data) == T_STRING) {
+    if (depth != CV_8U)
+      rb_raise(rb_eArgError, "Invalid CvMat depth");
+      
+    if (!CV_IS_MAT_CONT(self_ptr->type))
+      rb_raise(rb_eArgError, "CvMat must be continuous");
+      
+    const int dataLength = RSTRING_LEN(data);
+    if (dataLength != self_ptr->width * self_ptr->height * CV_MAT_CN(self_ptr->type))
+      rb_raise(rb_eArgError, "Invalid data string length");
+    
+    memcpy(self_ptr->data.ptr, RSTRING_PTR(data), dataLength);
+    
+  } else {
+    data = rb_funcall(data, rb_intern("flatten"), 0);
+    
+    const int DATA_LEN = RARRAY_LEN(data);
+   
+    void* array = NULL;
+  
+    switch (depth) {
+    case CV_8U:
+      array = rb_cvAlloc(sizeof(uchar) * DATA_LEN);
+      for (int i = 0; i < DATA_LEN; ++i)
+        ((uchar*)array)[i] = (uchar)(NUM2INT(rb_ary_entry(data, i)));
+      break;
+    case CV_8S:
+      array = rb_cvAlloc(sizeof(char) * DATA_LEN);
+      for (int i = 0; i < DATA_LEN; ++i)
+        ((char*)array)[i] = (char)(NUM2INT(rb_ary_entry(data, i)));
+      break;
+    case CV_16U:
+      array = rb_cvAlloc(sizeof(ushort) * DATA_LEN);
+      for (int i = 0; i < DATA_LEN; ++i)
+        ((ushort*)array)[i] = (ushort)(NUM2INT(rb_ary_entry(data, i)));
+      break;
+    case CV_16S:
+      array = rb_cvAlloc(sizeof(short) * DATA_LEN);
+      for (int i = 0; i < DATA_LEN; ++i)
+        ((short*)array)[i] = (short)(NUM2INT(rb_ary_entry(data, i)));
+      break;
+    case CV_32S:
+      array = rb_cvAlloc(sizeof(int) * DATA_LEN);
+      for (int i = 0; i < DATA_LEN; ++i)
+        ((int*)array)[i] = NUM2INT(rb_ary_entry(data, i));
+      break;
+    case CV_32F:
+      array = rb_cvAlloc(sizeof(float) * DATA_LEN);
+      for (int i = 0; i < DATA_LEN; ++i)
+        ((float*)array)[i] = (float)NUM2DBL(rb_ary_entry(data, i));
+      break;
+    case CV_64F:
+      array = rb_cvAlloc(sizeof(double) * DATA_LEN);
+      for (int i = 0; i < DATA_LEN; ++i)
+        ((double*)array)[i] = NUM2DBL(rb_ary_entry(data, i));
+      break;
+    default:
+      rb_raise(rb_eArgError, "Invalid CvMat depth");
+      break;
+    }
 
-  try {
-    cvSetData(self_ptr, array, self_ptr->step);    
-  }
-  catch (cv::Exception& e) {
-    raise_cverror(e);
+    try {
+      cvSetData(self_ptr, array, self_ptr->step);    
+    }
+    catch (cv::Exception& e) {
+      raise_cverror(e);
+    }
   }
 
   return self;
@@ -6568,6 +6586,7 @@ init_ruby_class()
   rb_define_method(rb_klass, "depth", RUBY_METHOD_FUNC(rb_depth), 0);
   rb_define_method(rb_klass, "channel", RUBY_METHOD_FUNC(rb_channel), 0);
   rb_define_method(rb_klass, "data", RUBY_METHOD_FUNC(rb_data), 0);
+  rb_define_method(rb_klass, "data=", RUBY_METHOD_FUNC(rb_set_data), 1);
 
   rb_define_method(rb_klass, "rcv_clone", RUBY_METHOD_FUNC(rb_rcv_clone), 0);
   rb_define_method(rb_klass, "copy", RUBY_METHOD_FUNC(rb_copy), -1);
