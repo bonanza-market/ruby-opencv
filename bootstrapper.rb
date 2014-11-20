@@ -10,10 +10,9 @@
 # make sure to add these lines before the Bundler.require line that will (presumably) require ruby-opencv, but after
 # boot.rb is required (so bundler/setup has been required by the time these lines are executed).
 #
-# Once ruby-opencv has been required, you can run the following to check that the version of opencv is what you expect
-# it to be:
-
-#   RubyOpenCVBootstrapper.check_opencv_version(...)
+# You can also use check_opencv_version to check that the version of opencv is what you expect it to be:
+#
+#   RubyOpenCVBootstrapper.check_opencv_version('2.4.10')
 # 
 module RubyOpenCVBootstrapper
   extend self
@@ -35,35 +34,25 @@ module RubyOpenCVBootstrapper
       end
     end
   end
-  
-  def check_opencv_version(git_url, branch: 'master')
-    extension_git_tag = OpenCV.build_information.scan(/Version control:\s+[\d\.]+\-(?:\d+\-)?(.+)\n/).flatten.first
-    if extension_git_tag.blank?
-      puts "=> Unable to determine version of OpenCV that #{ library_filename } was built against, skipping version check"
-      return
-    end
-    
-    remote_git_tag = `git ls-remote --heads #{ git_url } #{ branch }`.strip
-    if remote_git_tag.blank?
-      puts '=> Unable to determine remote OpenCV revision, skipping version check'
-      return
-    end
-    remote_git_tag = remote_git_tag.first(8)
 
-    if extension_git_tag != remote_git_tag
-      puts "WARNING: ruby-opencv built against OpenCV tag #{ extension_git_tag } but latest OpenCV tag is #{ remote_git_tag }"
-    end
+
+  def check_opencv_version(expected_opencv_version, error: false)
+    opencv_core_lib = File.realpath(opencv_core_library_path)
+
+    actual_version = opencv_core_lib[/libopencv_core(?:\.so)?\.([\d\.]+)(?:$|\.dylib$)/, 1]
+
+    return if opencv_core_lib =~ /#{ Regexp.escape expected_opencv_version }/
+
+    puts "#{ error ? 'ERROR' : 'WARNING' }: Installed opencv version is #{ actual_version }, not #{ expected_opencv_version }"
+    exit(1) if error
   end
   
   private
   
   def build(gem_spec, expected_opencv_version, debug: false)
     # Make sure we're building against the correct OpenCV version
-    opencv_core_lib = File.realpath(opencv_core_library_path)
-    unless opencv_core_lib.end_with?(expected_opencv_version)
-      puts "WARNING: Installed opencv version is #{ opencv_core_lib.sub("#{ opencv_core_library_path }.", '') }, not #{ expected_opencv_version }"
-    end
-    
+    check_opencv_version(expected_opencv_version)
+
     # Copied from Gem::Specification#build_extensions, with all the conditions that prevent the extension from being
     # built removed
     begin
@@ -100,6 +89,12 @@ module RubyOpenCVBootstrapper
   end
   
   def opencv_core_library_path
-    '/usr/local/lib/libopencv_core.so'
+    extension = if RUBY_PLATFORM =~ /darwin|mac os/
+      'dylib'
+    else
+      'so'
+    end
+
+    "/usr/local/lib/libopencv_core.#{ extension }"
   end
 end

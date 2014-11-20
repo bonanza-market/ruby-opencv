@@ -19,15 +19,8 @@
 require 'rubygems'
 require 'fileutils'
 
-
-# Make sure we're building against the correct OpenCV version
-expected_opencv_version = '2.4.10'
-opencv_core_library_path = '/usr/local/lib/libopencv_core.so'
-opencv_core_lib = File.realpath(opencv_core_library_path)
-unless opencv_core_lib.end_with?(expected_opencv_version)
-  puts "ERROR: Installed opencv version is #{ opencv_core_lib.sub("#{ opencv_core_library_path }.", '') }, not #{ expected_opencv_version }"
-  exit(1)
-end
+require_relative 'bootstrapper'
+RubyOpenCVBootstrapper.check_opencv_version('2.4.10', error: true)
 
 is_debug_mode = ARGV.first.to_s == 'debug'
 
