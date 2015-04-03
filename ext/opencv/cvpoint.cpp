@@ -175,8 +175,7 @@ rb_check_inequality(VALUE self, VALUE compare_to) {
 VALUE
 rb_hash(VALUE self) {
   CvPoint* self_ptr = CVPOINT(self);
-  VALUE array = rb_ary_new3(2, INT2NUM(self_ptr->x), INT2NUM(self_ptr->y));
-  return rb_funcall(array, rb_intern("hash"), 0);
+  return INT2NUM(rb_memhash(self_ptr, sizeof(CvPoint)));
 }
 
 /*
