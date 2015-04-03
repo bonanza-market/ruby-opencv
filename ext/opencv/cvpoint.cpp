@@ -172,6 +172,13 @@ rb_check_inequality(VALUE self, VALUE compare_to) {
   return (self_ptr->x != compare.x || self_ptr->y != compare.y) ? Qtrue : Qfalse;
 }
 
+VALUE
+rb_hash(VALUE self) {
+  CvPoint* self_ptr = CVPOINT(self);
+  VALUE array = rb_ary_new3(2, INT2NUM(self_ptr->x), INT2NUM(self_ptr->y));
+  return rb_funcall(array, rb_intern("hash"), 0);
+}
+
 /*
  * call-seq:
  *   to_s -> "<OpenCV::CvPoint:(self.x,self.y)>"
@@ -242,6 +249,8 @@ init_ruby_class()
   rb_define_singleton_method(rb_klass, "compatible?", RUBY_METHOD_FUNC(rb_compatible_q), 1);
   rb_define_method(rb_klass, "initialize", RUBY_METHOD_FUNC(rb_initialize), -1);
   rb_define_method(rb_klass, "==", RUBY_METHOD_FUNC(rb_check_equality), 1);
+  rb_define_method(rb_klass, "eql?", RUBY_METHOD_FUNC(rb_check_equality), 1);
+  rb_define_method(rb_klass, "hash", RUBY_METHOD_FUNC(rb_hash), 0);
   rb_define_method(rb_klass, "!=", RUBY_METHOD_FUNC(rb_check_inequality), 1);
   rb_define_method(rb_klass, "x", RUBY_METHOD_FUNC(rb_x), 0);
   rb_define_method(rb_klass, "x=", RUBY_METHOD_FUNC(rb_set_x), 1);
