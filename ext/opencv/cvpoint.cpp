@@ -241,6 +241,8 @@ init_ruby_class()
   rb_define_alloc_func(rb_klass, rb_allocate);
   rb_define_singleton_method(rb_klass, "compatible?", RUBY_METHOD_FUNC(rb_compatible_q), 1);
   rb_define_method(rb_klass, "initialize", RUBY_METHOD_FUNC(rb_initialize), -1);
+  rb_define_method(rb_klass, "==", RUBY_METHOD_FUNC(rb_check_equality), 1);
+  rb_define_method(rb_klass, "!=", RUBY_METHOD_FUNC(rb_check_inequality), 1);
   rb_define_method(rb_klass, "x", RUBY_METHOD_FUNC(rb_x), 0);
   rb_define_method(rb_klass, "x=", RUBY_METHOD_FUNC(rb_set_x), 1);
   rb_define_method(rb_klass, "y", RUBY_METHOD_FUNC(rb_y), 0);
