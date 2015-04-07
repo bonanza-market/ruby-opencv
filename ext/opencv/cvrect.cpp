@@ -130,6 +130,40 @@ rb_initialize(int argc, VALUE *argv, VALUE self)
 
 /*
  * call-seq:
+ *   rb_check_equality(val)
+ *
+ * Return true if CvRect has same values as we do
+ */
+VALUE
+rb_check_equality(VALUE self, VALUE compare_to) {
+	CvRect compare = VALUE_TO_CVRECT(compare_to);
+  CvRect* self_ptr = CVRECT(self);
+
+  return (self_ptr->x == compare.x && self_ptr->y == compare.y && self_ptr->width == compare.width && self_ptr->height == compare.height) ? Qtrue : Qfalse;
+}
+
+/*
+ * call-seq:
+ *   rb_check_inequality(val)
+ *
+ * Return true if CvRect does not have same values as we do
+ */
+VALUE
+rb_check_inequality(VALUE self, VALUE compare_to) {
+	CvRect compare = VALUE_TO_CVRECT(compare_to);
+  CvRect* self_ptr = CVRECT(self);
+
+  return (self_ptr->x != compare.x || self_ptr->y != compare.y || self_ptr->width != compare.width || self_ptr->height != compare.height) ? Qtrue : Qfalse;
+}
+
+VALUE
+rb_hash(VALUE self) {
+  CvRect* self_ptr = CVRECT(self);
+  return INT2NUM(rb_memhash(self_ptr, sizeof(CvRect)));
+}
+
+/*
+ * call-seq:
  *   to_s -> "<OpenCV::CvRect:(self.x,self.y,self.widthxself.height)>"
  *
  * Return x, y, width, and height by String.
@@ -378,6 +412,10 @@ init_ruby_class()
   rb_define_singleton_method(rb_klass, "max_rect", RUBY_METHOD_FUNC(rb_max_rect), 2);
   rb_define_method(rb_klass, "initialize", RUBY_METHOD_FUNC(rb_initialize), -1);
   rb_define_method(rb_klass, "to_s", RUBY_METHOD_FUNC(rb_to_s), 0);
+  rb_define_method(rb_klass, "==", RUBY_METHOD_FUNC(rb_check_equality), 1);
+  rb_define_method(rb_klass, "!=", RUBY_METHOD_FUNC(rb_check_inequality), 1);
+  rb_define_method(rb_klass, "eql?", RUBY_METHOD_FUNC(rb_check_equality), 1);
+  rb_define_method(rb_klass, "hash", RUBY_METHOD_FUNC(rb_hash), 0);
 
   rb_define_method(rb_klass, "x", RUBY_METHOD_FUNC(rb_x), 0);
   rb_define_method(rb_klass, "x=", RUBY_METHOD_FUNC(rb_set_x), 1);
