@@ -129,6 +129,26 @@ rb_initialize(int argc, VALUE *argv, VALUE self)
 }
 
 /*
+ * call-seq:
+ *   to_s -> "<OpenCV::CvRect:(self.x,self.y,self.widthxself.height)>"
+ *
+ * Return x, y, width, and height by String.
+ */
+VALUE
+rb_to_s(VALUE self)
+{
+  const int i = 6;
+  VALUE str[i];
+  str[0] = rb_str_new2("<%s:(%d,%d,%dx%d)>");
+  str[1] = rb_str_new2(rb_class2name(CLASS_OF(self)));
+  str[2] = rb_x(self);
+  str[3] = rb_y(self);
+  str[4] = rb_width(self);
+  str[5] = rb_height(self);
+  return rb_f_sprintf(i, str);
+}
+
+/*
  * Return parameter on x-axis of top-left point.
  */
 VALUE
@@ -357,6 +377,7 @@ init_ruby_class()
   rb_define_singleton_method(rb_klass, "compatible?", RUBY_METHOD_FUNC(rb_compatible_q), 1);
   rb_define_singleton_method(rb_klass, "max_rect", RUBY_METHOD_FUNC(rb_max_rect), 2);
   rb_define_method(rb_klass, "initialize", RUBY_METHOD_FUNC(rb_initialize), -1);
+  rb_define_method(rb_klass, "to_s", RUBY_METHOD_FUNC(rb_to_s), 0);
 
   rb_define_method(rb_klass, "x", RUBY_METHOD_FUNC(rb_x), 0);
   rb_define_method(rb_klass, "x=", RUBY_METHOD_FUNC(rb_set_x), 1);

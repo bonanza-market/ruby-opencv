@@ -27,6 +27,7 @@ VALUE rb_max_rect(VALUE klass, VALUE rect1, VALUE rect2);
 
 VALUE rb_allocate(VALUE klass);
 VALUE rb_initialize(int argc, VALUE *argv, VALUE self);
+VALUE rb_to_s(VALUE self);
 VALUE rb_x(VALUE self);
 VALUE rb_set_x(VALUE self, VALUE x);
 VALUE rb_y(VALUE self);
