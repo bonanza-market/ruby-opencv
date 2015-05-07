@@ -271,7 +271,7 @@ init_ruby_class()
   rb_define_method(rb_klass, "dir=", RUBY_METHOD_FUNC(rb_set_dir), 1);
   rb_define_method(rb_klass, "hessian", RUBY_METHOD_FUNC(rb_get_hessian), 0);
   rb_define_method(rb_klass, "hessian=", RUBY_METHOD_FUNC(rb_set_hessian), 1);
-  rb_define_method(rb_klass, "flann", RUBY_METHOD_FUNC(rb_flann), 2);
+  rb_define_singleton_method(rb_klass, "flann", RUBY_METHOD_FUNC(rb_flann), 2);
 }
 
 __NAMESPACE_END_CVSURFPOINT
