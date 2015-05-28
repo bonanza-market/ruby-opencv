@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.homepage = "https://github.com/ruby-opencv/ruby-opencv/"
   s.licenses = ["The BSD License"]
   s.rdoc_options = ["--main", "README.md"]
-  s.rubygems_version = "2.2.2"
+  #s.rubygems_version = "2.2.2"
   s.summary = "OpenCV wrapper for Ruby"
   s.test_files = ["test/test_cvcontour.rb", "test/test_eigenfaces.rb", "test/test_cvmoments.rb", "test/test_cvseq.rb", "test/test_cvcontourtree.rb", "test/test_cvbox2d.rb", "test/test_iplimage.rb", "test/test_cvvideowriter.rb", "test/test_cvline.rb", "test/test_cvhumoments.rb", "test/test_cvfont.rb", "test/test_cvconnectedcomp.rb", "test/test_cvhistogram.rb", "test/test_trackbar.rb", "test/test_cvmat_imageprocessing.rb", "test/test_cvhaarclassifiercascade.rb", "test/test_cvcircle32f.rb", "test/test_cvcapture.rb", "test/test_cvmat_dxt.rb", "test/test_cvrect.rb", "test/test_iplconvkernel.rb", "test/test_cvsurfpoint.rb", "test/test_cvavgcomp.rb", "test/test_cvscalar.rb", "test/test_pointset.rb", "test/test_curve.rb", "test/test_cvtermcriteria.rb", "test/test_cvtwopoints.rb", "test/test_cvsurfparams.rb", "test/test_cvpoint2d32f.rb", "test/test_cvpoint3d32f.rb", "test/test_cvfeaturetree.rb", "test/test_mouseevent.rb", "test/test_cvchain.rb", "test/test_cvmat.rb", "test/test_fisherfaces.rb", "test/test_cverror.rb", "test/test_cvpoint.rb", "test/test_cvsize2d32f.rb", "test/test_preliminary.rb", "test/test_cvmat_drawing.rb", "test/test_lbph.rb", "test/test_cvsize.rb", "test/test_window.rb", "test/test_cvslice.rb", "test/test_opencv.rb"]
 
