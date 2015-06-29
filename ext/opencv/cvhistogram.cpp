@@ -257,6 +257,36 @@ rb_aref(VALUE self, VALUE args)
   return rb_float_new((double)value);
 }
 
+VALUE
+rb_at(VALUE self, VALUE x)
+{
+  float value = 0.0;
+  CvHistogram* self_ptr = CVHISTOGRAM(self);
+  try {
+    value = cvQueryHistValue_1D(self_ptr, NUM2INT(x));
+  }
+  catch (cv::Exception& e) {
+    raise_cverror(e);
+  }
+  
+  return rb_float_new((double)value);
+}
+
+VALUE
+rb_at_3d(VALUE self, VALUE x, VALUE y, VALUE z)
+{
+  float value = 0.0;
+  CvHistogram* self_ptr = CVHISTOGRAM(self);
+  try {
+    value = cvQueryHistValue_3D(self_ptr, NUM2INT(x), NUM2INT(y), NUM2INT(z));
+  }
+  catch (cv::Exception& e) {
+    raise_cverror(e);
+  }
+  
+  return rb_float_new((double)value);
+}
+
 /*
  * Finds the minimum and maximum histogram bins.
  * @overload min_max_value
@@ -682,6 +712,8 @@ init_ruby_class()
   rb_define_method(rb_klass, "calc_hist", RUBY_METHOD_FUNC(rb_calc_hist), -1);
   rb_define_method(rb_klass, "calc_hist!", RUBY_METHOD_FUNC(rb_calc_hist_bang), -1);
   rb_define_method(rb_klass, "[]", RUBY_METHOD_FUNC(rb_aref), -2);
+  rb_define_method(rb_klass, "at", RUBY_METHOD_FUNC(rb_at), 1);
+  rb_define_method(rb_klass, "at_3d", RUBY_METHOD_FUNC(rb_at_3d), 3);
   rb_define_alias(rb_klass, "query_hist_value", "[]");
   rb_define_method(rb_klass, "min_max_value", RUBY_METHOD_FUNC(rb_min_max_value), 0);
   rb_define_method(rb_klass, "copy_hist", RUBY_METHOD_FUNC(rb_copy_hist), 0);
