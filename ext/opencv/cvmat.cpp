@@ -1977,6 +1977,18 @@ rb_and(int argc, VALUE *argv, VALUE self)
   return dest;
 }
 
+VALUE
+rb_and_into(VALUE self, VALUE other, VALUE dest)
+{
+  try {
+    cvAnd(CVARR(self), CVARR(other), CVARR(dest));
+  }
+  catch (cv::Exception& e) {
+    raise_cverror(e);
+  }
+  return dest;
+}
+
 /*
  * Calculates the per-element bit-wise disjunction of two arrays or an array and a scalar.
  *
@@ -4465,6 +4477,19 @@ rb_dilate_bang(int argc, VALUE *argv, VALUE self)
   return self;
 }
 
+VALUE
+rb_dilate_into(VALUE self, VALUE dest, VALUE element, VALUE iteration)
+{
+  IplConvKernel* kernel = NIL_P(element) ? NULL : IPLCONVKERNEL_WITH_CHECK(element);
+  try {
+    cvDilate(CVARR(self), CVARR(dest), kernel, NUM2INT(iteration));
+  }
+  catch (cv::Exception& e) {
+    raise_cverror(e);
+  }
+  return self;
+}
+
 /*
  * Performs advanced morphological transformations using erosion and dilation as basic operations.
  *
@@ -5129,6 +5154,35 @@ rb_flood_fill_bang(int argc, VALUE *argv, VALUE self)
     raise_cverror(e);
   }
   return rb_ary_new3(3, self, cCvRect::new_object(cvRect(rect.x, rect.y, rect.width, rect.height)), mask);
+}
+
+VALUE
+rb_flood_fill_mask(VALUE self, VALUE seed_point, VALUE mask, VALUE lo_diff, VALUE up_diff, VALUE connectivity, VALUE fixed_range)
+{
+  int flags = NUM2INT(connectivity);
+  if (RTEST(fixed_range)) {
+    flags |= CV_FLOODFILL_FIXED_RANGE;
+  }
+  flags |= CV_FLOODFILL_MASK_ONLY;
+  cv::Rect rect;
+  try {
+    cv::Mat selfMat(CVMAT(self));
+    cv::Mat maskMat(CVMAT(mask));
+
+    cv::floodFill(
+      selfMat,
+      maskMat,
+      cv::Point(VALUE_TO_CVPOINT(seed_point)),
+      cv::Scalar(cvScalar(0)),
+      &rect,
+      cv::Scalar(NIL_P(lo_diff) ? cvScalar(0) : VALUE_TO_CVSCALAR(lo_diff)),
+      cv::Scalar(NIL_P(up_diff) ? cvScalar(0) : VALUE_TO_CVSCALAR(up_diff)),
+      flags);
+  }
+  catch (cv::Exception& e) {
+    raise_cverror(e);
+  }
+  return cCvRect::new_object(cvRect(rect.x, rect.y, rect.width, rect.height));
 }
 
 /*
@@ -6658,6 +6712,7 @@ init_ruby_class()
   rb_define_singleton_method(rb_klass, "add_weighted", RUBY_METHOD_FUNC(rb_add_weighted), 5);
   rb_define_method(rb_klass, "and", RUBY_METHOD_FUNC(rb_and), -1);
   rb_define_alias(rb_klass, "&", "and");
+  rb_define_method(rb_klass, "and_into", RUBY_METHOD_FUNC(rb_and_into), 2);
   rb_define_method(rb_klass, "or", RUBY_METHOD_FUNC(rb_or), -1);
   rb_define_alias(rb_klass, "|", "or");
   rb_define_method(rb_klass, "xor", RUBY_METHOD_FUNC(rb_xor), -1);
@@ -6751,6 +6806,7 @@ init_ruby_class()
   rb_define_method(rb_klass, "erode!", RUBY_METHOD_FUNC(rb_erode_bang), -1);
   rb_define_method(rb_klass, "dilate", RUBY_METHOD_FUNC(rb_dilate), -1);
   rb_define_method(rb_klass, "dilate!", RUBY_METHOD_FUNC(rb_dilate_bang), -1);
+  rb_define_method(rb_klass, "dilate_into", RUBY_METHOD_FUNC(rb_dilate_into), 3);
   rb_define_method(rb_klass, "morphology", RUBY_METHOD_FUNC(rb_morphology), -1);
 
   rb_define_method(rb_klass, "smooth", RUBY_METHOD_FUNC(rb_smooth), -1);
@@ -6766,6 +6822,7 @@ init_ruby_class()
 
   rb_define_method(rb_klass, "flood_fill", RUBY_METHOD_FUNC(rb_flood_fill), -1);
   rb_define_method(rb_klass, "flood_fill!", RUBY_METHOD_FUNC(rb_flood_fill_bang), -1);
+  rb_define_method(rb_klass, "flood_fill_mask", RUBY_METHOD_FUNC(rb_flood_fill_mask), 6);
   rb_define_method(rb_klass, "find_contours", RUBY_METHOD_FUNC(rb_find_contours), -1);
   rb_define_method(rb_klass, "find_contours!", RUBY_METHOD_FUNC(rb_find_contours_bang), -1);
   rb_define_method(rb_klass, "draw_contours", RUBY_METHOD_FUNC(rb_draw_contours), -1);
