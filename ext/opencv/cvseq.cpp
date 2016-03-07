@@ -547,6 +547,7 @@ VALUE
 new_sequence(VALUE klass, CvSeq *seq, VALUE element_klass, VALUE storage)
 {
   register_root_object(seq, storage);
+  rb_gc_mark(storage);
   if (!NIL_P(element_klass))
     register_elem_class(seq, element_klass);
   return Data_Wrap_Struct(klass, mark_root_object, unregister_elem_class, seq);
