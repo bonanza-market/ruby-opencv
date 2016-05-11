@@ -1977,6 +1977,18 @@ rb_and(int argc, VALUE *argv, VALUE self)
   return dest;
 }
 
+VALUE
+rb_and_into(VALUE self, VALUE other, VALUE dest)
+{
+  try {
+    cvAnd(CVARR(self), CVARR(other), CVARR(dest));
+  }
+  catch (cv::Exception& e) {
+    raise_cverror(e);
+  }
+  return dest;
+}
+
 /*
  * Calculates the per-element bit-wise disjunction of two arrays or an array and a scalar.
  *
@@ -6682,6 +6694,7 @@ init_ruby_class()
   rb_define_singleton_method(rb_klass, "add_weighted", RUBY_METHOD_FUNC(rb_add_weighted), 5);
   rb_define_method(rb_klass, "and", RUBY_METHOD_FUNC(rb_and), -1);
   rb_define_alias(rb_klass, "&", "and");
+  rb_define_method(rb_klass, "and_into", RUBY_METHOD_FUNC(rb_and_into), 2);
   rb_define_method(rb_klass, "or", RUBY_METHOD_FUNC(rb_or), -1);
   rb_define_alias(rb_klass, "|", "or");
   rb_define_method(rb_klass, "xor", RUBY_METHOD_FUNC(rb_xor), -1);
