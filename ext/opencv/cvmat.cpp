@@ -4476,6 +4476,19 @@ rb_dilate_bang(int argc, VALUE *argv, VALUE self)
   return self;
 }
 
+VALUE
+rb_dilate_into(VALUE self, VALUE dest, VALUE element, VALUE iteration)
+{
+  IplConvKernel* kernel = NIL_P(element) ? NULL : IPLCONVKERNEL_WITH_CHECK(element);
+  try {
+    cvDilate(CVARR(self), CVARR(dest), kernel, NUM2INT(iteration));
+  }
+  catch (cv::Exception& e) {
+    raise_cverror(e);
+  }
+  return self;
+}
+
 /*
  * Performs advanced morphological transformations using erosion and dilation as basic operations.
  *
@@ -6763,6 +6776,7 @@ init_ruby_class()
   rb_define_method(rb_klass, "erode!", RUBY_METHOD_FUNC(rb_erode_bang), -1);
   rb_define_method(rb_klass, "dilate", RUBY_METHOD_FUNC(rb_dilate), -1);
   rb_define_method(rb_klass, "dilate!", RUBY_METHOD_FUNC(rb_dilate_bang), -1);
+  rb_define_method(rb_klass, "dilate_into", RUBY_METHOD_FUNC(rb_dilate_into), 3);
   rb_define_method(rb_klass, "morphology", RUBY_METHOD_FUNC(rb_morphology), -1);
 
   rb_define_method(rb_klass, "smooth", RUBY_METHOD_FUNC(rb_smooth), -1);
