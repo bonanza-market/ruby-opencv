@@ -2068,10 +2068,15 @@ rb_not_bang(VALUE self)
 }
 
 VALUE
-rb_cmp_internal(VALUE self, VALUE val, int operand)
+rb_cmp(VALUE self, VALUE val, VALUE dest, VALUE operand)
+{
+  return rb_cmp_internal(self, val, dest, NUM2INT(operand));
+}
+
+VALUE
+rb_cmp_internal(VALUE self, VALUE val, VALUE dest, int operand)
 {
   CvArr* self_ptr = CVARR(self);
-  VALUE dest = new_mat_kind_object(cvGetSize(self_ptr), self, CV_8U, 1);
   try {
     if (rb_obj_is_kind_of(val, rb_klass))
       cvCmp(self_ptr, CVARR(val), CVARR(dest), operand);
@@ -2101,7 +2106,8 @@ rb_cmp_internal(VALUE self, VALUE val, int operand)
 VALUE
 rb_eq(VALUE self, VALUE val)
 {
-  return rb_cmp_internal(self, val, CV_CMP_EQ);
+  VALUE dest = new_mat_kind_object(cvGetSize(CVARR(self)), self, CV_8U, 1);
+  return rb_cmp_internal(self, val, dest, CV_CMP_EQ);
 }
 
 /*
@@ -2116,7 +2122,8 @@ rb_eq(VALUE self, VALUE val)
 VALUE
 rb_gt(VALUE self, VALUE val)
 {
-  return rb_cmp_internal(self, val, CV_CMP_GT);
+  VALUE dest = new_mat_kind_object(cvGetSize(CVARR(self)), self, CV_8U, 1);
+  return rb_cmp_internal(self, val, dest, CV_CMP_GT);
 }
 
 /*
@@ -2131,7 +2138,8 @@ rb_gt(VALUE self, VALUE val)
 VALUE
 rb_ge(VALUE self, VALUE val)
 {
-  return rb_cmp_internal(self, val, CV_CMP_GE);
+  VALUE dest = new_mat_kind_object(cvGetSize(CVARR(self)), self, CV_8U, 1);
+  return rb_cmp_internal(self, val, dest, CV_CMP_GE);
 }
 
 /*
@@ -2146,7 +2154,8 @@ rb_ge(VALUE self, VALUE val)
 VALUE
 rb_lt(VALUE self, VALUE val)
 {
-  return rb_cmp_internal(self, val, CV_CMP_LT);
+  VALUE dest = new_mat_kind_object(cvGetSize(CVARR(self)), self, CV_8U, 1);
+  return rb_cmp_internal(self, val, dest, CV_CMP_LT);
 }
 
 /*
@@ -2161,7 +2170,8 @@ rb_lt(VALUE self, VALUE val)
 VALUE
 rb_le(VALUE self, VALUE val)
 {
-  return rb_cmp_internal(self, val, CV_CMP_LE);
+  VALUE dest = new_mat_kind_object(cvGetSize(CVARR(self)), self, CV_8U, 1);
+  return rb_cmp_internal(self, val, dest, CV_CMP_LE);
 }
 
 /*
@@ -2176,7 +2186,8 @@ rb_le(VALUE self, VALUE val)
 VALUE
 rb_ne(VALUE self, VALUE val)
 {
-  return rb_cmp_internal(self, val, CV_CMP_NE);
+  VALUE dest = new_mat_kind_object(cvGetSize(CVARR(self)), self, CV_8U, 1);
+  return rb_cmp_internal(self, val, dest, CV_CMP_NE);
 }
 
 /*
@@ -6664,6 +6675,7 @@ init_ruby_class()
   rb_define_alias(rb_klass, "^", "xor");
   rb_define_method(rb_klass, "not", RUBY_METHOD_FUNC(rb_not), 0);
   rb_define_method(rb_klass, "not!", RUBY_METHOD_FUNC(rb_not_bang), 0);
+  rb_define_method(rb_klass, "cmp", RUBY_METHOD_FUNC(rb_cmp), 3);
   rb_define_method(rb_klass, "eq", RUBY_METHOD_FUNC(rb_eq), 1);
   rb_define_method(rb_klass, "gt", RUBY_METHOD_FUNC(rb_gt), 1);
   rb_define_method(rb_klass, "ge", RUBY_METHOD_FUNC(rb_ge), 1);

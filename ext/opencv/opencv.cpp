@@ -234,6 +234,14 @@ init_ruby_module()
   rb_define_const(rb_module, "CV_IMWRITE_PNG_STRATEGY_FIXED", INT2FIX(CV_IMWRITE_PNG_STRATEGY_FIXED));
   rb_define_const(rb_module, "CV_IMWRITE_PXM_BINARY", INT2FIX(CV_IMWRITE_PXM_BINARY));
 
+  /* Comparison types */
+  rb_define_const(rb_module, "CV_CMP_EQ", INT2FIX(CV_CMP_EQ));
+  rb_define_const(rb_module, "CV_CMP_GT", INT2FIX(CV_CMP_GT));
+  rb_define_const(rb_module, "CV_CMP_GE", INT2FIX(CV_CMP_GE));
+  rb_define_const(rb_module, "CV_CMP_LT", INT2FIX(CV_CMP_LT));
+  rb_define_const(rb_module, "CV_CMP_LE", INT2FIX(CV_CMP_LE));
+  rb_define_const(rb_module, "CV_CMP_NE", INT2FIX(CV_CMP_NE));
+
   /* Types of morphological operations */
   rb_define_const(rb_module, "CV_MOP_OPEN", INT2FIX(CV_MOP_OPEN));
   rb_define_const(rb_module, "CV_MOP_CLOSE", INT2FIX(CV_MOP_CLOSE));

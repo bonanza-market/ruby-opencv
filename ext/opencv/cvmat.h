@@ -104,7 +104,7 @@ VALUE rb_or(int argc, VALUE *argv, VALUE self);
 VALUE rb_xor(int argc, VALUE *argv, VALUE self);
 VALUE rb_not(VALUE self);
 VALUE rb_not_bang(VALUE self);
-VALUE rb_cmp_internal(VALUE self, VALUE val, int operand);
+VALUE rb_cmp_internal(VALUE self, VALUE val, VALUE dest, int operand);
 VALUE rb_eq(VALUE self, VALUE val);
 VALUE rb_gt(VALUE self, VALUE val);
 VALUE rb_ge(VALUE self, VALUE val);
