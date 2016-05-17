@@ -2423,6 +2423,19 @@ rb_avg(int argc, VALUE *argv, VALUE self)
   return cCvScalar::new_object(avg);
 }
 
+VALUE
+rb_avg_value(VALUE self, VALUE mask)
+{
+  CvScalar avg;
+  try {
+    avg = cvAvg(CVARR(self), MASK(mask));
+  }
+  catch (cv::Exception& e) {
+    raise_cverror(e);
+  }
+  return rb_float_new(avg.val[0]);
+}
+
 /*
  * Calculates a mean and standard deviation of array elements.
  * @overload avg_sdv(mask = nil)
@@ -6717,6 +6730,7 @@ init_ruby_class()
   rb_define_method(rb_klass, "count_non_zero", RUBY_METHOD_FUNC(rb_count_non_zero), 0);
   rb_define_method(rb_klass, "sum", RUBY_METHOD_FUNC(rb_sum), 0);
   rb_define_method(rb_klass, "avg", RUBY_METHOD_FUNC(rb_avg), -1);
+  rb_define_method(rb_klass, "avg_value", RUBY_METHOD_FUNC(rb_avg_value), 1);
   rb_define_method(rb_klass, "avg_sdv", RUBY_METHOD_FUNC(rb_avg_sdv), -1);
   rb_define_method(rb_klass, "sdv", RUBY_METHOD_FUNC(rb_sdv), -1);
   rb_define_method(rb_klass, "min_max_loc", RUBY_METHOD_FUNC(rb_min_max_loc), -1);
