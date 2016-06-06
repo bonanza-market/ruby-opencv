@@ -21,9 +21,8 @@ __NAMESPACE_BEGIN_CVSEQ
 VALUE rb_class();
 void init_ruby_class();
 
-VALUE seqblock_class(void *ptr);
-void register_elem_class(CvSeq *seq, VALUE klass);
-void unregister_elem_class(void *ptr);
+VALUE seqblock_class(VALUE object);
+void register_elem_class(VALUE object, VALUE klass);
 
 VALUE rb_allocate(VALUE klass);
 
