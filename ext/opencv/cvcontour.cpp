@@ -65,7 +65,7 @@ rb_initialize(int argc, VALUE *argv, VALUE self)
   catch (cv::Exception& e) {
     raise_cverror(e);
   }
-  cCvSeq::register_elem_class(CVSEQ(self), cCvPoint::rb_class());
+  cCvSeq::register_elem_class(self, cCvPoint::rb_class());
   register_root_object(CVSEQ(self), storage);
 
   return self;
