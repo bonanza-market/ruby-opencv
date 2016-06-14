@@ -1282,9 +1282,8 @@ rb_save_image(int argc, VALUE *argv, VALUE self)
  *
  */
 VALUE
-rb_fit_line(VALUE self, VALUE distType, VALUE param, VALUE reps, VALUE aeps)
+rb_fit_line(VALUE self, VALUE dest, VALUE distType, VALUE param, VALUE reps, VALUE aeps)
 {
-  VALUE dest = new_mat_kind_object(cvGetSize(CVARR(self)), self);
   try {
     const cv::Mat selfMat(CVMAT(self));
     cv::Mat destMat(CVMAT(dest));
@@ -6863,7 +6862,7 @@ init_ruby_class()
   rb_define_method(rb_klass, "subspace_reconstruct", RUBY_METHOD_FUNC(rb_subspace_reconstruct), 2);
 
   rb_define_method(rb_klass, "fit_ellipse", RUBY_METHOD_FUNC(rb_fit_ellipse), 0);
-  rb_define_method(rb_klass, "fit_line", RUBY_METHOD_FUNC(rb_fit_line), 4);
+  rb_define_method(rb_klass, "fit_line", RUBY_METHOD_FUNC(rb_fit_line), 5);
 
 //  Bonz TODO: reimplement if necessary
 //  rb_define_method(rb_klass, "connected_components", RUBY_METHOD_FUNC(rb_connected_components), -1);
