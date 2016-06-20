@@ -1045,6 +1045,19 @@ rb_pixel_value(VALUE self, VALUE index)
 	return rb_float_new(scalar.val[0]);
 }
 
+VALUE
+rb_zero_q(VALUE self, VALUE x, VALUE y)
+{
+  CvScalar scalar;
+  try {
+    scalar = cvGet2D(CVARR(self), NUM2INT(y), NUM2INT(x));
+  }
+  catch (cv::Exception& e) {
+    raise_cverror(e);
+  }
+  return (scalar.val[0] == 0 && scalar.val[1] == 0 && scalar.val[2] == 0 && scalar.val[3] == 0) ? Qtrue : Qfalse;
+}
+
 /*
  * call-seq:
  *
@@ -6665,6 +6678,7 @@ init_ruby_class()
   rb_define_alias(rb_klass, "at", "[]");
   rb_define_method(rb_klass, "[]=", RUBY_METHOD_FUNC(rb_aset), -2);
   rb_define_method(rb_klass, "pixel_value", RUBY_METHOD_FUNC(rb_pixel_value), 1);
+  rb_define_method(rb_klass, "zero?", RUBY_METHOD_FUNC(rb_zero_q), 2);
   rb_define_method(rb_klass, "vector_magnitude!", RUBY_METHOD_FUNC(rb_vector_magnitude), 0);
   rb_define_method(rb_klass, "set_data", RUBY_METHOD_FUNC(rb_set_data), 1);
   rb_define_method(rb_klass, "set", RUBY_METHOD_FUNC(rb_set), -1);
