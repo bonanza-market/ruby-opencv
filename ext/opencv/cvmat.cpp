@@ -5432,6 +5432,19 @@ rb_watershed(VALUE self, VALUE markers)
   return markers;
 }
 
+VALUE
+rb_kmeans(VALUE self, VALUE k, VALUE termcrit)
+{
+  VALUE labels = new_object(CVMAT(self)->height, 1, CV_32SC1);
+  try {
+    cvKMeans2(CVARR(self), NUM2INT(k), CVARR(labels), *CVTERMCRITERIA(termcrit));
+  }
+  catch (cv::Exception& e) {
+    raise_cverror(e);
+  }
+  return labels;
+}
+
 /*
  * call-seq:
  *   grab_cut -> cvmat(mask:cv8uc1)
@@ -6840,6 +6853,7 @@ init_ruby_class()
   rb_define_method(rb_klass, "draw_chessboard_corners!", RUBY_METHOD_FUNC(rb_draw_chessboard_corners_bang), 3);
   rb_define_method(rb_klass, "pyr_mean_shift_filtering", RUBY_METHOD_FUNC(rb_pyr_mean_shift_filtering), -1);
   rb_define_method(rb_klass, "watershed", RUBY_METHOD_FUNC(rb_watershed), 1);
+  rb_define_method(rb_klass, "kmeans", RUBY_METHOD_FUNC(rb_kmeans), 2);
   rb_define_method(rb_klass, "grab_cut", RUBY_METHOD_FUNC(rb_grab_cut), 6);
   rb_define_method(rb_klass, "grab_cut2", RUBY_METHOD_FUNC(rb_grab_cut2), 10);
 
