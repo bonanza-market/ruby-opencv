@@ -1,3 +1,4 @@
+require (File.dirname(__FILE__) + '/opencv/cvmat')
 require (File.dirname(__FILE__) + '/opencv/version')
 
 if RUBY_PLATFORM =~ /mingw|mswin/
