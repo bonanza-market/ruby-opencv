@@ -34,9 +34,6 @@ module Bonz
     end
 
     module ClassMethods
-      def mask_from_points(size, points)
-        new_sized(size).mask_from_points(points)
-      end
     end
   end
 end
