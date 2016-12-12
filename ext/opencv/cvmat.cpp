@@ -1045,6 +1045,19 @@ rb_pixel_value(VALUE self, VALUE index)
 	return rb_float_new(scalar.val[0]);
 }
 
+VALUE
+rb_zero_q(VALUE self, VALUE x, VALUE y)
+{
+  CvScalar scalar;
+  try {
+    scalar = cvGet2D(CVARR(self), NUM2INT(y), NUM2INT(x));
+  }
+  catch (cv::Exception& e) {
+    raise_cverror(e);
+  }
+  return (scalar.val[0] == 0 && scalar.val[1] == 0 && scalar.val[2] == 0 && scalar.val[3] == 0) ? Qtrue : Qfalse;
+}
+
 /*
  * call-seq:
  *
@@ -1282,9 +1295,8 @@ rb_save_image(int argc, VALUE *argv, VALUE self)
  *
  */
 VALUE
-rb_fit_line(VALUE self, VALUE distType, VALUE param, VALUE reps, VALUE aeps)
+rb_fit_line(VALUE self, VALUE dest, VALUE distType, VALUE param, VALUE reps, VALUE aeps)
 {
-  VALUE dest = new_mat_kind_object(cvGetSize(CVARR(self)), self);
   try {
     const cv::Mat selfMat(CVMAT(self));
     cv::Mat destMat(CVMAT(dest));
@@ -2080,10 +2092,15 @@ rb_not_bang(VALUE self)
 }
 
 VALUE
-rb_cmp_internal(VALUE self, VALUE val, int operand)
+rb_cmp(VALUE self, VALUE val, VALUE dest, VALUE operand)
+{
+  return rb_cmp_internal(self, val, dest, NUM2INT(operand));
+}
+
+VALUE
+rb_cmp_internal(VALUE self, VALUE val, VALUE dest, int operand)
 {
   CvArr* self_ptr = CVARR(self);
-  VALUE dest = new_mat_kind_object(cvGetSize(self_ptr), self, CV_8U, 1);
   try {
     if (rb_obj_is_kind_of(val, rb_klass))
       cvCmp(self_ptr, CVARR(val), CVARR(dest), operand);
@@ -2113,7 +2130,8 @@ rb_cmp_internal(VALUE self, VALUE val, int operand)
 VALUE
 rb_eq(VALUE self, VALUE val)
 {
-  return rb_cmp_internal(self, val, CV_CMP_EQ);
+  VALUE dest = new_mat_kind_object(cvGetSize(CVARR(self)), self, CV_8U, 1);
+  return rb_cmp_internal(self, val, dest, CV_CMP_EQ);
 }
 
 /*
@@ -2128,7 +2146,8 @@ rb_eq(VALUE self, VALUE val)
 VALUE
 rb_gt(VALUE self, VALUE val)
 {
-  return rb_cmp_internal(self, val, CV_CMP_GT);
+  VALUE dest = new_mat_kind_object(cvGetSize(CVARR(self)), self, CV_8U, 1);
+  return rb_cmp_internal(self, val, dest, CV_CMP_GT);
 }
 
 /*
@@ -2143,7 +2162,8 @@ rb_gt(VALUE self, VALUE val)
 VALUE
 rb_ge(VALUE self, VALUE val)
 {
-  return rb_cmp_internal(self, val, CV_CMP_GE);
+  VALUE dest = new_mat_kind_object(cvGetSize(CVARR(self)), self, CV_8U, 1);
+  return rb_cmp_internal(self, val, dest, CV_CMP_GE);
 }
 
 /*
@@ -2158,7 +2178,8 @@ rb_ge(VALUE self, VALUE val)
 VALUE
 rb_lt(VALUE self, VALUE val)
 {
-  return rb_cmp_internal(self, val, CV_CMP_LT);
+  VALUE dest = new_mat_kind_object(cvGetSize(CVARR(self)), self, CV_8U, 1);
+  return rb_cmp_internal(self, val, dest, CV_CMP_LT);
 }
 
 /*
@@ -2173,7 +2194,8 @@ rb_lt(VALUE self, VALUE val)
 VALUE
 rb_le(VALUE self, VALUE val)
 {
-  return rb_cmp_internal(self, val, CV_CMP_LE);
+  VALUE dest = new_mat_kind_object(cvGetSize(CVARR(self)), self, CV_8U, 1);
+  return rb_cmp_internal(self, val, dest, CV_CMP_LE);
 }
 
 /*
@@ -2188,7 +2210,8 @@ rb_le(VALUE self, VALUE val)
 VALUE
 rb_ne(VALUE self, VALUE val)
 {
-  return rb_cmp_internal(self, val, CV_CMP_NE);
+  VALUE dest = new_mat_kind_object(cvGetSize(CVARR(self)), self, CV_8U, 1);
+  return rb_cmp_internal(self, val, dest, CV_CMP_NE);
 }
 
 /*
@@ -2410,6 +2433,19 @@ rb_avg(int argc, VALUE *argv, VALUE self)
     raise_cverror(e);
   }
   return cCvScalar::new_object(avg);
+}
+
+VALUE
+rb_avg_value(VALUE self, VALUE mask)
+{
+  CvScalar avg;
+  try {
+    avg = cvAvg(CVARR(self), MASK(mask));
+  }
+  catch (cv::Exception& e) {
+    raise_cverror(e);
+  }
+  return rb_float_new(avg.val[0]);
 }
 
 /*
@@ -5425,6 +5461,19 @@ rb_watershed(VALUE self, VALUE markers)
   return markers;
 }
 
+VALUE
+rb_kmeans(VALUE self, VALUE k, VALUE termcrit)
+{
+  VALUE labels = new_object(CVMAT(self)->height, 1, CV_32SC1);
+  try {
+    cvKMeans2(CVARR(self), NUM2INT(k), CVARR(labels), *CVTERMCRITERIA(termcrit));
+  }
+  catch (cv::Exception& e) {
+    raise_cverror(e);
+  }
+  return labels;
+}
+
 /*
  * call-seq:
  *   grab_cut -> cvmat(mask:cv8uc1)
@@ -6671,6 +6720,7 @@ init_ruby_class()
   rb_define_alias(rb_klass, "at", "[]");
   rb_define_method(rb_klass, "[]=", RUBY_METHOD_FUNC(rb_aset), -2);
   rb_define_method(rb_klass, "pixel_value", RUBY_METHOD_FUNC(rb_pixel_value), 1);
+  rb_define_method(rb_klass, "zero?", RUBY_METHOD_FUNC(rb_zero_q), 2);
   rb_define_method(rb_klass, "vector_magnitude!", RUBY_METHOD_FUNC(rb_vector_magnitude), 0);
   rb_define_method(rb_klass, "set_data", RUBY_METHOD_FUNC(rb_set_data), 1);
   rb_define_method(rb_klass, "set", RUBY_METHOD_FUNC(rb_set), -1);
@@ -6719,6 +6769,7 @@ init_ruby_class()
   rb_define_alias(rb_klass, "^", "xor");
   rb_define_method(rb_klass, "not", RUBY_METHOD_FUNC(rb_not), 0);
   rb_define_method(rb_klass, "not!", RUBY_METHOD_FUNC(rb_not_bang), 0);
+  rb_define_method(rb_klass, "cmp", RUBY_METHOD_FUNC(rb_cmp), 3);
   rb_define_method(rb_klass, "eq", RUBY_METHOD_FUNC(rb_eq), 1);
   rb_define_method(rb_klass, "gt", RUBY_METHOD_FUNC(rb_gt), 1);
   rb_define_method(rb_klass, "ge", RUBY_METHOD_FUNC(rb_ge), 1);
@@ -6734,6 +6785,7 @@ init_ruby_class()
   rb_define_method(rb_klass, "count_non_zero", RUBY_METHOD_FUNC(rb_count_non_zero), 0);
   rb_define_method(rb_klass, "sum", RUBY_METHOD_FUNC(rb_sum), 0);
   rb_define_method(rb_klass, "avg", RUBY_METHOD_FUNC(rb_avg), -1);
+  rb_define_method(rb_klass, "avg_value", RUBY_METHOD_FUNC(rb_avg_value), 1);
   rb_define_method(rb_klass, "avg_sdv", RUBY_METHOD_FUNC(rb_avg_sdv), -1);
   rb_define_method(rb_klass, "sdv", RUBY_METHOD_FUNC(rb_sdv), -1);
   rb_define_method(rb_klass, "min_max_loc", RUBY_METHOD_FUNC(rb_min_max_loc), -1);
@@ -6831,6 +6883,7 @@ init_ruby_class()
   rb_define_method(rb_klass, "draw_chessboard_corners!", RUBY_METHOD_FUNC(rb_draw_chessboard_corners_bang), 3);
   rb_define_method(rb_klass, "pyr_mean_shift_filtering", RUBY_METHOD_FUNC(rb_pyr_mean_shift_filtering), -1);
   rb_define_method(rb_klass, "watershed", RUBY_METHOD_FUNC(rb_watershed), 1);
+  rb_define_method(rb_klass, "kmeans", RUBY_METHOD_FUNC(rb_kmeans), 2);
   rb_define_method(rb_klass, "grab_cut", RUBY_METHOD_FUNC(rb_grab_cut), 6);
   rb_define_method(rb_klass, "grab_cut2", RUBY_METHOD_FUNC(rb_grab_cut2), 10);
 
@@ -6867,7 +6920,7 @@ init_ruby_class()
   rb_define_method(rb_klass, "subspace_reconstruct", RUBY_METHOD_FUNC(rb_subspace_reconstruct), 2);
 
   rb_define_method(rb_klass, "fit_ellipse", RUBY_METHOD_FUNC(rb_fit_ellipse), 0);
-  rb_define_method(rb_klass, "fit_line", RUBY_METHOD_FUNC(rb_fit_line), 4);
+  rb_define_method(rb_klass, "fit_line", RUBY_METHOD_FUNC(rb_fit_line), 5);
 
 //  Bonz TODO: reimplement if necessary
 //  rb_define_method(rb_klass, "connected_components", RUBY_METHOD_FUNC(rb_connected_components), -1);
