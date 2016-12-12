@@ -6688,7 +6688,7 @@ init_ruby_class()
   rb_define_method(rb_klass, "range", RUBY_METHOD_FUNC(rb_range), 2);
   rb_define_method(rb_klass, "range!", RUBY_METHOD_FUNC(rb_range_bang), 2);
 
-  rb_define_method(rb_klass, "reshape", RUBY_METHOD_FUNC(rb_reshape), -1);
+  rb_define_method(rb_klass, "reshape", RUBY_METHOD_FUNC(rb_reshape), 1);
   rb_define_method(rb_klass, "repeat", RUBY_METHOD_FUNC(rb_repeat), 1);
   rb_define_method(rb_klass, "flip", RUBY_METHOD_FUNC(rb_flip), -1);
   rb_define_method(rb_klass, "flip!", RUBY_METHOD_FUNC(rb_flip_bang), -1);
