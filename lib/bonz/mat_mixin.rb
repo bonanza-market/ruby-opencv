@@ -1,5 +1,4 @@
 require "bonz/mat_measure_mixin"
-require "bonz/mat_trace_mixin"
 require "bonz/mat_border_mixin"
 require "bonz/mat_mask_mixin"
 require "bonz/mat_general_mixin"
@@ -9,7 +8,7 @@ module Bonz
     extend self
 
     def included(mod)
-      mixins = [ MatMeasureMixin, MatTraceMixin, MatBorderMixin, MatMaskMixin, MatGeneralMixin ]
+      mixins = [ MatMeasureMixin, MatBorderMixin, MatMaskMixin, MatGeneralMixin ]
       mixins.each do |m|
         mod.include(m::InstanceMethods)
         mod.extend(m::ClassMethods)
