@@ -18,7 +18,7 @@ module RubyOpenCVBootstrapper
   extend self
   
   def bootstrap(expected_opencv_version)
-    gem_spec = Gem::Specification.find_by_name 'ruby-opencv'
+    gem_spec = Gem::Specification.find_by_name 'bonanza-ruby-opencv'
     
     library_path = File.join(gem_spec.extension_dir, library_filename)
     if !File.exists?(library_path)
