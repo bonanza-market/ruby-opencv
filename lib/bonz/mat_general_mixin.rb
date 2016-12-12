@@ -27,8 +27,8 @@ module Bonz
       def to_gray
         case channel
         when 1 then self
-        when 3 then BGR2GRAY
-        when 4 then BGRA2GRAY
+        when 3 then self.BGR2GRAY
+        when 4 then self.BGRA2GRAY
         else split.first
         end
       end
