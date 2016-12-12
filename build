@@ -31,7 +31,7 @@ is_vendored = !Dir.pwd.end_with?('ruby-opencv')
 if is_vendored
   require 'bundler'
   Bundler.setup(:default)
-  gem_spec = Gem::Specification.find_by_name 'ruby-opencv'
+  gem_spec = Gem::Specification.find_by_name 'bonanza-ruby-opencv'
   
   puts "=> Building native extensions #{ '(debug)' if is_debug_mode }"
   
