@@ -20,7 +20,7 @@ require 'rubygems'
 require 'fileutils'
 
 require_relative 'bootstrapper'
-RubyOpenCVBootstrapper.check_opencv_version('2.4.10', error: true)
+RubyOpenCVBootstrapper.check_opencv_version('2.4.13', error: true)
 
 is_debug_mode = ARGV.first.to_s == 'debug'
 
