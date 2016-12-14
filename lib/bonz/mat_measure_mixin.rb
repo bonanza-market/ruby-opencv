@@ -1,5 +1,3 @@
-require "bonz/ruby"
-
 module Bonz
   module MatMeasureMixin
     extend self
@@ -28,12 +26,12 @@ module Bonz
       end
 
       def same_size?(*mats)
-        self.class.same_size?(Ruby.from_varargs_or_array(*mats).unshift(self))
+        self.class.same_size?(Array.wrap(*mats).unshift(self))
       end
 
       # Raise :OpenCV::CvStsUnmatchedSizes: if :mats: are not the same size.
       def require_same_size(*mats)
-        self.class.require_same_size(Ruby.from_varargs_or_array(*mats).unshift(self))
+        self.class.require_same_size(Array.wrap(*mats).unshift(self))
       end
 
       # Hash of image properties. This method is intended for debugging.
@@ -52,14 +50,14 @@ module Bonz
       #   same_size?          <=> true
       #
       def same_size?(*mats)
-        unique_count = Ruby.from_varargs_or_array(*mats).map(&:size).map(&:to_a).uniq.count
+        unique_count = Array.wrap(*mats).map(&:size).map(&:to_a).uniq.count
         [ 0, 1 ].include?(unique_count)
       end
 
       # @see :InstanceMethods#require_same_size:
       def require_same_size(*mats)
         unless same_size?(*mats)
-          mats = Ruby.from_varargs_or_array(*mats)
+          mats = Array.wrap(*mats)
           message = "mats not same size: #{ mats.map(&:size).map(&:to_s) }"
           raise OpenCV::CvStsUnmatchedSizes.new(message)
         end

@@ -8,20 +8,16 @@ module Bonz
     end
 
     module InstanceMethods
-      # @see set
       # @see fill
-      def set_points(value, points)
-        copy.set_points!(value, points)
+      def fill_points(value, points)
+        copy.fill_points!(value, points)
       end
-      alias_method :fill_points, :set_points
 
-      # @see set!
       # @see fill!
-      def set_points!(value, points)
+      def fill_points!(value, points)
         points.each { |p| self[p.y, p.x] = value }
         self
       end
-      alias_method :fill_points!, :set_points!
 
       # Convert to single channel. If already single channel, return :self:.
       def to_gray

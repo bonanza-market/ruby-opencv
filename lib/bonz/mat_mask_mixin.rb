@@ -12,11 +12,7 @@ module Bonz
     end
 
     module InstanceMethods
-      def blank
-        fill(OpenCV::CvColor::Black)
-      end
-
-      def full
+      def white
         fill(OpenCV::CvColor::White)
       end
 
@@ -29,7 +25,7 @@ module Bonz
       end
 
       def mask_from_points(points)
-        blank.to_mask.set_points!(OpenCV::CvColor::White, points)
+        zero.to_mask.fill_points!(OpenCV::CvColor::White, points)
       end
     end
 
