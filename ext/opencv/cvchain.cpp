@@ -62,7 +62,11 @@ rb_initialize(int argc, VALUE *argv, VALUE self)
     raise_cverror(e);
   }
   CvSeq* self_ptr = CVSEQ(self);
+#ifdef RUBY_INTEGER_UNIFICATION
+  cCvSeq::register_elem_class(self, rb_cInteger);
+#else
   cCvSeq::register_elem_class(self, rb_cFixnum);
+#endif
   register_root_object(self_ptr, storage_value);
 
   return self;

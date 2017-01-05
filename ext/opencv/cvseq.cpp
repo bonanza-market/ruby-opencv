@@ -88,7 +88,11 @@ rb_initialize(int argc, VALUE *argv, VALUE self)
     raise_typeerror(klass, rb_cClass);
 
   int type = 0, size = 0;
+#ifdef RUBY_INTEGER_UNIFICATION
+  if (klass == rb_cInteger) {
+#else
   if (klass == rb_cFixnum) {
+#endif
     type = CV_SEQ_ELTYPE_INDEX;
     size = sizeof(int);
   }
@@ -170,7 +174,11 @@ rb_aref(VALUE self, VALUE index)
 
   VALUE result = Qnil;
   try {
+#ifdef RUBY_INTEGER_UNIFICATION
+    if (seqblock_class(self) == rb_cInteger)
+#else
     if (seqblock_class(self) == rb_cFixnum)
+#endif
       result = INT2NUM(*CV_GET_SEQ_ELEM(int, seq, idx));
     else
       result = REFER_OBJECT(seqblock_class(self), cvGetSeqElem(seq, idx), self);
@@ -352,7 +360,11 @@ rb_pop(VALUE self)
   VALUE object = Qnil;
   VALUE klass = seqblock_class(self);
   try {
+#ifdef RUBY_INTEGER_UNIFICATION
+    if (klass == rb_cInteger) {
+#else
     if (klass == rb_cFixnum) {
+#endif
       int n = 0;
       cvSeqPop(seq, &n);
       object = INT2FIX(n);
@@ -420,7 +432,11 @@ rb_shift(VALUE self)
 
   VALUE object = Qnil;
   try {
+#ifdef RUBY_INTEGER_UNIFICATION
+    if (seqblock_class(self) == rb_cInteger) {
+#else
     if (seqblock_class(self) == rb_cFixnum) {
+#endif
       int n = 0;
       cvSeqPopFront(seq, &n);
       object = INT2NUM(n);
@@ -456,7 +472,11 @@ rb_each(VALUE self)
   if (seq->total > 0) {
     VALUE klass = seqblock_class(self);
     try {
+#ifdef RUBY_INTEGER_UNIFICATION
+      if (klass == rb_cInteger)
+#else
       if (klass == rb_cFixnum)
+#endif
 	for (int i = 0; i < seq->total; ++i)
 	  rb_yield(INT2NUM(*CV_GET_SEQ_ELEM(int, seq, i)));
       else
@@ -501,7 +521,11 @@ rb_insert(VALUE self, VALUE index, VALUE object)
   if (CLASS_OF(object) != klass)
     rb_raise(rb_eTypeError, "arguments should be %s.", rb_class2name(klass));
   try {
+#ifdef RUBY_INTEGER_UNIFICATION
+    if (klass == rb_cInteger) {
+#else
     if (klass == rb_cFixnum) {
+#endif
       int n = NUM2INT(object);
       cvSeqInsert(seq, NUM2INT(index), &n);
     }
