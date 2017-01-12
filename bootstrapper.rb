@@ -35,6 +35,15 @@ module RubyOpenCVBootstrapper
     end
   end
 
+  def build_native_extension(expected_opencv_version, debug: false)
+    require "bundler"
+    Bundler.setup(:default)
+    gem_spec = Gem::Specification.find_by_name "bonanza-ruby-opencv"
+
+    puts "=> Building native extension #{ "(debug)" if debug }"
+
+    build(gem_spec, expected_opencv_version, debug: debug)
+  end
 
   def check_opencv_version(expected_opencv_version, error: false)
     opencv_core_lib = File.realpath(opencv_core_library_path)

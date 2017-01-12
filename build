@@ -19,8 +19,10 @@
 require 'rubygems'
 require 'fileutils'
 
+OPENCV_VERSION = "2.4.13"
+
 require_relative 'bootstrapper'
-RubyOpenCVBootstrapper.check_opencv_version('2.4.13', error: true)
+RubyOpenCVBootstrapper.check_opencv_version(OPENCV_VERSION, error: true)
 
 is_debug_mode = ARGV.first.to_s == 'debug'
 
@@ -29,40 +31,7 @@ is_debug_mode = ARGV.first.to_s == 'debug'
 is_vendored = !Dir.pwd.end_with?('ruby-opencv')
 
 if is_vendored
-  require 'bundler'
-  Bundler.setup(:default)
-  gem_spec = Gem::Specification.find_by_name 'bonanza-ruby-opencv'
-  
-  puts "=> Building native extensions #{ '(debug)' if is_debug_mode }"
-  
-  # Copied from Gem::Specification#build_extensions
-  begin
-    # We need to require things in $LOAD_PATH without looking for the
-    # extension we are about to build.
-    unresolved_deps = Gem::Specification.unresolved_deps.dup
-    Gem::Specification.unresolved_deps.clear
-  
-    require 'rubygems/config_file'
-    require 'rubygems/ext'
-    require 'rubygems/user_interaction'
-    
-    Gem::DefaultUserInteraction.use_ui Gem::ConsoleUI.new do
-      build_args = gem_spec.build_args
-      build_args << '--enable-debug' if is_debug_mode
-      
-      builder = Gem::Ext::Builder.new gem_spec, build_args
-      builder.build_extensions
-    end
-  end
-
-  library_filename = if RUBY_PLATFORM =~ /darwin|mac os/
-    'opencv.bundle'
-  else
-    'opencv.so'
-  end
-
-  puts "=> Copying #{ library_filename } to #{ gem_spec.extension_dir }"
-  `cp #{ gem_spec.gem_dir }/lib/#{ library_filename } #{ gem_spec.extension_dir }/#{ library_filename }`
+  RubyOpenCVBootstrapper.build_native_extension(OPENCV_VERSION, debug: is_debug_mode)
 else
   target_gemset_name = 'bonz-imagetools'
   
@@ -71,14 +40,14 @@ else
   gem_spec = Gem::Specification.load(gem_spec_path)
   gem_filename = "#{ gem_spec.name }-#{ gem_spec.version }.gem"
 
-# Build the gem
+  # Build the gem
   puts "=> Building #{ gem_spec_filename }"
   unless system("gem build #{ gem_spec_filename }")
     puts '=> Gem build failed'
     exit(1)
   end
 
-# Install gem in target RVM gemset
+  # Install gem in target RVM gemset
   puts "=> Installing #{ gem_filename }"
   unless system("#{ ENV['rvm_path'] }/wrappers/ruby-#{ RUBY_VERSION }@#{ target_gemset_name }/gem install #{ gem_filename }")
     puts '=> Gem install failed'
