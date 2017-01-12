@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+require "rubygems"
+require "fileutils"
+
+require "bundler"
+Bundler.setup(:default)
+
+require_relative "bootstrapper"
+
+RubyOpenCVBootstrapper.bootstrap("2.4.13")
