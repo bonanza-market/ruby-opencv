@@ -38,7 +38,7 @@ module Bonz
       when 1 then self.GRAY2BGR
       when 3 then self
       when 4 then self.BGRA2BGR
-      else split.first
+      else raise ArgumentError # ambiguous what to do here
       end
     end
 
