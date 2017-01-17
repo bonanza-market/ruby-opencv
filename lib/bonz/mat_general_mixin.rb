@@ -20,6 +20,7 @@ module Bonz
       end
 
       # Convert to single channel. If already single channel, return :self:.
+      # Assumes any 3- or 4-channel image is BGR(A) (not HSV).
       def to_gray
         case channel
         when 1 then self
@@ -27,6 +28,17 @@ module Bonz
         when 4 then self.BGRA2GRAY
         else split.first
         end
+      end
+    end
+
+    # Convert to BGR. If already BGR, return :self:. Assumes any 3- or
+    # 4-channel image is already BGR(A) (not HSV).
+    def to_bgr
+      case channel
+      when 1 then self.GRAY2BGR
+      when 3 then self
+      when 4 then self.BGRA2BGR
+      else split.first
       end
     end
 
