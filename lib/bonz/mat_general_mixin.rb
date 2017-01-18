@@ -38,7 +38,9 @@ module Bonz
       when 1 then self.GRAY2BGR
       when 3 then self
       when 4 then self.BGRA2BGR
-      else raise ArgumentError # ambiguous what to do here
+      else
+        # ambiguous what the caller actually wants here
+        raise ArgumentError.new("ambiguous conversion of #{ channel } channels to BGR")
       end
     end
 
