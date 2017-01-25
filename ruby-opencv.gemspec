@@ -4,12 +4,12 @@
 
 Gem::Specification.new do |s|
   s.name = "bonanza-ruby-opencv"
-  s.version = "0.0.13.20170103170729"
+  s.version = "0.0.13.20170125170729"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib"]
   s.authors = ["lsxi", "ser1zw", "pcting"]
-  s.date = "2017-01-03"
+  s.date = "2017-01-25"
   s.description = "ruby-opencv is a wrapper of OpenCV for Ruby. It helps you to write computer vision programs (e.g. detecting faces from pictures) with Ruby."
   s.email = ["masakazu.yonekura@gmail.com", "azariahsawtikes@gmail.com", "pcting@gmail.com"]
   s.extensions = ["ext/opencv/extconf.rb"]
