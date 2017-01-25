@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 -*-
-# stub: ruby-opencv 0.0.13.20170103170729 ruby lib
+# stub: ruby-opencv 0.0.13.20170125170729 ruby lib
 # stub: ext/opencv/extconf.rb
 
 Gem::Specification.new do |s|
