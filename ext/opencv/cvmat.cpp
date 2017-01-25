@@ -1137,14 +1137,11 @@ rb_set_data(VALUE self, VALUE data)
   int depth = CV_MAT_DEPTH(self_ptr->type);
 
   if (TYPE(data) == T_STRING) {
-    if (depth != CV_8U)
-      rb_raise(rb_eArgError, "Invalid CvMat depth");
-      
     if (!CV_IS_MAT_CONT(self_ptr->type))
       rb_raise(rb_eArgError, "CvMat must be continuous");
       
     const int dataLength = RSTRING_LEN(data);
-    if (dataLength != self_ptr->width * self_ptr->height * CV_MAT_CN(self_ptr->type))
+    if (dataLength != self_ptr->width * self_ptr->height * CV_ELEM_SIZE(self_ptr->type))
       rb_raise(rb_eArgError, "Invalid data string length");
     
     memcpy(self_ptr->data.ptr, RSTRING_PTR(data), dataLength);
