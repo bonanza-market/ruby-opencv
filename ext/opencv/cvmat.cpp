@@ -2098,12 +2098,21 @@ VALUE
 rb_cmp_internal(VALUE self, VALUE val, VALUE dest, int operand)
 {
   CvArr* self_ptr = CVARR(self);
+
+  if (CV_MAT_CN(cvGetElemType(self_ptr)) != 1) {
+    rb_raise(rb_eArgError, "self should be a single-channel CvMat.");
+  }
+
   try {
-    if (rb_obj_is_kind_of(val, rb_klass))
-      cvCmp(self_ptr, CVARR(val), CVARR(dest), operand);
-    else if (CV_MAT_CN(cvGetElemType(self_ptr)) == 1 && rb_obj_is_kind_of(val, rb_cNumeric))
+    if (rb_obj_is_kind_of(val, rb_klass)) {
+      CvArr* val_ptr = CVARR(val);
+      if (CV_MAT_CN(cvGetElemType(val_ptr)) != 1) {
+        rb_raise(rb_eArgError, "val should be a single-channel CvMat.");
+      }
+      cvCmp(self_ptr, val_ptr, CVARR(dest), operand);
+    } else if (rb_obj_is_kind_of(val, rb_cNumeric)) {
       cvCmpS(self_ptr, NUM2DBL(val), CVARR(dest), operand);
-    else {
+    } else {
       VALUE mat = new_mat_kind_object(cvGetSize(CVARR(self)), self);
       cvSet(CVARR(mat), VALUE_TO_CVSCALAR(val));
       cvCmp(self_ptr, CVARR(mat), CVARR(dest), operand);
