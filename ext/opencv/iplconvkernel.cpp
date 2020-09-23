@@ -75,7 +75,7 @@ rb_initialize(int argc, VALUE *argv, VALUE self)
     if (NIL_P(values))
       rb_raise(rb_eArgError, "argument 6 (values) should not be nil when the shape is :custom.");
     num_values = RARRAY_LEN(values);
-    _values = ALLOCA_N(int, num_values);
+    _values = RB_ALLOC_N(int, num_values);
     VALUE *values_ptr = RARRAY_PTR(values);
     for (int i = 0; i < num_values; ++i)
       _values[i] = NUM2INT(values_ptr[i]);

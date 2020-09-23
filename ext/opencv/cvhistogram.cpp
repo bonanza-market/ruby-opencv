@@ -95,19 +95,19 @@ rb_initialize(int argc, VALUE *argv, VALUE self)
 
   rb_scan_args(argc, argv, "32", &_dims, &_sizes, &_type, &_ranges, &_uniform);
   int sizes_len = RARRAY_LEN(_sizes);
-  sizes = ALLOCA_N(int, sizes_len);
+  sizes = RB_ALLOC_N(int, sizes_len);
 
   if (NIL_P(_ranges)) {
     sizes = ary2intptr(_sizes, sizes);
     ranges = NULL;
   }
   else {
-    ranges = ALLOCA_N(float*, sizes_len);
+    ranges = RB_ALLOC_N(float*, sizes_len);
     VALUE* range_ptr = RARRAY_PTR(_ranges);
     int i;
     for (i = 0; i < sizes_len; i++) {
       sizes[i] = NUM2INT(RARRAY_PTR(_sizes)[i]);
-      ranges[i] = ary2fltptr(range_ptr[i], ALLOCA_N(float, 2));
+      ranges[i] = ary2fltptr(range_ptr[i], RB_ALLOC_N(float, 2));
     }
   }
   uniform = TRUE_OR_FALSE(_uniform, 1);
@@ -193,7 +193,7 @@ rb_calc_hist_bang(int argc, VALUE* argv, VALUE self)
   rb_scan_args(argc, argv, "12", &images, &accumulate, &mask);
   Check_Type(images, T_ARRAY);
   int num_images = RARRAY_LEN(images);
-  IplImage** img = ALLOCA_N(IplImage*, num_images);
+  IplImage** img = RB_ALLOC_N(IplImage*, num_images);
   VALUE* images_ptr = RARRAY_PTR(images);
   for (int i = 0; i < num_images; i++) {
     img[i] = IPLIMAGE_WITH_CHECK(images_ptr[i]);
@@ -226,7 +226,7 @@ VALUE
 rb_aref(VALUE self, VALUE args)
 {
   int num_idx = RARRAY_LEN(args);
-  int* idx = ALLOCA_N(int, num_idx);
+  int* idx = RB_ALLOC_N(int, num_idx);
   VALUE* args_ptr = RARRAY_PTR(args);
   for (int i = 0; i < num_idx; i++) {
     idx[i] = NUM2INT(args_ptr[i]);
@@ -309,8 +309,8 @@ rb_min_max_value(VALUE self)
   int *max_idx = NULL;
   try {
     dims = cvGetDims(self_ptr->bins, NULL);
-    min_idx = ALLOCA_N(int, dims);
-    max_idx = ALLOCA_N(int, dims);
+    min_idx = RB_ALLOC_N(int, dims);
+    max_idx = RB_ALLOC_N(int, dims);
     cvGetMinMaxHistValue(CVHISTOGRAM(self), &min_value, &max_value, min_idx, max_idx);
   }
   catch (cv::Exception& e) {
@@ -523,10 +523,10 @@ rb_set_hist_bin_ranges_bang(int argc, VALUE* argv, VALUE self)
   Check_Type(_ranges, T_ARRAY);
 
   int ranges_size = RARRAY_LEN(_ranges);
-  float** ranges = ALLOCA_N(float*, ranges_size);
+  float** ranges = RB_ALLOC_N(float*, ranges_size);
   VALUE* range_ptr = RARRAY_PTR(_ranges);
   for (int i = 0; i < ranges_size; ++i) {
-    ranges[i] = ary2fltptr(range_ptr[i], ALLOCA_N(float, 2));
+    ranges[i] = ary2fltptr(range_ptr[i], RB_ALLOC_N(float, 2));
   }
   int uniform = TRUE_OR_FALSE(_uniform, 1);
 
@@ -560,7 +560,7 @@ rb_calc_back_project(VALUE self, VALUE image)
     return Qnil;
   }
   
-  IplImage** img = ALLOCA_N(IplImage*, num_images);
+  IplImage** img = RB_ALLOC_N(IplImage*, num_images);
   VALUE* image_ptr = RARRAY_PTR(image);
   for (int i = 0; i < num_images; ++i) {
     img[i] = IPLIMAGE_WITH_CHECK(image_ptr[i]);
@@ -607,7 +607,7 @@ rb_calc_back_project_patch(VALUE self, VALUE image, VALUE patch_size, VALUE meth
     return Qnil;
   }
   
-  IplImage** img = ALLOCA_N(IplImage*, num_images);
+  IplImage** img = RB_ALLOC_N(IplImage*, num_images);
   VALUE* image_ptr = RARRAY_PTR(image);
   for (int i = 0; i < num_images; ++i) {
     img[i] = IPLIMAGE_WITH_CHECK(image_ptr[i]);
