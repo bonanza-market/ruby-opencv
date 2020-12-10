@@ -41,7 +41,7 @@ opencv_headers = ["opencv2/core/core_c.h", "opencv2/core/core.hpp", "opencv2/img
                   "opencv2/highgui/highgui.hpp", "opencv2/photo/photo.hpp"]
 opencv_headers_opt = ["opencv2/nonfree/nonfree.hpp"]
 
-opencv_libraries = ["opencv_calib3d", "opencv_contrib", "opencv_core", "opencv_features2d",
+opencv_libraries = ["opencv_calib3d", "opencv_core", "opencv_features2d",
                     "opencv_flann", "opencv_highgui", "opencv_imgproc", "opencv_legacy",
                     "opencv_ml", "opencv_objdetect", "opencv_video", "opencv_photo"]
 opencv_libraries_opt = ["opencv_gpu", "opencv_nonfree"]
